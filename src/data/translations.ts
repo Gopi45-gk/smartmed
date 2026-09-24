@@ -36,7 +36,7 @@ export const translations: Record<Language, TranslationStrings> = {
     getOtpBtn: "Get OTP & Continue",
     incomingCall: "Incoming Call",
     aiVoiceAssistant: "SmartMed AI Voice Assistant",
-    aiSpeakingPrompt: "\"Good afternoon, Mr. Ravi. It is time for your BP tablet. Have you taken your medicine?\"",
+    aiSpeakingPrompt: "\"Hello Mr. Ravi! I am your SmartMed AI voice assistant. How can I help you with your health or medications today?\"",
     patientRepliedLabel: "Patient Replied",
     statusUpdated: "Status Updated Successfully",
     replyTaken: "\"Yes, I took it.\" (Mark Taken)",

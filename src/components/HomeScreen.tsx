@@ -4,6 +4,7 @@ import { Medicine, ScreenType, TranslationStrings } from '../types';
 import { Pill, PhoneCall, FileText, CheckCircle2, Clock, Sparkles, AlertCircle, ChevronRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
+import { ttsProvider } from '../utils/speech';
 
 interface Props {
   medicines: Medicine[];
@@ -165,7 +166,11 @@ export function HomeScreen({ medicines, setMedicines, navigate, t }: Props) {
         </button>
 
         <button 
-          onClick={() => navigate('phone_call')} 
+          onClick={() => {
+            ttsProvider.unlock();
+            soundManager.resumeAudioContext();
+            navigate('phone_call');
+          }} 
           className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100/60 border border-emerald-200/70 rounded-2xl flex flex-col items-center justify-center text-center text-[#34C759] active:scale-95 transition-all shadow-sm group"
         >
           <div className="w-11 h-11 bg-[#34C759] text-white rounded-xl flex items-center justify-center mb-2 shadow-md shadow-emerald-500/20 group-hover:scale-110 transition-transform">

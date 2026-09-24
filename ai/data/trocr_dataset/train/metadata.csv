@@ -1,0 +1,501 @@
+file_name,text
+train_0000.png,4. Cap Amoxicillin 500mg 1-1-1 x 5 days
+train_0001.png,Tramadol 50mg stat.
+train_0002.png,ORS 2 sachets.
+train_0003.png,Diclofenac 50mg 10 units stat.
+train_0004.png,Ciprofloxacin 500mg 2 tabs TDS
+train_0005.png,Dextrose 5% 10 units 1-0-1
+train_0006.png,UHID: 10193
+train_0007.png,UHID: 10193
+train_0008.png,IV RL 500 ml stat over 4 hours
+train_0009.png,Paracetamol 650mg stat.
+train_0010.png,Review SOS / after 3 days
+train_0011.png,ORS 10 units stat.
+train_0012.png,Omeprazole 20mg 1 tablet
+train_0013.png,Plenty of oral fluids
+train_0014.png,Cap Amoxicillin 10 units TDS
+train_0015.png,Tab Paracetamol 2 tabs OD
+train_0016.png,Telmisartan 40mg IV stat.
+train_0017.png,Diclofenac 50mg x 3 days
+train_0018.png,Acute Gastroenteritis
+train_0019.png,Metformin 500mg 2 sachets
+train_0020.png,Metformin 500mg 1 tab OD
+train_0021.png,Cap Amoxicillin 1 tab stat.
+train_0022.png,Metformin 500mg 10 units stat.
+train_0023.png,Diclofenac 50mg 2 sachets TDS
+train_0024.png,Paracetamol 650mg 10 units BD
+train_0025.png,Inj Pantocid 40mg IV stat
+train_0026.png,5% Dextrose OD
+train_0027.png,Tab Metformin 2 tabs stat.
+train_0028.png,Azithromycin 500mg 1-0-1
+train_0029.png,Tab Metformin x 3 days
+train_0030.png,"Giddiness, Weakness"
+train_0031.png,IV RL 500 ml stat over 4 hours
+train_0032.png,Review SOS / after 3 days
+train_0033.png,Dextrose 5% 10 units BD
+train_0034.png,Drink ORS in 1 liter boiled water
+train_0035.png,Ciprofloxacin 500mg 2 sachets
+train_0036.png,5% Dextrose 5 ml TDS
+train_0037.png,Tramadol 50mg 1 capsule
+train_0038.png,Tab Pantoprazole 500 ml TDS
+train_0039.png,Paracetamol 650mg x 7 days
+train_0040.png,Paracetamol 650mg 10 units BD
+train_0041.png,"Giddiness, Weakness"
+train_0042.png,4. Cap Amoxicillin 500mg 1-1-1 x 5 days
+train_0043.png,5% Dextrose 2 sachets TDS
+train_0044.png,Acute Gastroenteritis
+train_0045.png,Inj Ondansetron 4mg IV stat
+train_0046.png,Ibuprofen 400mg 10 units 1-0-1
+train_0047.png,1. Tab Metformin 500mg 1-0-1 after food
+train_0048.png,ORS 1-1-1
+train_0049.png,Clopidogrel 75mg 1-0-0
+train_0050.png,Clopidogrel 75mg 1 capsule
+train_0051.png,4. Cap Amoxicillin 500mg 1-1-1 x 5 days
+train_0052.png,Amoxicillin 500mg 0-0-1
+train_0053.png,UHID: 10193
+train_0054.png,PR - 60 bpm
+train_0055.png,UHID: 10193
+train_0056.png,"Giddiness, Weakness"
+train_0057.png,1. Tab Metformin 500mg 1-0-1 after food
+train_0058.png,Ondansetron 4mg 1-1-1
+train_0059.png,Azithromycin 500mg before breakfast
+train_0060.png,IV RL 500ml 5 ml TDS
+train_0061.png,Ibuprofen 400mg OD
+train_0062.png,Tab Pantoprazole 2 tabs OD
+train_0063.png,Cetirizine 10mg 10 units OD
+train_0064.png,Drink ORS in 1 liter boiled water
+train_0065.png,IV RL 500ml 1-1-1
+train_0066.png,Cap Amoxicillin 2 tabs 1-0-1
+train_0067.png,4. Cap Amoxicillin 500mg 1-1-1 x 5 days
+train_0068.png,Cetirizine 10mg 1-1-1
+train_0069.png,Atorvastatin 10mg HS
+train_0070.png,Atorvastatin 10mg 2 tabs 1-0-1
+train_0071.png,Ranitidine 150mg 1 capsule
+train_0072.png,CRBS - 108 mg/dl
+train_0073.png,Tab Paracetamol 2 tabs TDS
+train_0074.png,Amoxicillin 500mg 1-0-0
+train_0075.png,Omeprazole 20mg SOS
+train_0076.png,Azithromycin 500mg 1 cap stat.
+train_0077.png,IV RL 500 ml stat over 4 hours
+train_0078.png,Adv: 10 5% Dextrose (iv) stat.
+train_0079.png,Tramadol 50mg x 3 days
+train_0080.png,Atorvastatin 10mg 2 sachets
+train_0081.png,Tab Pantoprazole OD
+train_0082.png,Tab PCM 650 OD
+train_0083.png,Tab Paracetamol 1-1-1
+train_0084.png,Paracetamol 650mg 1 tab BD
+train_0085.png,Review SOS / after 3 days
+train_0086.png,Cap Amoxicillin SOS
+train_0087.png,Ranitidine 150mg (iv) stat.
+train_0088.png,Metformin 500mg 10 units stat.
+train_0089.png,Amoxicillin 500mg 1 tab 1-0-1
+train_0090.png,Metformin 500mg SOS
+train_0091.png,Ciprofloxacin 500mg 10 units stat.
+train_0092.png,Inj Ondansetron 4mg IV stat
+train_0093.png,Tab Paracetamol 2 sachets
+train_0094.png,Review SOS / after 3 days
+train_0095.png,Adequate fluid intake
+train_0096.png,CRBS - 108 mg/dl
+train_0097.png,Plenty of oral fluids
+train_0098.png,Telmisartan 40mg 1 cap OD
+train_0099.png,3. Tab Paracetamol 650mg SOS fever
+train_0100.png,"Giddiness, Weakness"
+train_0101.png,Paracetamol 650mg x 3 days
+train_0102.png,CRBS - 108 mg/dl
+train_0103.png,IV RL 500ml after food
+train_0104.png,Tab Metformin SOS
+train_0105.png,Ibuprofen 400mg 1 cap 1-0-1
+train_0106.png,Plenty of oral fluids
+train_0107.png,Tramadol 50mg 10 units 1-0-1
+train_0108.png,Plenty of oral fluids
+train_0109.png,Omeprazole 20mg 2 tabs BD
+train_0110.png,Adv: 10 5% Dextrose (iv) stat.
+train_0111.png,Amoxicillin 500mg 2 sachets stat.
+train_0112.png,4. Cap Amoxicillin 500mg 1-1-1 x 5 days
+train_0113.png,IV NS 500ml 2 sachets
+train_0114.png,Pantoprazole 40mg BD
+train_0115.png,Azithromycin 500mg stat.
+train_0116.png,Azithromycin 500mg 1 cap BD
+train_0117.png,Tab PCM 650 IV stat.
+train_0118.png,5. Tab Cetirizine 10mg 0-0-1 night
+train_0119.png,Drink ORS in 1 liter boiled water
+train_0120.png,Plenty of oral fluids
+train_0121.png,Plenty of oral fluids
+train_0122.png,2. Tab Pantoprazole 40mg 1-0-0 before food
+train_0123.png,Adv: 5% Dextrose (iv) stat.
+train_0124.png,Adv: 5% Dextrose (iv) stat.
+train_0125.png,Drink ORS in 1 liter boiled water
+train_0126.png,UHID: 10193
+train_0127.png,Atorvastatin 10mg 5 ml TDS
+train_0128.png,IV RL 500 ml stat over 4 hours
+train_0129.png,Tab Metformin 1 cap 1-0-1
+train_0130.png,Cap Amoxicillin x 3 days
+train_0131.png,Cap Amoxicillin 1 cap BD
+train_0132.png,Ondansetron 4mg x 3 days
+train_0133.png,Tab Metformin 0-0-1
+train_0134.png,5. Tab Cetirizine 10mg 0-0-1 night
+train_0135.png,Diclofenac 50mg x 7 days
+train_0136.png,Clopidogrel 75mg before breakfast
+train_0137.png,Pantoprazole 40mg 1 cap TDS
+train_0138.png,Atorvastatin 10mg after food
+train_0139.png,Cap Amoxicillin 2 tabs 1-0-1
+train_0140.png,Ciprofloxacin 500mg after food
+train_0141.png,Clopidogrel 75mg TDS
+train_0142.png,Adv: 10 5% Dextrose (iv) stat.
+train_0143.png,Paracetamol 650mg x 3 days
+train_0144.png,Name: Vivek S. 19/M
+train_0145.png,Amoxicillin 500mg 1 tab TDS
+train_0146.png,Ciprofloxacin 500mg 1-0-0
+train_0147.png,Paracetamol 650mg x 5 days
+train_0148.png,Plenty of oral fluids
+train_0149.png,Pantoprazole 40mg BD
+train_0150.png,Light bland diet
+train_0151.png,Dextrose 5% BD
+train_0152.png,Plenty of oral fluids
+train_0153.png,Tramadol 50mg 10 units OD
+train_0154.png,Metformin 500mg 1 tab TDS
+train_0155.png,Pantoprazole 40mg 1-1-1
+train_0156.png,1. Tab Metformin 500mg 1-0-1 after food
+train_0157.png,Cap Amoxicillin 10 units stat.
+train_0158.png,IV RL 500 ml stat over 4 hours
+train_0159.png,Diclofenac 50mg 2 sachets OD
+train_0160.png,Adv: 10 5% Dextrose (iv) stat.
+train_0161.png,Diclofenac 50mg 1 cap TDS
+train_0162.png,Ciprofloxacin 500mg 1 tab BD
+train_0163.png,Diclofenac 50mg IV stat.
+train_0164.png,2. Tab Pantoprazole 40mg 1-0-0 before food
+train_0165.png,Pantoprazole 40mg 1-0-0
+train_0166.png,Cap Amoxicillin 1 tab OD
+train_0167.png,Cap Amoxicillin x 7 days
+train_0168.png,Name: Vivek S. 19/M
+train_0169.png,Telmisartan 40mg before breakfast
+train_0170.png,Clopidogrel 75mg 2 tabs BD
+train_0171.png,IV NS 500ml 2 sachets 1-0-1
+train_0172.png,Metformin 500mg at bedtime
+train_0173.png,Tramadol 50mg 2 tabs OD
+train_0174.png,Tab Pantoprazole 1-1-1
+train_0175.png,IV RL 500 ml stat over 4 hours
+train_0176.png,IV RL 500ml 500 ml stat.
+train_0177.png,Ibuprofen 400mg 10 units BD
+train_0178.png,IV RL 500ml 1 tab BD
+train_0179.png,IV RL 500ml at bedtime
+train_0180.png,Pantoprazole 40mg 1 tab stat.
+train_0181.png,Ondansetron 4mg 1-0-1
+train_0182.png,Plenty of oral fluids
+train_0183.png,Adv: 5% Dextrose (iv) stat.
+train_0184.png,Adv: 5% Dextrose (iv) stat.
+train_0185.png,Omeprazole 20mg BD
+train_0186.png,Ciprofloxacin 500mg BD
+train_0187.png,5% Dextrose (iv) stat.
+train_0188.png,Atorvastatin 10mg 1-0-0
+train_0189.png,IV RL 500ml 1-1-1
+train_0190.png,Inj Ondansetron 4mg IV stat
+train_0191.png,5. Tab Cetirizine 10mg 0-0-1 night
+train_0192.png,Pantoprazole 40mg (iv) stat.
+train_0193.png,Adv: 5% Dextrose (iv) stat.
+train_0194.png,Adv: 10 5% Dextrose (iv) stat.
+train_0195.png,Inj Ondansetron 4mg IV stat
+train_0196.png,Tab PCM 650 1 cap BD
+train_0197.png,Adequate fluid intake
+train_0198.png,Inj Ondansetron 4mg IV stat
+train_0199.png,Tab Pantoprazole 500 ml 1-0-1
+train_0200.png,Adv: 10 5% Dextrose (iv) stat.
+train_0201.png,Drink ORS in 1 liter boiled water
+train_0202.png,BP - 110/70 mmHg
+train_0203.png,Dextrose 5% x 3 days
+train_0204.png,Tab PCM 650 500 ml stat.
+train_0205.png,Plenty of oral fluids
+train_0206.png,Plenty of oral fluids
+train_0207.png,Diclofenac 50mg IV stat.
+train_0208.png,Tab Metformin x 3 days
+train_0209.png,Diclofenac 50mg before breakfast
+train_0210.png,Azithromycin 500mg 1 tab BD
+train_0211.png,Omeprazole 20mg 2 sachets TDS
+train_0212.png,Cetirizine 10mg 5 ml TDS
+train_0213.png,3. Tab Paracetamol 650mg SOS fever
+train_0214.png,Ibuprofen 400mg 10 units BD
+train_0215.png,Metformin 500mg 2 sachets stat.
+train_0216.png,BP - 110/70 mmHg
+train_0217.png,Adequate fluid intake
+train_0218.png,4. Cap Amoxicillin 500mg 1-1-1 x 5 days
+train_0219.png,Amlodipine 5mg x 7 days
+train_0220.png,Inj Pantocid 40mg IV stat
+train_0221.png,CRBS - 108 mg/dl
+train_0222.png,Omeprazole 20mg 10 units TDS
+train_0223.png,Pantoprazole 40mg x 3 days
+train_0224.png,Amoxicillin 500mg 1-0-1
+train_0225.png,Drink ORS in 1 liter boiled water
+train_0226.png,IV RL 500ml 2 sachets TDS
+train_0227.png,Omeprazole 20mg 10 units OD
+train_0228.png,Adv: 5% Dextrose (iv) stat.
+train_0229.png,Telmisartan 40mg 500 ml OD
+train_0230.png,Paracetamol 650mg 1 cap TDS
+train_0231.png,5% Dextrose 2 tabs stat.
+train_0232.png,Telmisartan 40mg 1-0-0
+train_0233.png,Plenty of oral fluids
+train_0234.png,Review SOS / after 3 days
+train_0235.png,4. Cap Amoxicillin 500mg 1-1-1 x 5 days
+train_0236.png,5% Dextrose TDS
+train_0237.png,Light bland diet
+train_0238.png,Ciprofloxacin 500mg 10 units stat.
+train_0239.png,Name: Vivek S. 19/M
+train_0240.png,IV RL 500ml 1-1-1
+train_0241.png,IV RL 500 ml stat over 4 hours
+train_0242.png,IV NS 500ml 2 sachets 1-0-1
+train_0243.png,Telmisartan 40mg 1 tab TDS
+train_0244.png,IV NS 500ml 10 units BD
+train_0245.png,ORS 2 sachets.
+train_0246.png,Adequate fluid intake
+train_0247.png,Ranitidine 150mg 500 ml TDS
+train_0248.png,Diclofenac 50mg 500 ml OD
+train_0249.png,CRBS - 108 mg/dl
+train_0250.png,Tab Paracetamol x 3 days
+train_0251.png,Ibuprofen 400mg stat.
+train_0252.png,Adv: 10 5% Dextrose (iv) stat.
+train_0253.png,UHID: 10193
+train_0254.png,Name: Vivek S. 19/M
+train_0255.png,Atorvastatin 10mg TDS
+train_0256.png,IV RL 500ml 0-0-1
+train_0257.png,Cetirizine 10mg 1-0-1
+train_0258.png,2. Tab Pantoprazole 40mg 1-0-0 before food
+train_0259.png,IV NS 500ml 2 sachets stat.
+train_0260.png,Azithromycin 500mg 500 ml OD
+train_0261.png,3. Tab Paracetamol 650mg SOS fever
+train_0262.png,Acute Gastroenteritis
+train_0263.png,PR - 60 bpm
+train_0264.png,IV RL 500ml 1 capsule
+train_0265.png,Ciprofloxacin 500mg 2 sachets TDS
+train_0266.png,Pantoprazole 40mg 500 ml TDS
+train_0267.png,Omeprazole 20mg 1-0-1
+train_0268.png,ORS x 7 days
+train_0269.png,Review SOS / after 3 days
+train_0270.png,Adv: 10 5% Dextrose (iv) stat.
+train_0271.png,Tramadol 50mg 2 tabs stat.
+train_0272.png,5% Dextrose 2 sachets TDS
+train_0273.png,Drink ORS in 1 liter boiled water
+train_0274.png,5. Tab Cetirizine 10mg 0-0-1 night
+train_0275.png,Acute Gastroenteritis
+train_0276.png,Paracetamol 650mg 1-0-1
+train_0277.png,UHID: 10193
+train_0278.png,UHID: 10193
+train_0279.png,Telmisartan 40mg 2 sachets TDS
+train_0280.png,1. Tab Metformin 500mg 1-0-1 after food
+train_0281.png,Metformin 500mg 2 tabs BD
+train_0282.png,Cetirizine 10mg 1-0-0
+train_0283.png,ORS 500 ml OD
+train_0284.png,Adequate fluid intake
+train_0285.png,Omeprazole 20mg 2 tabs BD
+train_0286.png,UHID: 10193
+train_0287.png,Ciprofloxacin 500mg 500 ml BD
+train_0288.png,Plenty of oral fluids
+train_0289.png,Inj Ondansetron 4mg IV stat
+train_0290.png,Ondansetron 4mg 10 units stat.
+train_0291.png,Adv: 5% Dextrose (iv) stat.
+train_0292.png,IV NS 500ml x 3 days
+train_0293.png,Tab Paracetamol 10 units 1-0-1
+train_0294.png,4. Cap Amoxicillin 500mg 1-1-1 x 5 days
+train_0295.png,Atorvastatin 10mg before breakfast
+train_0296.png,Omeprazole 20mg TDS
+train_0297.png,Inj Ondansetron 4mg IV stat
+train_0298.png,Acute Gastroenteritis
+train_0299.png,2. Tab Pantoprazole 40mg 1-0-0 before food
+train_0300.png,ORS 2 sachets.
+train_0301.png,Diclofenac 50mg 10 units BD
+train_0302.png,Tab PCM 650 1 capsule
+train_0303.png,Diclofenac 50mg 2 sachets BD
+train_0304.png,Ondansetron 4mg x 5 days
+train_0305.png,Metformin 500mg 1-0-1
+train_0306.png,Tab Metformin IV stat.
+train_0307.png,Diclofenac 50mg x 5 days
+train_0308.png,Amoxicillin 500mg 1 cap BD
+train_0309.png,2. Tab Pantoprazole 40mg 1-0-0 before food
+train_0310.png,2. Tab Pantoprazole 40mg 1-0-0 before food
+train_0311.png,Ranitidine 150mg BD
+train_0312.png,Light bland diet
+train_0313.png,Amoxicillin 500mg 10 units 1-0-1
+train_0314.png,Paracetamol 650mg 2 sachets BD
+train_0315.png,IV NS 500ml after food
+train_0316.png,Cap Amoxicillin at bedtime
+train_0317.png,Ciprofloxacin 500mg before breakfast
+train_0318.png,ORS 2 sachets.
+train_0319.png,Tab Pantoprazole 1 tab stat.
+train_0320.png,Telmisartan 40mg 1 tablet
+train_0321.png,IV RL 500 ml stat over 4 hours
+train_0322.png,Review SOS / after 3 days
+train_0323.png,IV RL 500ml 10 units TDS
+train_0324.png,Cap Amoxicillin 500 ml BD
+train_0325.png,4. Cap Amoxicillin 500mg 1-1-1 x 5 days
+train_0326.png,Telmisartan 40mg 2 sachets OD
+train_0327.png,Omeprazole 20mg 500 ml OD
+train_0328.png,Cap Amoxicillin after food
+train_0329.png,IV NS 500ml 2 sachets
+train_0330.png,ORS 1-0-1
+train_0331.png,Ranitidine 150mg 1 tab OD
+train_0332.png,Tab PCM 650 10 units OD
+train_0333.png,Tab Paracetamol IV stat.
+train_0334.png,1. Tab Metformin 500mg 1-0-1 after food
+train_0335.png,3. Tab Paracetamol 650mg SOS fever
+train_0336.png,Ibuprofen 400mg HS
+train_0337.png,Telmisartan 40mg at bedtime
+train_0338.png,Paracetamol 650mg 1 cap stat.
+train_0339.png,3. Tab Paracetamol 650mg SOS fever
+train_0340.png,Dextrose 5% 500 ml BD
+train_0341.png,Clopidogrel 75mg 2 sachets stat.
+train_0342.png,4. Cap Amoxicillin 500mg 1-1-1 x 5 days
+train_0343.png,1. Tab Metformin 500mg 1-0-1 after food
+train_0344.png,IV RL 500ml 1 capsule
+train_0345.png,1. Tab Metformin 500mg 1-0-1 after food
+train_0346.png,Amlodipine 5mg IV stat.
+train_0347.png,Adequate fluid intake
+train_0348.png,Tab Paracetamol after food
+train_0349.png,Adv: 5% Dextrose (iv) stat.
+train_0350.png,ORS 2 sachets.
+train_0351.png,Tab Metformin 2 sachets
+train_0352.png,Acute Gastroenteritis
+train_0353.png,Omeprazole 20mg (iv) stat.
+train_0354.png,UHID: 10193
+train_0355.png,Name: Vivek S. 19/M
+train_0356.png,Inj Ondansetron 4mg IV stat
+train_0357.png,Omeprazole 20mg 2 tabs OD
+train_0358.png,Amoxicillin 500mg after food
+train_0359.png,Ranitidine 150mg 1 tab 1-0-1
+train_0360.png,Inj Ondansetron 4mg IV stat
+train_0361.png,Inj Pantocid 40mg IV stat
+train_0362.png,Name: Vivek S. 19/M
+train_0363.png,Metformin 500mg 500 ml stat.
+train_0364.png,Telmisartan 40mg 2 tabs stat.
+train_0365.png,Atorvastatin 10mg BD
+train_0366.png,3. Tab Paracetamol 650mg SOS fever
+train_0367.png,Adv: 5% Dextrose (iv) stat.
+train_0368.png,5% Dextrose 1-1-1
+train_0369.png,Drink ORS in 1 liter boiled water
+train_0370.png,5% Dextrose 10 units stat.
+train_0371.png,ORS 1 capsule
+train_0372.png,Amlodipine 5mg HS
+train_0373.png,Plenty of oral fluids
+train_0374.png,Tab PCM 650 1 cap BD
+train_0375.png,5. Tab Cetirizine 10mg 0-0-1 night
+train_0376.png,Ranitidine 150mg x 3 days
+train_0377.png,Ibuprofen 400mg 1 cap BD
+train_0378.png,Inj Pantocid 40mg IV stat
+train_0379.png,PR - 60 bpm
+train_0380.png,Ondansetron 4mg 500 ml BD
+train_0381.png,Clopidogrel 75mg 1 tab BD
+train_0382.png,Tab PCM 650 1 cap TDS
+train_0383.png,ORS 2 sachets.
+train_0384.png,Pantoprazole 40mg stat.
+train_0385.png,Ondansetron 4mg HS
+train_0386.png,Amoxicillin 500mg 1 capsule
+train_0387.png,Ondansetron 4mg 1-0-0
+train_0388.png,Light bland diet
+train_0389.png,Acute Gastroenteritis
+train_0390.png,Amoxicillin 500mg 500 ml OD
+train_0391.png,Ondansetron 4mg 500 ml OD
+train_0392.png,Adv: 5% Dextrose (iv) stat.
+train_0393.png,Ranitidine 150mg 1-0-0
+train_0394.png,Drink ORS in 1 liter boiled water
+train_0395.png,ORS 500 ml OD
+train_0396.png,Ciprofloxacin 500mg 1 tablet
+train_0397.png,Clopidogrel 75mg 500 ml 1-0-1
+train_0398.png,2. Tab Pantoprazole 40mg 1-0-0 before food
+train_0399.png,Ondansetron 4mg 1 tab BD
+train_0400.png,Atorvastatin 10mg IV stat.
+train_0401.png,Adequate fluid intake
+train_0402.png,Ciprofloxacin 500mg 2 sachets
+train_0403.png,Ranitidine 150mg (iv) stat.
+train_0404.png,Diclofenac 50mg (iv) stat.
+train_0405.png,Ibuprofen 400mg before breakfast
+train_0406.png,Tab Metformin 2 tabs TDS
+train_0407.png,Inj Ondansetron 4mg IV stat
+train_0408.png,Telmisartan 40mg 2 sachets BD
+train_0409.png,Tab Pantoprazole 1 capsule
+train_0410.png,Adv: 5% Dextrose (iv) stat.
+train_0411.png,Dextrose 5% x 5 days
+train_0412.png,Paracetamol 650mg x 7 days
+train_0413.png,Acute Gastroenteritis
+train_0414.png,Review SOS / after 3 days
+train_0415.png,Dextrose 5% after food
+train_0416.png,Atorvastatin 10mg 1 tab BD
+train_0417.png,Pantoprazole 40mg 2 sachets 1-0-1
+train_0418.png,4. Cap Amoxicillin 500mg 1-1-1 x 5 days
+train_0419.png,1. Tab Metformin 500mg 1-0-1 after food
+train_0420.png,Adv: 10 5% Dextrose (iv) stat.
+train_0421.png,Ciprofloxacin 500mg 1 cap TDS
+train_0422.png,PR - 60 bpm
+train_0423.png,Paracetamol 650mg 10 units 1-0-1
+train_0424.png,Cetirizine 10mg (iv) stat.
+train_0425.png,Atorvastatin 10mg 1-0-1
+train_0426.png,Tab Metformin stat.
+train_0427.png,Atorvastatin 10mg IV stat.
+train_0428.png,Adv: 10 5% Dextrose (iv) stat.
+train_0429.png,Inj Ondansetron 4mg IV stat
+train_0430.png,Azithromycin 500mg x 3 days
+train_0431.png,Pantoprazole 40mg 2 sachets TDS
+train_0432.png,Cetirizine 10mg TDS
+train_0433.png,Inj Pantocid 40mg IV stat
+train_0434.png,1. Tab Metformin 500mg 1-0-1 after food
+train_0435.png,Tab Metformin 500 ml TDS
+train_0436.png,IV NS 500ml 1-0-0
+train_0437.png,Name: Vivek S. 19/M
+train_0438.png,IV NS 500ml 0-0-1
+train_0439.png,Pantoprazole 40mg 2 tabs TDS
+train_0440.png,Tab PCM 650 HS
+train_0441.png,Tramadol 50mg 500 ml BD
+train_0442.png,"Giddiness, Weakness"
+train_0443.png,Tab Metformin OD
+train_0444.png,Telmisartan 40mg 1 cap OD
+train_0445.png,Name: Vivek S. 19/M
+train_0446.png,Atorvastatin 10mg 2 sachets BD
+train_0447.png,IV NS 500ml 2 tabs stat.
+train_0448.png,Atorvastatin 10mg 10 units TDS
+train_0449.png,4. Cap Amoxicillin 500mg 1-1-1 x 5 days
+train_0450.png,Adv: 10 5% Dextrose (iv) stat.
+train_0451.png,Plenty of oral fluids
+train_0452.png,Acute Gastroenteritis
+train_0453.png,IV NS 500ml 1-1-1
+train_0454.png,Adv: 5% Dextrose (iv) stat.
+train_0455.png,"Giddiness, Weakness"
+train_0456.png,Tab Pantoprazole TDS
+train_0457.png,Azithromycin 500mg 500 ml 1-0-1
+train_0458.png,Inj Pantocid 40mg IV stat
+train_0459.png,4. Cap Amoxicillin 500mg 1-1-1 x 5 days
+train_0460.png,Clopidogrel 75mg 1-0-0
+train_0461.png,Tab Paracetamol OD
+train_0462.png,Inj Pantocid 40mg IV stat
+train_0463.png,Ondansetron 4mg 2 sachets
+train_0464.png,ORS 1 cap BD
+train_0465.png,Cetirizine 10mg 2 tabs 1-0-1
+train_0466.png,Acute Gastroenteritis
+train_0467.png,Tab Paracetamol after food
+train_0468.png,Tab PCM 650 500 ml stat.
+train_0469.png,Inj Ondansetron 4mg IV stat
+train_0470.png,5. Tab Cetirizine 10mg 0-0-1 night
+train_0471.png,Pantoprazole 40mg 500 ml TDS
+train_0472.png,Dextrose 5% HS
+train_0473.png,Plenty of oral fluids
+train_0474.png,Name: Vivek S. 19/M
+train_0475.png,Ibuprofen 400mg 10 units OD
+train_0476.png,Adv: 5% Dextrose (iv) stat.
+train_0477.png,Telmisartan 40mg 500 ml OD
+train_0478.png,ORS 1 cap OD
+train_0479.png,Azithromycin 500mg after food
+train_0480.png,"Giddiness, Weakness"
+train_0481.png,Adv: 10 5% Dextrose (iv) stat.
+train_0482.png,Inj Pantocid 40mg IV stat
+train_0483.png,Paracetamol 650mg SOS
+train_0484.png,5% Dextrose 1 tab OD
+train_0485.png,Diclofenac 50mg 1-0-1
+train_0486.png,Amoxicillin 500mg 10 units OD
+train_0487.png,Pantoprazole 40mg stat.
+train_0488.png,"Giddiness, Weakness"
+train_0489.png,Ibuprofen 400mg at bedtime
+train_0490.png,PR - 60 bpm
+train_0491.png,PR - 60 bpm
+train_0492.png,Review SOS / after 3 days
+train_0493.png,Drink ORS in 1 liter boiled water
+train_0494.png,Drink ORS in 1 liter boiled water
+train_0495.png,Metformin 500mg 2 sachets stat.
+train_0496.png,Ranitidine 150mg 10 units 1-0-1
+train_0497.png,IV NS 500ml 1 tab 1-0-1
+train_0498.png,Clopidogrel 75mg 10 units 1-0-1
+train_0499.png,Cap Amoxicillin 2 sachets BD

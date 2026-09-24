@@ -1,0 +1,60 @@
+{
+  "id": "test_0015",
+  "doctor": {
+    "name": "Dr. Sunita Sharma",
+    "degree": "MBBS, DNB (Internal Medicine)",
+    "reg": "71032/DMC",
+    "clinic": "Apollo Clinic, Delhi"
+  },
+  "patient": {
+    "name": "Anita Sharma",
+    "age": "45 Y",
+    "gender": "F"
+  },
+  "clinical_notes": [
+    "Fever x 3 days, mild abdominal pain"
+  ],
+  "medications": [
+    {
+      "name": "Pantoprazole",
+      "strength": "40 mg",
+      "frequency": "1-0-0",
+      "instructions": "Before breakfast",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [],
+  "advice": [],
+  "boxes": [
+    {
+      "text": "Name: Anita Sharma   Age: 45 Y   Sex: F   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "C/O: Fever x 3 days, mild abdominal pain",
+      "category": "clinical_notes",
+      "box": [
+        60,
+        215,
+        850,
+        240
+      ]
+    },
+    {
+      "text": "1. Tab Pantoprazole 40 mg  1-0-0  Before breakfast",
+      "category": "medication",
+      "box": [
+        80,
+        305,
+        850,
+        330
+      ]
+    }
+  ]
+}

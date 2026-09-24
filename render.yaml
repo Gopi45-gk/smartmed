@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: smartmed-backend
+    runtime: docker
+    dockerfilePath: ./ai/Dockerfile
+    dockerContext: ./ai
+    plan: starter
+    region: oregon
+    envVars:
+      - key: MNN_DEVICE
+        value: cpu
+      - key: MNN_THREAD_NUM
+        value: "2"
+      - key: HF_TOKEN
+        sync: false
+      - key: HUGGINGFACE_HUB_TOKEN
+        sync: false
+    healthCheckPath: /api/ai/health

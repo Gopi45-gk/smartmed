@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">SmartMed Call Reminder</string>
+    <string name="schedule_10s">Schedule Call (in 10s)</string>
+    <string name="schedule_30s">Schedule Call (in 30s)</string>
+    <string name="grant_permissions">Check &amp; Grant Permissions</string>
+    <string name="phone_number_hint">Enter Phone Number (+91...)</string>
+    <string name="medicine_hint">Medicine (e.g. Metformin 500mg)</string>
+</resources>

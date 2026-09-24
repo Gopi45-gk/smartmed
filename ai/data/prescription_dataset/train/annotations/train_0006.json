@@ -1,0 +1,77 @@
+{
+  "id": "train_0006",
+  "doctor": {
+    "name": "Dr. Anand Joshi",
+    "degree": "MBBS, MS, FICS",
+    "reg": "55219/MMC",
+    "clinic": "Lilavati Medical Center, Mumbai"
+  },
+  "patient": {
+    "name": "Meenakshi Sundaram",
+    "age": "61 Y",
+    "gender": "F"
+  },
+  "clinical_notes": [],
+  "medications": [
+    {
+      "name": "Atorvastatin",
+      "strength": "10 mg",
+      "frequency": "0-0-1",
+      "instructions": "Night after dinner",
+      "type": "Tab"
+    },
+    {
+      "name": "Amoxicillin",
+      "strength": "500 mg",
+      "frequency": "1-1-1",
+      "instructions": "After meals x 5 days",
+      "type": "Cap"
+    }
+  ],
+  "iv_fluids": [
+    "IV RL 500 ml over 4 hrs"
+  ],
+  "advice": [],
+  "boxes": [
+    {
+      "text": "Name: Meenakshi Sundaram   Age: 61 Y   Sex: F   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "IV RL 500 ml over 4 hrs",
+      "category": "iv_fluid",
+      "box": [
+        80,
+        260,
+        750,
+        285
+      ]
+    },
+    {
+      "text": "1. Tab Atorvastatin 10 mg  0-0-1  Night after dinner",
+      "category": "medication",
+      "box": [
+        80,
+        305,
+        850,
+        330
+      ]
+    },
+    {
+      "text": "2. Cap Amoxicillin 500 mg  1-1-1  After meals x 5 days",
+      "category": "medication",
+      "box": [
+        80,
+        355,
+        850,
+        380
+      ]
+    }
+  ]
+}

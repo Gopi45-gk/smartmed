@@ -1,0 +1,71 @@
+{
+  "id": "val_0005",
+  "doctor": {
+    "name": "Dr. Anand Joshi",
+    "degree": "MBBS, MS, FICS",
+    "reg": "55219/MMC",
+    "clinic": "Lilavati Medical Center, Mumbai"
+  },
+  "patient": {
+    "name": "Rajesh Patel",
+    "age": "52 Y",
+    "gender": "M"
+  },
+  "clinical_notes": [],
+  "medications": [
+    {
+      "name": "Azithromycin",
+      "strength": "500 mg",
+      "frequency": "1-0-0",
+      "instructions": "Daily once x 3 days",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [],
+  "advice": [
+    "Drink ORS solution, plenty of boiled water",
+    "Avoid oily/spicy foods"
+  ],
+  "boxes": [
+    {
+      "text": "Name: Rajesh Patel   Age: 52 Y   Sex: M   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "1. Tab Azithromycin 500 mg  1-0-0  Daily once x 3 days",
+      "category": "medication",
+      "box": [
+        80,
+        260,
+        850,
+        285
+      ]
+    },
+    {
+      "text": "- Drink ORS solution, plenty of boiled water",
+      "category": "advice",
+      "box": [
+        80,
+        365,
+        850,
+        390
+      ]
+    },
+    {
+      "text": "- Avoid oily/spicy foods",
+      "category": "advice",
+      "box": [
+        80,
+        400,
+        850,
+        425
+      ]
+    }
+  ]
+}

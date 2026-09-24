@@ -68,32 +68,32 @@ export const initialChatMessages: Record<string, ChatMessage[]> = {
     { 
       id: '1', 
       sender: 'ai', 
-      text: 'Hello Ravi! You have your BP tablet scheduled for 1:00 PM today. Remember to take it after your lunch. How can I help you today?',
-      time: '12:45 PM'
+      text: 'Hello! I am your SmartMed local offline AI assistant powered by MNN. How can I help you with your health or medications today?',
+      time: 'Now'
     }
   ],
   ta: [
     { 
       id: '1', 
       sender: 'ai', 
-      text: 'வணக்கம் ரவி ஐயா! இன்று மதியம் 1:00 மணிக்கு உங்கள் பிபி மாத்திரை அட்டவணைப்படுத்தப்பட்டுள்ளது. மதிய உணவுக்குப் பின் உட்கொள்ளவும். நான் உங்களுக்கு எவ்வாறு உதவ முடியும்?',
-      time: '12:45 PM'
+      text: 'வணக்கம்! நான் உங்கள் SmartMed உள்ளூர் AI உதவியாளர். உங்கள் உடல்நலம் அல்லது மருந்துகள் குறித்து நான் எவ்வாறு உதவ முடியும்?',
+      time: 'இப்போது'
     }
   ],
   hi: [
     { 
       id: '1', 
       sender: 'ai', 
-      text: 'नमस्ते रवि जी! आज दोपहर 1:00 बजे आपकी बीपी की गोली का समय है। कृपया दोपहर के भोजन के बाद लें। मैं आज आपकी क्या मदद कर सकता हूँ?',
-      time: '12:45 PM'
+      text: 'नमस्ते! मैं आपका SmartMed स्थानीय AI सहायक हूँ। आज मैं आपकी स्वास्थ्य या दवाओं के बारे में क्या मदद कर सकता हूँ?',
+      time: 'अब'
     }
   ],
   ur: [
     { 
       id: '1', 
       sender: 'ai', 
-      text: 'السلام علیکم روی صاحب! آج دوپہر 1:00 بجے آپ کی بی پی کی گولی کا شیڈول ہے۔ لنچ کے بعد ضرور لیں۔ میں آپ کی کس طرح مدد کر سکتا ہوں؟',
-      time: '12:45 PM'
+      text: 'السلام علیکم! میں آپ کا SmartMed مقامی AI اسسٹنٹ ہوں۔ آج میں آپ کی صحت یا ادویات کے بارے میں کیا مدد کر سکتا ہوں?',
+      time: 'ابھی'
     }
   ]
 };

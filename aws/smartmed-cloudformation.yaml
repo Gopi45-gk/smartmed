@@ -1,0 +1,133 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'SmartMed - Production EC2 Deployment with Docker, Nginx, and FastAPI AI Backend'
+
+Parameters:
+  InstanceType:
+    Description: 'EC2 Instance Type (t3.xlarge recommended for CPU inference; g4dn.xlarge for GPU)'
+    Type: String
+    Default: 't3.xlarge'
+    AllowedValues:
+      - 't3.xlarge'
+      - 't3.2xlarge'
+      - 'c5a.2xlarge'
+      - 'g4dn.xlarge'
+
+  KeyName:
+    Description: 'Name of an existing EC2 KeyPair for SSH access'
+    Type: 'AWS::EC2::KeyPair::KeyName'
+    ConstraintDescription: 'Must be the name of an existing EC2 KeyPair.'
+
+  SSHLocation:
+    Description: 'IP address range that can SSH to the EC2 instance'
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    Default: '0.0.0.0/0'
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
+    ConstraintDescription: 'Must be a valid IP CIDR range of the form x.x.x.x/x.'
+
+  GitRepoUrl:
+    Description: 'Git Repository URL to clone and deploy'
+    Type: String
+    Default: 'https://github.com/Gopi45-gk/smartmed.git'
+
+Mappings:
+  # Ubuntu 24.04 LTS AMIs (Canonical Official)
+  Region2AMI:
+    us-east-1:
+      AMI: 'ami-0e2c8caa4b6378d8c'
+    us-east-2:
+      AMI: 'ami-036841078a4b68e14'
+    us-west-2:
+      AMI: 'ami-0075013580f5e0b77'
+    ap-south-1:
+      AMI: 'ami-0dee22c13ea7a9a67'
+    eu-west-1:
+      AMI: 'ami-0c1c30571d2dae5c9'
+    ap-southeast-1:
+      AMI: 'ami-060e277c0d4cce553'
+
+Resources:
+  SmartMedSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Allow HTTP, HTTPS, and SSH traffic for SmartMed'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SSHLocation
+
+  SmartMedInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      ImageId: !FindInMap [Region2AMI, !Ref 'AWS::Region', AMI]
+      SecurityGroups:
+        - !Ref SmartMedSecurityGroup
+      BlockDeviceMappings:
+        - DeviceName: '/dev/sda1'
+          Ebs:
+            VolumeSize: 50
+            VolumeType: 'gp3'
+            DeleteOnTermination: true
+      Tags:
+        - Key: Name
+          Value: 'SmartMed-Production-Server'
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -e
+          exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+
+          echo "Starting SmartMed EC2 Provisioning..."
+
+          # Update & configure 4GB swapfile
+          apt-get update -y && apt-get upgrade -y
+          fallocate -l 4G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=4096
+          chmod 600 /swapfile
+          mkswap /swapfile
+          swapon /swapfile
+          echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+          # Install Docker & Docker Compose
+          apt-get install -y ca-certificates curl gnupg lsb-release git
+          mkdir -p /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg --yes
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+          apt-get update -y
+          apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+          usermod -aG docker ubuntu
+
+          # Clone repository
+          cd /home/ubuntu
+          git clone ${GitRepoUrl} smartmed || true
+          chown -R ubuntu:ubuntu smartmed
+          cd smartmed
+
+          # Launch via Docker Compose
+          docker compose up -d --build
+          echo "SmartMed deployment complete!"
+
+Outputs:
+  InstancePublicIP:
+    Description: 'Public IP of the SmartMed EC2 instance'
+    Value: !GetAtt SmartMedInstance.PublicIp
+  WebUrl:
+    Description: 'SmartMed Web Application URL'
+    Value: !Sub 'http://${SmartMedInstance.PublicIp}'
+  HealthCheckUrl:
+    Description: 'SmartMed Health Check URL'
+    Value: !Sub 'http://${SmartMedInstance.PublicIp}/healthz'
+  ApiHealthUrl:
+    Description: 'AI Backend Health URL'
+    Value: !Sub 'http://${SmartMedInstance.PublicIp}/api/ai/health'

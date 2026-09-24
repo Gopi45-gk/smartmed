@@ -1,0 +1,117 @@
+{
+  "id": "test_0002",
+  "doctor": {
+    "name": "Dr. R. Menon",
+    "degree": "MBBS, MD (Gen Med)",
+    "reg": "48921/KMC",
+    "clinic": "City Health Clinic, Bangalore"
+  },
+  "patient": {
+    "name": "Anita Sharma",
+    "age": "45 Y",
+    "gender": "F"
+  },
+  "clinical_notes": [
+    "Fever x 3 days, mild abdominal pain"
+  ],
+  "medications": [
+    {
+      "name": "Azithromycin",
+      "strength": "500 mg",
+      "frequency": "1-0-0",
+      "instructions": "Daily once x 3 days",
+      "type": "Tab"
+    },
+    {
+      "name": "Cetirizine",
+      "strength": "10 mg",
+      "frequency": "0-0-1",
+      "instructions": "At bedtime",
+      "type": "Tab"
+    },
+    {
+      "name": "Atorvastatin",
+      "strength": "10 mg",
+      "frequency": "0-0-1",
+      "instructions": "Night after dinner",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [],
+  "advice": [
+    "Drink ORS solution, plenty of boiled water",
+    "Avoid oily/spicy foods"
+  ],
+  "boxes": [
+    {
+      "text": "Name: Anita Sharma   Age: 45 Y   Sex: F   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "C/O: Fever x 3 days, mild abdominal pain",
+      "category": "clinical_notes",
+      "box": [
+        60,
+        215,
+        850,
+        240
+      ]
+    },
+    {
+      "text": "1. Tab Azithromycin 500 mg  1-0-0  Daily once x 3 days",
+      "category": "medication",
+      "box": [
+        80,
+        305,
+        850,
+        330
+      ]
+    },
+    {
+      "text": "2. Tab Cetirizine 10 mg  0-0-1  At bedtime",
+      "category": "medication",
+      "box": [
+        80,
+        355,
+        850,
+        380
+      ]
+    },
+    {
+      "text": "3. Tab Atorvastatin 10 mg  0-0-1  Night after dinner",
+      "category": "medication",
+      "box": [
+        80,
+        405,
+        850,
+        430
+      ]
+    },
+    {
+      "text": "- Drink ORS solution, plenty of boiled water",
+      "category": "advice",
+      "box": [
+        80,
+        510,
+        850,
+        535
+      ]
+    },
+    {
+      "text": "- Avoid oily/spicy foods",
+      "category": "advice",
+      "box": [
+        80,
+        545,
+        850,
+        570
+      ]
+    }
+  ]
+}

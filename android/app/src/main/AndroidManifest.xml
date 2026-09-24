@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- ===================================================================== -->
+    <!-- PERMISSIONS: Required for Offline Scheduled Native Phone Calls        -->
+    <!-- ===================================================================== -->
+
+    <!-- Direct native phone call execution without manual dialer interaction -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
+    <!-- Exact alarm scheduling on Android 12+ (API 31+) -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+    <!-- Exact alarm exemption on Android 13+ (API 33+) for reminder/health apps -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
+    <!-- Device reboot & restart listener to restore alarms from Room DB -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- System overlay / wake permissions for background launch reliability -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- WakeLock to maintain CPU power during broadcast receiver DB updates -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Push Notification permission on Android 13+ (API 33+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:allowBackup="true"
+        android:label="SmartMed Native Call Reminder"
+        android:theme="@style/Theme.SmartMed"
+        android:supportsRtl="true">
+
+        <!-- ================================================================= -->
+        <!-- MainActivity: Test & Control UI Dashboard                         -->
+        <!-- ================================================================= -->
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:label="SmartMed Call Reminder">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- ================================================================= -->
+        <!-- CallTrampolineActivity: Zero-UI Invisible Call Dispatcher          -->
+        <!-- ================================================================= -->
+        <activity
+            android:name=".activity.CallTrampolineActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:launchMode="singleInstance"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true" />
+
+        <!-- ================================================================= -->
+        <!-- CallAlarmReceiver: AlarmManager RTC_WAKEUP Trigger Receiver       -->
+        <!-- ================================================================= -->
+        <receiver
+            android:name=".receiver.CallAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.smartmed.android.reminder.call.ACTION_TRIGGER_CALL" />
+            </intent-filter>
+        </receiver>
+
+        <!-- ================================================================= -->
+        <!-- BootReceiver: Restores scheduled calls from Room on device reboot -->
+        <!-- ================================================================= -->
+        <receiver
+            android:name=".receiver.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter android:priority="999">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>

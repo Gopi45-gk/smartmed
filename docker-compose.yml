@@ -1,0 +1,46 @@
+services:
+  backend:
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+    container_name: smartmed-backend
+    restart: unless-stopped
+    environment:
+      - SMARTMED_AI_PORT=8100
+      - MNN_MODEL_PATH=/app/mnn/model
+      - MNN_DEVICE=cpu
+      - MNN_THREAD_NUM=4
+      - HF_TOKEN=${HF_TOKEN:-}
+      - HUGGINGFACE_HUB_TOKEN=${HUGGINGFACE_HUB_TOKEN:-}
+    volumes:
+      - ./ai/mnn/model:/app/mnn/model
+      - ./ai/tts:/app/tts
+      - ./ai/data:/app/data
+      - ./ai/ocr/models:/app/ocr/models
+      - hf_cache:/root/.cache/huggingface
+      - paddle_cache:/root/.paddleocr
+    ports:
+      - "8100:8100"
+    networks:
+      - smartmed-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smartmed-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - smartmed-network
+
+networks:
+  smartmed-network:
+    driver: bridge
+
+volumes:
+  hf_cache:
+  paddle_cache:

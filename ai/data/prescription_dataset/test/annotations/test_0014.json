@@ -1,0 +1,60 @@
+{
+  "id": "test_0014",
+  "doctor": {
+    "name": "Dr. Anand Joshi",
+    "degree": "MBBS, MS, FICS",
+    "reg": "55219/MMC",
+    "clinic": "Lilavati Medical Center, Mumbai"
+  },
+  "patient": {
+    "name": "Rahul Verma",
+    "age": "19 Y",
+    "gender": "M"
+  },
+  "clinical_notes": [],
+  "medications": [
+    {
+      "name": "Ciprofloxacin",
+      "strength": "500 mg",
+      "frequency": "1-0-1",
+      "instructions": "Twice daily",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [
+    "IV RL 500 ml over 4 hrs"
+  ],
+  "advice": [],
+  "boxes": [
+    {
+      "text": "Name: Rahul Verma   Age: 19 Y   Sex: M   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "IV RL 500 ml over 4 hrs",
+      "category": "iv_fluid",
+      "box": [
+        80,
+        260,
+        750,
+        285
+      ]
+    },
+    {
+      "text": "1. Tab Ciprofloxacin 500 mg  1-0-1  Twice daily",
+      "category": "medication",
+      "box": [
+        80,
+        305,
+        850,
+        330
+      ]
+    }
+  ]
+}

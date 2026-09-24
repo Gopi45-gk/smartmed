@@ -15,6 +15,8 @@ import { ChatScreen } from './components/ChatScreen';
 import { ReportsScreen } from './components/ReportsScreen';
 import { ProfileScreen } from './components/ProfileScreen';
 import { BottomNav } from './components/BottomNav';
+import { soundManager } from './utils/audio';
+import { ttsProvider } from './utils/speech';
 
 export default function App() {
   const [screen, setScreen] = useState<ScreenType>('splash');
@@ -179,7 +181,11 @@ export default function App() {
         <BottomNav 
           activeTab={activeTab} 
           setActiveTab={handleTabSwitch} 
-          onCallAI={() => setScreen('phone_call')} 
+          onCallAI={() => {
+            ttsProvider.unlock();
+            soundManager.resumeAudioContext();
+            setScreen('phone_call');
+          }} 
           t={t} 
         />
       )}

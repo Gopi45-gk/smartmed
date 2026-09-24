@@ -1,0 +1,99 @@
+{
+  "id": "test_0008",
+  "doctor": {
+    "name": "Dr. Sunita Sharma",
+    "degree": "MBBS, DNB (Internal Medicine)",
+    "reg": "71032/DMC",
+    "clinic": "Apollo Clinic, Delhi"
+  },
+  "patient": {
+    "name": "Meenakshi Sundaram",
+    "age": "61 Y",
+    "gender": "F"
+  },
+  "clinical_notes": [],
+  "medications": [
+    {
+      "name": "Cetirizine",
+      "strength": "10 mg",
+      "frequency": "0-0-1",
+      "instructions": "At bedtime",
+      "type": "Tab"
+    },
+    {
+      "name": "Amoxicillin",
+      "strength": "500 mg",
+      "frequency": "1-1-1",
+      "instructions": "After meals x 5 days",
+      "type": "Cap"
+    },
+    {
+      "name": "Ciprofloxacin",
+      "strength": "500 mg",
+      "frequency": "1-0-1",
+      "instructions": "Twice daily",
+      "type": "Tab"
+    },
+    {
+      "name": "Pantoprazole",
+      "strength": "40 mg",
+      "frequency": "1-0-0",
+      "instructions": "Before breakfast",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [],
+  "advice": [],
+  "boxes": [
+    {
+      "text": "Name: Meenakshi Sundaram   Age: 61 Y   Sex: F   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "1. Tab Cetirizine 10 mg  0-0-1  At bedtime",
+      "category": "medication",
+      "box": [
+        80,
+        260,
+        850,
+        285
+      ]
+    },
+    {
+      "text": "2. Cap Amoxicillin 500 mg  1-1-1  After meals x 5 days",
+      "category": "medication",
+      "box": [
+        80,
+        310,
+        850,
+        335
+      ]
+    },
+    {
+      "text": "3. Tab Ciprofloxacin 500 mg  1-0-1  Twice daily",
+      "category": "medication",
+      "box": [
+        80,
+        360,
+        850,
+        385
+      ]
+    },
+    {
+      "text": "4. Tab Pantoprazole 40 mg  1-0-0  Before breakfast",
+      "category": "medication",
+      "box": [
+        80,
+        410,
+        850,
+        435
+      ]
+    }
+  ]
+}

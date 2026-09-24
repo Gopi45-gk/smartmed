@@ -6,3 +6,33 @@ coverage/
 *.log
 .env*
 !.env.example
+!ai/.env.example
+
+# Python / AI backend
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# MNN model files (large binaries — download separately)
+ai/mnn/model/*.mnn
+ai/mnn/model/*.mnn.weight
+ai/mnn/model/*.bin
+ai/mnn/model/*.txt
+ai/mnn/model/*.json
+!ai/mnn/model/.gitkeep
+
+# Large ML weights (>100MB, exceeds GitHub limits)
+*.safetensors
+*.onnx
+ai/tts/models/kokoro/
+ai/tts/models/piper/
+ai/ocr/models/fine_tuned_trocr/*.safetensors
+
+# Android build & caches
+**/.gradle/
+android/**/build/
+android/.idea/
+android/local.properties
+

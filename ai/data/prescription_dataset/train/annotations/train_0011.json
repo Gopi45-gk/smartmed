@@ -1,0 +1,94 @@
+{
+  "id": "train_0011",
+  "doctor": {
+    "name": "Dr. R. Menon",
+    "degree": "MBBS, MD (Gen Med)",
+    "reg": "48921/KMC",
+    "clinic": "City Health Clinic, Bangalore"
+  },
+  "patient": {
+    "name": "Anita Sharma",
+    "age": "45 Y",
+    "gender": "F"
+  },
+  "clinical_notes": [],
+  "medications": [
+    {
+      "name": "Paracetamol",
+      "strength": "650 mg",
+      "frequency": "1-0-1",
+      "instructions": "SOS fever",
+      "type": "Tab"
+    },
+    {
+      "name": "Amoxicillin",
+      "strength": "500 mg",
+      "frequency": "1-1-1",
+      "instructions": "After meals x 5 days",
+      "type": "Cap"
+    },
+    {
+      "name": "Pantoprazole",
+      "strength": "40 mg",
+      "frequency": "1-0-0",
+      "instructions": "Before breakfast",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [
+    "IV RL 500 ml over 4 hrs"
+  ],
+  "advice": [],
+  "boxes": [
+    {
+      "text": "Name: Anita Sharma   Age: 45 Y   Sex: F   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "IV RL 500 ml over 4 hrs",
+      "category": "iv_fluid",
+      "box": [
+        80,
+        260,
+        750,
+        285
+      ]
+    },
+    {
+      "text": "1. Tab Paracetamol 650 mg  1-0-1  SOS fever",
+      "category": "medication",
+      "box": [
+        80,
+        305,
+        850,
+        330
+      ]
+    },
+    {
+      "text": "2. Cap Amoxicillin 500 mg  1-1-1  After meals x 5 days",
+      "category": "medication",
+      "box": [
+        80,
+        355,
+        850,
+        380
+      ]
+    },
+    {
+      "text": "3. Tab Pantoprazole 40 mg  1-0-0  Before breakfast",
+      "category": "medication",
+      "box": [
+        80,
+        405,
+        850,
+        430
+      ]
+    }
+  ]
+}

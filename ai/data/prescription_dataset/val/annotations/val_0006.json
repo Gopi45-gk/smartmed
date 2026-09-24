@@ -1,0 +1,146 @@
+{
+  "id": "val_0006",
+  "doctor": {
+    "name": "Dr. R. Menon",
+    "degree": "MBBS, MD (Gen Med)",
+    "reg": "48921/KMC",
+    "clinic": "City Health Clinic, Bangalore"
+  },
+  "patient": {
+    "name": "Rajesh Patel",
+    "age": "52 Y",
+    "gender": "M"
+  },
+  "clinical_notes": [
+    "Fever x 3 days, mild abdominal pain"
+  ],
+  "medications": [
+    {
+      "name": "Azithromycin",
+      "strength": "500 mg",
+      "frequency": "1-0-0",
+      "instructions": "Daily once x 3 days",
+      "type": "Tab"
+    },
+    {
+      "name": "Paracetamol",
+      "strength": "650 mg",
+      "frequency": "1-0-1",
+      "instructions": "SOS fever",
+      "type": "Tab"
+    },
+    {
+      "name": "Pantoprazole",
+      "strength": "40 mg",
+      "frequency": "1-0-0",
+      "instructions": "Before breakfast",
+      "type": "Tab"
+    },
+    {
+      "name": "Metformin",
+      "strength": "500 mg",
+      "frequency": "1-0-1",
+      "instructions": "After food",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [
+    "IV RL 500 ml over 4 hrs"
+  ],
+  "advice": [
+    "Drink ORS solution, plenty of boiled water",
+    "Avoid oily/spicy foods"
+  ],
+  "boxes": [
+    {
+      "text": "Name: Rajesh Patel   Age: 52 Y   Sex: M   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "C/O: Fever x 3 days, mild abdominal pain",
+      "category": "clinical_notes",
+      "box": [
+        60,
+        215,
+        850,
+        240
+      ]
+    },
+    {
+      "text": "IV RL 500 ml over 4 hrs",
+      "category": "iv_fluid",
+      "box": [
+        80,
+        305,
+        750,
+        330
+      ]
+    },
+    {
+      "text": "1. Tab Azithromycin 500 mg  1-0-0  Daily once x 3 days",
+      "category": "medication",
+      "box": [
+        80,
+        350,
+        850,
+        375
+      ]
+    },
+    {
+      "text": "2. Tab Paracetamol 650 mg  1-0-1  SOS fever",
+      "category": "medication",
+      "box": [
+        80,
+        400,
+        850,
+        425
+      ]
+    },
+    {
+      "text": "3. Tab Pantoprazole 40 mg  1-0-0  Before breakfast",
+      "category": "medication",
+      "box": [
+        80,
+        450,
+        850,
+        475
+      ]
+    },
+    {
+      "text": "4. Tab Metformin 500 mg  1-0-1  After food",
+      "category": "medication",
+      "box": [
+        80,
+        500,
+        850,
+        525
+      ]
+    },
+    {
+      "text": "- Drink ORS solution, plenty of boiled water",
+      "category": "advice",
+      "box": [
+        80,
+        605,
+        850,
+        630
+      ]
+    },
+    {
+      "text": "- Avoid oily/spicy foods",
+      "category": "advice",
+      "box": [
+        80,
+        640,
+        850,
+        665
+      ]
+    }
+  ]
+}

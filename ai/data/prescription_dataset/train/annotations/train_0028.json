@@ -1,0 +1,122 @@
+{
+  "id": "train_0028",
+  "doctor": {
+    "name": "Dr. Anand Joshi",
+    "degree": "MBBS, MS, FICS",
+    "reg": "55219/MMC",
+    "clinic": "Lilavati Medical Center, Mumbai"
+  },
+  "patient": {
+    "name": "Vivek Kumar",
+    "age": "28 Y",
+    "gender": "M"
+  },
+  "clinical_notes": [],
+  "medications": [
+    {
+      "name": "Pantoprazole",
+      "strength": "40 mg",
+      "frequency": "1-0-0",
+      "instructions": "Before breakfast",
+      "type": "Tab"
+    },
+    {
+      "name": "Paracetamol",
+      "strength": "650 mg",
+      "frequency": "1-0-1",
+      "instructions": "SOS fever",
+      "type": "Tab"
+    },
+    {
+      "name": "Metformin",
+      "strength": "500 mg",
+      "frequency": "1-0-1",
+      "instructions": "After food",
+      "type": "Tab"
+    },
+    {
+      "name": "Cetirizine",
+      "strength": "10 mg",
+      "frequency": "0-0-1",
+      "instructions": "At bedtime",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [],
+  "advice": [
+    "Drink ORS solution, plenty of boiled water",
+    "Avoid oily/spicy foods"
+  ],
+  "boxes": [
+    {
+      "text": "Name: Vivek Kumar   Age: 28 Y   Sex: M   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "1. Tab Pantoprazole 40 mg  1-0-0  Before breakfast",
+      "category": "medication",
+      "box": [
+        80,
+        260,
+        850,
+        285
+      ]
+    },
+    {
+      "text": "2. Tab Paracetamol 650 mg  1-0-1  SOS fever",
+      "category": "medication",
+      "box": [
+        80,
+        310,
+        850,
+        335
+      ]
+    },
+    {
+      "text": "3. Tab Metformin 500 mg  1-0-1  After food",
+      "category": "medication",
+      "box": [
+        80,
+        360,
+        850,
+        385
+      ]
+    },
+    {
+      "text": "4. Tab Cetirizine 10 mg  0-0-1  At bedtime",
+      "category": "medication",
+      "box": [
+        80,
+        410,
+        850,
+        435
+      ]
+    },
+    {
+      "text": "- Drink ORS solution, plenty of boiled water",
+      "category": "advice",
+      "box": [
+        80,
+        515,
+        850,
+        540
+      ]
+    },
+    {
+      "text": "- Avoid oily/spicy foods",
+      "category": "advice",
+      "box": [
+        80,
+        550,
+        850,
+        575
+      ]
+    }
+  ]
+}

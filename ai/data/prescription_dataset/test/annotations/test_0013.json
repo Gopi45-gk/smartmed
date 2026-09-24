@@ -1,0 +1,105 @@
+{
+  "id": "test_0013",
+  "doctor": {
+    "name": "Dr. Sunita Sharma",
+    "degree": "MBBS, DNB (Internal Medicine)",
+    "reg": "71032/DMC",
+    "clinic": "Apollo Clinic, Delhi"
+  },
+  "patient": {
+    "name": "Rahul Verma",
+    "age": "19 Y",
+    "gender": "M"
+  },
+  "clinical_notes": [],
+  "medications": [
+    {
+      "name": "Atorvastatin",
+      "strength": "10 mg",
+      "frequency": "0-0-1",
+      "instructions": "Night after dinner",
+      "type": "Tab"
+    },
+    {
+      "name": "Azithromycin",
+      "strength": "500 mg",
+      "frequency": "1-0-0",
+      "instructions": "Daily once x 3 days",
+      "type": "Tab"
+    },
+    {
+      "name": "Cetirizine",
+      "strength": "10 mg",
+      "frequency": "0-0-1",
+      "instructions": "At bedtime",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [],
+  "advice": [
+    "Drink ORS solution, plenty of boiled water",
+    "Avoid oily/spicy foods"
+  ],
+  "boxes": [
+    {
+      "text": "Name: Rahul Verma   Age: 19 Y   Sex: M   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "1. Tab Atorvastatin 10 mg  0-0-1  Night after dinner",
+      "category": "medication",
+      "box": [
+        80,
+        260,
+        850,
+        285
+      ]
+    },
+    {
+      "text": "2. Tab Azithromycin 500 mg  1-0-0  Daily once x 3 days",
+      "category": "medication",
+      "box": [
+        80,
+        310,
+        850,
+        335
+      ]
+    },
+    {
+      "text": "3. Tab Cetirizine 10 mg  0-0-1  At bedtime",
+      "category": "medication",
+      "box": [
+        80,
+        360,
+        850,
+        385
+      ]
+    },
+    {
+      "text": "- Drink ORS solution, plenty of boiled water",
+      "category": "advice",
+      "box": [
+        80,
+        465,
+        850,
+        490
+      ]
+    },
+    {
+      "text": "- Avoid oily/spicy foods",
+      "category": "advice",
+      "box": [
+        80,
+        500,
+        850,
+        525
+      ]
+    }
+  ]
+}

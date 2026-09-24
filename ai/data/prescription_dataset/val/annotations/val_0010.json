@@ -1,0 +1,111 @@
+{
+  "id": "val_0010",
+  "doctor": {
+    "name": "Dr. Anand Joshi",
+    "degree": "MBBS, MS, FICS",
+    "reg": "55219/MMC",
+    "clinic": "Lilavati Medical Center, Mumbai"
+  },
+  "patient": {
+    "name": "Rajesh Patel",
+    "age": "52 Y",
+    "gender": "M"
+  },
+  "clinical_notes": [],
+  "medications": [
+    {
+      "name": "Paracetamol",
+      "strength": "650 mg",
+      "frequency": "1-0-1",
+      "instructions": "SOS fever",
+      "type": "Tab"
+    },
+    {
+      "name": "Pantoprazole",
+      "strength": "40 mg",
+      "frequency": "1-0-0",
+      "instructions": "Before breakfast",
+      "type": "Tab"
+    },
+    {
+      "name": "Azithromycin",
+      "strength": "500 mg",
+      "frequency": "1-0-0",
+      "instructions": "Daily once x 3 days",
+      "type": "Tab"
+    },
+    {
+      "name": "Metformin",
+      "strength": "500 mg",
+      "frequency": "1-0-1",
+      "instructions": "After food",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [
+    "IV RL 500 ml over 4 hrs"
+  ],
+  "advice": [],
+  "boxes": [
+    {
+      "text": "Name: Rajesh Patel   Age: 52 Y   Sex: M   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "IV RL 500 ml over 4 hrs",
+      "category": "iv_fluid",
+      "box": [
+        80,
+        260,
+        750,
+        285
+      ]
+    },
+    {
+      "text": "1. Tab Paracetamol 650 mg  1-0-1  SOS fever",
+      "category": "medication",
+      "box": [
+        80,
+        305,
+        850,
+        330
+      ]
+    },
+    {
+      "text": "2. Tab Pantoprazole 40 mg  1-0-0  Before breakfast",
+      "category": "medication",
+      "box": [
+        80,
+        355,
+        850,
+        380
+      ]
+    },
+    {
+      "text": "3. Tab Azithromycin 500 mg  1-0-0  Daily once x 3 days",
+      "category": "medication",
+      "box": [
+        80,
+        405,
+        850,
+        430
+      ]
+    },
+    {
+      "text": "4. Tab Metformin 500 mg  1-0-1  After food",
+      "category": "medication",
+      "box": [
+        80,
+        455,
+        850,
+        480
+      ]
+    }
+  ]
+}

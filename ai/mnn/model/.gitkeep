@@ -1,0 +1,13 @@
+# This directory holds the MNN model files.
+# Download and place your model files here.
+# See OFFLINE_AI_SETUP.md for instructions.
+#
+# Expected files after model setup:
+#   config.json
+#   llm.mnn
+#   llm.mnn.weight
+#   embeddings_bf16.bin
+#   tokenizer.txt
+#   llm_config.json
+#
+# DO NOT commit model files to Git.

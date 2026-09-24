@@ -1,9 +1,17 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { Medicine, ChatMessage, TranslationStrings, Language } from '../types';
 import { initialChatMessages } from '../data/initialData';
-import { Send, Bot, User, Sparkles } from 'lucide-react';
+import { Send, Bot, User, Sparkles, Trash2, RefreshCw, ShieldAlert } from 'lucide-react';
 import { soundManager } from '../utils/audio';
+import {
+  sendMessageToLocalAI,
+  isAIServerReachable,
+  saveConversationHistory,
+  loadConversationHistory,
+  clearConversationHistory,
+  type AIMessage,
+} from '../utils/aiClient';
 
 interface Props {
   medicines: Medicine[];
@@ -12,9 +20,23 @@ interface Props {
 }
 
 export function ChatScreen({ medicines, t, lang }: Props) {
-  const [messages, setMessages] = useState<ChatMessage[]>(() => initialChatMessages[lang] || initialChatMessages.en);
+  // Load persisted messages or fall back to initial welcome messages
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    const saved = loadConversationHistory();
+    if (saved.length > 0) {
+      // Convert saved AIMessage[] back to ChatMessage[]
+      return saved.map((m, idx) => ({
+        id: `saved-${idx}`,
+        sender: m.role === 'user' ? 'user' as const : 'ai' as const,
+        text: m.content,
+      }));
+    }
+    return initialChatMessages[lang] || initialChatMessages.en;
+  });
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [aiAvailable, setAiAvailable] = useState<boolean | null>(null);
+  const [lastError, setLastError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const quickPrompts = [
@@ -32,37 +54,43 @@ export function ChatScreen({ medicines, t, lang }: Props) {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const generateAnswer = (userQuery: string): string => {
-    const q = userQuery.toLowerCase();
+  // Check AI server availability on mount and periodically
+  useEffect(() => {
+    const checkStatus = async () => {
+      const reachable = await isAIServerReachable();
+      setAiAvailable(reachable);
+    };
+    checkStatus();
+    const interval = setInterval(checkStatus, 15000); // Check every 15s
+    return () => clearInterval(interval);
+  }, []);
 
-    if (q.includes('coffee') || q.includes('tea')) {
-      return "It is recommended to wait at least 30 to 45 minutes before or after drinking coffee or tea when taking your BP medication, as caffeine can temporarily elevate blood pressure and reduce absorption.";
+  // Persist messages to localStorage whenever they change
+  useEffect(() => {
+    if (messages.length > 0) {
+      const aiMessages: AIMessage[] = messages.map(m => ({
+        role: m.sender === 'user' ? 'user' : 'assistant',
+        content: m.text,
+      }));
+      saveConversationHistory(aiMessages);
     }
+  }, [messages]);
 
-    if (q.includes('lunch') || q.includes('food') || q.includes('after')) {
-      const afterFoodMeds = medicines.filter(m => m.food.toLowerCase().includes('after'));
-      if (afterFoodMeds.length > 0) {
-        return `You have ${afterFoodMeds.map(m => `${m.name} (${m.time})`).join(' and ')} scheduled to be taken after food!`;
-      }
-      return "All your scheduled medicines can be checked on your home dashboard.";
-    }
+  // Build conversation history for the API
+  const getConversationHistory = useCallback((): AIMessage[] => {
+    return messages
+      .filter(m => m.sender === 'user' || m.sender === 'ai')
+      .map(m => ({
+        role: m.sender === 'user' ? 'user' as const : 'assistant' as const,
+        content: m.text,
+      }));
+  }, [messages]);
 
-    if (q.includes('miss') || q.includes('did i take') || q.includes('status')) {
-      const taken = medicines.filter(m => m.status === 'taken');
-      const upcoming = medicines.filter(m => m.status === 'upcoming');
-      return `You have taken ${taken.length} medicines so far (${taken.map(m => m.name).join(', ') || 'none'}). You still have ${upcoming.length} upcoming (${upcoming.map(m => m.name).join(', ') || 'none'}).`;
-    }
-
-    if (q.includes('son') || q.includes('caregiver')) {
-      return "I have synced your medicine log with your primary caregiver Arun Kumar (+91 98765 12345). He can see your status in real time!";
-    }
-
-    return "I've checked your doctor's clinical prescription. Please ensure you always take your BP tablet after food with a full glass of water, and keep your daily routine consistent.";
-  };
-
-  const handleSend = (textToSend?: string) => {
+  const handleSend = async (textToSend?: string) => {
     const text = textToSend || input;
     if (!text.trim()) return;
+
+    setLastError(null);
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
@@ -75,18 +103,67 @@ export function ChatScreen({ medicines, t, lang }: Props) {
     setInput('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      const reply = generateAnswer(text);
-      const aiMsg: ChatMessage = {
+    // Send to local MNN AI engine
+    try {
+      const history = getConversationHistory();
+      const result = await sendMessageToLocalAI(text.trim(), history);
+
+      if (result.success && result.response) {
+        setAiAvailable(true);
+        const aiMsg: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          sender: 'ai',
+          text: result.response,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        setMessages(prev => [...prev, aiMsg]);
+        soundManager.playSuccessChime();
+        setIsTyping(false);
+        return;
+      } else {
+        // AI service returned an error or is offline
+        const err = result.error || 'Failed to generate response from local AI.';
+        setLastError(err);
+        setAiAvailable(false);
+        const errorMsg: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          sender: 'ai',
+          text: `⚠ ${err}`,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        setMessages(prev => [...prev, errorMsg]);
+        setIsTyping(false);
+        return;
+      }
+    } catch (e: unknown) {
+      setAiAvailable(false);
+      const errMsg = e instanceof Error ? e.message : 'Cannot connect to local AI server.';
+      setLastError(errMsg);
+      const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
-        text: reply,
+        text: `⚠ Local AI is currently offline. Please ensure the local AI server is running (cd ai && python server.py).`,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
-      setMessages(prev => [...prev, aiMsg]);
+      setMessages(prev => [...prev, errorMsg]);
       setIsTyping(false);
-      soundManager.playSuccessChime();
-    }, 900);
+    }
+  };
+
+  const handleClearChat = () => {
+    clearConversationHistory();
+    setMessages(initialChatMessages[lang] || initialChatMessages.en);
+    setLastError(null);
+  };
+
+  const handleRetry = () => {
+    // Find the last user message and retry it
+    const lastUserMsg = [...messages].reverse().find(m => m.sender === 'user');
+    if (lastUserMsg) {
+      // Remove the error message
+      setMessages(prev => prev.filter(m => !m.text.startsWith('⚠')));
+      handleSend(lastUserMsg.text);
+    }
   };
 
   return (
@@ -103,24 +180,59 @@ export function ChatScreen({ medicines, t, lang }: Props) {
             <Bot className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-[#1D1D1F] leading-tight">{t.chat}</h2>
-            <div className="flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Active Medical AI Assistant</span>
+            <div className="flex items-center gap-2">
+              <h2 className="text-base font-bold text-[#1D1D1F] leading-tight">SmartMed</h2>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-[#0071E3] border border-blue-200/60">
+                Care AI
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 mt-0.5 text-[11px] font-medium">
+              {aiAvailable === null ? (
+                <span className="text-gray-400">Checking AI status...</span>
+              ) : aiAvailable ? (
+                <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Local AI Ready (Offline MNN)
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-amber-600">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                  Offline AI Unavailable — Basic Mode
+                </span>
+              )}
             </div>
           </div>
         </div>
+        <button
+          onClick={handleClearChat}
+          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+          title="Clear conversation"
+          aria-label="Clear conversation"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Medical Safety Disclaimer */}
+      <div className="px-4 py-2 bg-amber-50/70 border-b border-amber-100/80 flex items-center gap-2">
+        <ShieldAlert className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+        <p className="text-[10px] text-amber-700 leading-tight">
+          This AI provides general health information only. Not a substitute for professional medical advice.
+        </p>
       </div>
 
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3.5">
         {messages.map((m) => {
           const isUser = m.sender === 'user';
+          const isError = !isUser && m.text.startsWith('⚠');
           return (
             <div key={m.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
               <div className="flex items-end gap-2 max-w-[85%]">
                 {!isUser && (
-                  <div className="w-7 h-7 rounded-full bg-blue-100 text-[#0071E3] flex items-center justify-center shrink-0 mb-1 text-xs">
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mb-1 text-xs ${
+                    isError ? 'bg-red-100 text-red-500' : 'bg-blue-100 text-[#0071E3]'
+                  }`}>
                     <Bot className="w-4 h-4" />
                   </div>
                 )}
@@ -128,12 +240,16 @@ export function ChatScreen({ medicines, t, lang }: Props) {
                   className={`p-3.5 rounded-2xl text-xs leading-relaxed ${
                     isUser 
                       ? 'bg-[#0071E3] text-white rounded-br-none shadow-sm' 
-                      : 'bg-white text-[#1D1D1F] border border-gray-200/80 shadow-xs rounded-bl-none'
+                      : isError
+                        ? 'bg-red-50 text-red-700 border border-red-200/80 shadow-xs rounded-bl-none'
+                        : 'bg-white text-[#1D1D1F] border border-gray-200/80 shadow-xs rounded-bl-none'
                   }`}
                 >
                   <p>{m.text}</p>
                   {m.time && (
-                    <span className={`text-[10px] block mt-1 text-right ${isUser ? 'text-blue-100' : 'text-gray-400'}`}>
+                    <span className={`text-[10px] block mt-1 text-right ${
+                      isUser ? 'text-blue-100' : isError ? 'text-red-300' : 'text-gray-400'
+                    }`}>
                       {m.time}
                     </span>
                   )}
@@ -151,7 +267,20 @@ export function ChatScreen({ medicines, t, lang }: Props) {
         {isTyping && (
           <div className="flex items-center gap-2 text-xs text-gray-500 italic ml-2">
             <Bot className="w-4 h-4 text-[#0071E3] animate-pulse" />
-            <span>SmartMed AI is verifying your prescription...</span>
+            <span>SmartMed AI is thinking...</span>
+          </div>
+        )}
+
+        {/* Retry button when there was an error */}
+        {lastError && !isTyping && (
+          <div className="flex justify-center">
+            <button
+              onClick={handleRetry}
+              className="flex items-center gap-1.5 text-[11px] text-[#0071E3] font-semibold bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-full hover:bg-blue-100 active:scale-95 transition-all"
+            >
+              <RefreshCw className="w-3 h-3" />
+              <span>Retry</span>
+            </button>
           </div>
         )}
 
@@ -178,13 +307,14 @@ export function ChatScreen({ medicines, t, lang }: Props) {
           type="text" 
           value={input} 
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' && !isTyping) handleSend(); }}
           placeholder={t.askAnything} 
           className="flex-1 p-3 bg-[#F5F5F7] rounded-xl border border-gray-200 text-xs focus:outline-none focus:border-[#0071E3] focus:bg-white transition-all text-[#1D1D1F]" 
+          disabled={isTyping}
         />
         <button 
           onClick={() => handleSend()}
-          disabled={!input.trim()}
+          disabled={!input.trim() || isTyping}
           className="p-3 bg-[#0071E3] disabled:opacity-40 text-white rounded-xl shadow-md active:scale-90 transition-transform"
         >
           <Send className="w-4 h-4" />

@@ -1,0 +1,83 @@
+{
+  "id": "val_0003",
+  "doctor": {
+    "name": "Dr. Sunita Sharma",
+    "degree": "MBBS, DNB (Internal Medicine)",
+    "reg": "71032/DMC",
+    "clinic": "Apollo Clinic, Delhi"
+  },
+  "patient": {
+    "name": "Meenakshi Sundaram",
+    "age": "61 Y",
+    "gender": "F"
+  },
+  "clinical_notes": [],
+  "medications": [
+    {
+      "name": "Paracetamol",
+      "strength": "650 mg",
+      "frequency": "1-0-1",
+      "instructions": "SOS fever",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [
+    "IV RL 500 ml over 4 hrs"
+  ],
+  "advice": [
+    "Drink ORS solution, plenty of boiled water",
+    "Avoid oily/spicy foods"
+  ],
+  "boxes": [
+    {
+      "text": "Name: Meenakshi Sundaram   Age: 61 Y   Sex: F   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "IV RL 500 ml over 4 hrs",
+      "category": "iv_fluid",
+      "box": [
+        80,
+        260,
+        750,
+        285
+      ]
+    },
+    {
+      "text": "1. Tab Paracetamol 650 mg  1-0-1  SOS fever",
+      "category": "medication",
+      "box": [
+        80,
+        305,
+        850,
+        330
+      ]
+    },
+    {
+      "text": "- Drink ORS solution, plenty of boiled water",
+      "category": "advice",
+      "box": [
+        80,
+        410,
+        850,
+        435
+      ]
+    },
+    {
+      "text": "- Avoid oily/spicy foods",
+      "category": "advice",
+      "box": [
+        80,
+        445,
+        850,
+        470
+      ]
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "id": "val_0008",
+  "doctor": {
+    "name": "Dr. R. Menon",
+    "degree": "MBBS, MD (Gen Med)",
+    "reg": "48921/KMC",
+    "clinic": "City Health Clinic, Bangalore"
+  },
+  "patient": {
+    "name": "Rajesh Patel",
+    "age": "52 Y",
+    "gender": "M"
+  },
+  "clinical_notes": [],
+  "medications": [
+    {
+      "name": "Pantoprazole",
+      "strength": "40 mg",
+      "frequency": "1-0-0",
+      "instructions": "Before breakfast",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [],
+  "advice": [
+    "Drink ORS solution, plenty of boiled water",
+    "Avoid oily/spicy foods"
+  ],
+  "boxes": [
+    {
+      "text": "Name: Rajesh Patel   Age: 52 Y   Sex: M   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "1. Tab Pantoprazole 40 mg  1-0-0  Before breakfast",
+      "category": "medication",
+      "box": [
+        80,
+        260,
+        850,
+        285
+      ]
+    },
+    {
+      "text": "- Drink ORS solution, plenty of boiled water",
+      "category": "advice",
+      "box": [
+        80,
+        365,
+        850,
+        390
+      ]
+    },
+    {
+      "text": "- Avoid oily/spicy foods",
+      "category": "advice",
+      "box": [
+        80,
+        400,
+        850,
+        425
+      ]
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "id": "train_0025",
+  "doctor": {
+    "name": "Dr. R. Menon",
+    "degree": "MBBS, MD (Gen Med)",
+    "reg": "48921/KMC",
+    "clinic": "City Health Clinic, Bangalore"
+  },
+  "patient": {
+    "name": "Meenakshi Sundaram",
+    "age": "61 Y",
+    "gender": "F"
+  },
+  "clinical_notes": [
+    "Fever x 3 days, mild abdominal pain"
+  ],
+  "medications": [
+    {
+      "name": "Pantoprazole",
+      "strength": "40 mg",
+      "frequency": "1-0-0",
+      "instructions": "Before breakfast",
+      "type": "Tab"
+    },
+    {
+      "name": "Amoxicillin",
+      "strength": "500 mg",
+      "frequency": "1-1-1",
+      "instructions": "After meals x 5 days",
+      "type": "Cap"
+    },
+    {
+      "name": "Paracetamol",
+      "strength": "650 mg",
+      "frequency": "1-0-1",
+      "instructions": "SOS fever",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [
+    "IV RL 500 ml over 4 hrs"
+  ],
+  "advice": [
+    "Drink ORS solution, plenty of boiled water",
+    "Avoid oily/spicy foods"
+  ],
+  "boxes": [
+    {
+      "text": "Name: Meenakshi Sundaram   Age: 61 Y   Sex: F   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "C/O: Fever x 3 days, mild abdominal pain",
+      "category": "clinical_notes",
+      "box": [
+        60,
+        215,
+        850,
+        240
+      ]
+    },
+    {
+      "text": "IV RL 500 ml over 4 hrs",
+      "category": "iv_fluid",
+      "box": [
+        80,
+        305,
+        750,
+        330
+      ]
+    },
+    {
+      "text": "1. Tab Pantoprazole 40 mg  1-0-0  Before breakfast",
+      "category": "medication",
+      "box": [
+        80,
+        350,
+        850,
+        375
+      ]
+    },
+    {
+      "text": "2. Cap Amoxicillin 500 mg  1-1-1  After meals x 5 days",
+      "category": "medication",
+      "box": [
+        80,
+        400,
+        850,
+        425
+      ]
+    },
+    {
+      "text": "3. Tab Paracetamol 650 mg  1-0-1  SOS fever",
+      "category": "medication",
+      "box": [
+        80,
+        450,
+        850,
+        475
+      ]
+    },
+    {
+      "text": "- Drink ORS solution, plenty of boiled water",
+      "category": "advice",
+      "box": [
+        80,
+        555,
+        850,
+        580
+      ]
+    },
+    {
+      "text": "- Avoid oily/spicy foods",
+      "category": "advice",
+      "box": [
+        80,
+        590,
+        850,
+        615
+      ]
+    }
+  ]
+}

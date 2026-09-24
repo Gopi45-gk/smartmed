@@ -1,0 +1,95 @@
+{
+  "id": "train_0008",
+  "doctor": {
+    "name": "Dr. Sunita Sharma",
+    "degree": "MBBS, DNB (Internal Medicine)",
+    "reg": "71032/DMC",
+    "clinic": "Apollo Clinic, Delhi"
+  },
+  "patient": {
+    "name": "Rahul Verma",
+    "age": "19 Y",
+    "gender": "M"
+  },
+  "clinical_notes": [
+    "Fever x 3 days, mild abdominal pain"
+  ],
+  "medications": [
+    {
+      "name": "Cetirizine",
+      "strength": "10 mg",
+      "frequency": "0-0-1",
+      "instructions": "At bedtime",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [
+    "IV RL 500 ml over 4 hrs"
+  ],
+  "advice": [
+    "Drink ORS solution, plenty of boiled water",
+    "Avoid oily/spicy foods"
+  ],
+  "boxes": [
+    {
+      "text": "Name: Rahul Verma   Age: 19 Y   Sex: M   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "C/O: Fever x 3 days, mild abdominal pain",
+      "category": "clinical_notes",
+      "box": [
+        60,
+        215,
+        850,
+        240
+      ]
+    },
+    {
+      "text": "IV RL 500 ml over 4 hrs",
+      "category": "iv_fluid",
+      "box": [
+        80,
+        305,
+        750,
+        330
+      ]
+    },
+    {
+      "text": "1. Tab Cetirizine 10 mg  0-0-1  At bedtime",
+      "category": "medication",
+      "box": [
+        80,
+        350,
+        850,
+        375
+      ]
+    },
+    {
+      "text": "- Drink ORS solution, plenty of boiled water",
+      "category": "advice",
+      "box": [
+        80,
+        455,
+        850,
+        480
+      ]
+    },
+    {
+      "text": "- Avoid oily/spicy foods",
+      "category": "advice",
+      "box": [
+        80,
+        490,
+        850,
+        515
+      ]
+    }
+  ]
+}

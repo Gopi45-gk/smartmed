@@ -1,0 +1,117 @@
+{
+  "id": "train_0003",
+  "doctor": {
+    "name": "Dr. Priya Varma",
+    "degree": "MBBS, MD (Pediatrics)",
+    "reg": "89341/TNC",
+    "clinic": "Kaveri Children Hospital, Chennai"
+  },
+  "patient": {
+    "name": "Anita Sharma",
+    "age": "45 Y",
+    "gender": "F"
+  },
+  "clinical_notes": [
+    "Fever x 3 days, mild abdominal pain"
+  ],
+  "medications": [
+    {
+      "name": "Metformin",
+      "strength": "500 mg",
+      "frequency": "1-0-1",
+      "instructions": "After food",
+      "type": "Tab"
+    },
+    {
+      "name": "Pantoprazole",
+      "strength": "40 mg",
+      "frequency": "1-0-0",
+      "instructions": "Before breakfast",
+      "type": "Tab"
+    },
+    {
+      "name": "Ciprofloxacin",
+      "strength": "500 mg",
+      "frequency": "1-0-1",
+      "instructions": "Twice daily",
+      "type": "Tab"
+    }
+  ],
+  "iv_fluids": [],
+  "advice": [
+    "Drink ORS solution, plenty of boiled water",
+    "Avoid oily/spicy foods"
+  ],
+  "boxes": [
+    {
+      "text": "Name: Anita Sharma   Age: 45 Y   Sex: F   Date: 14/09/2026",
+      "category": "patient_info",
+      "box": [
+        60,
+        165,
+        900,
+        195
+      ]
+    },
+    {
+      "text": "C/O: Fever x 3 days, mild abdominal pain",
+      "category": "clinical_notes",
+      "box": [
+        60,
+        215,
+        850,
+        240
+      ]
+    },
+    {
+      "text": "1. Tab Metformin 500 mg  1-0-1  After food",
+      "category": "medication",
+      "box": [
+        80,
+        305,
+        850,
+        330
+      ]
+    },
+    {
+      "text": "2. Tab Pantoprazole 40 mg  1-0-0  Before breakfast",
+      "category": "medication",
+      "box": [
+        80,
+        355,
+        850,
+        380
+      ]
+    },
+    {
+      "text": "3. Tab Ciprofloxacin 500 mg  1-0-1  Twice daily",
+      "category": "medication",
+      "box": [
+        80,
+        405,
+        850,
+        430
+      ]
+    },
+    {
+      "text": "- Drink ORS solution, plenty of boiled water",
+      "category": "advice",
+      "box": [
+        80,
+        510,
+        850,
+        535
+      ]
+    },
+    {
+      "text": "- Avoid oily/spicy foods",
+      "category": "advice",
+      "box": [
+        80,
+        545,
+        850,
+        570
+      ]
+    }
+  ]
+}

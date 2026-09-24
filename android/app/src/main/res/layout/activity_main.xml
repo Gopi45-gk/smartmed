@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121214"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SmartMed Native Call"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Offline Scheduled Native Telephone Caller"
+            android:textColor="#9CA3AF"
+            android:textSize="13sp"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1E293B"
+            android:padding="12dp"
+            android:text="Status: Ready"
+            android:textColor="#38BDF8"
+            android:textSize="13sp"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/etPhoneNumber"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="#1F2937"
+            android:hint="Phone Number (e.g. 9876543210)"
+            android:textColorHint="#6B7280"
+            android:textColor="#FFFFFF"
+            android:inputType="phone"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/etMedicineName"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="#1F2937"
+            android:hint="Medicine (e.g. Metformin 500mg)"
+            android:textColorHint="#6B7280"
+            android:textColor="#FFFFFF"
+            android:inputType="text"
+            android:text="Metformin 500mg"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:layout_marginBottom="20dp" />
+
+        <Button
+            android:id="@+id/btnRequestPermissions"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:backgroundTint="#3B82F6"
+            android:text="Grant Call &amp; Alarm Permissions"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnSchedule10s"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:backgroundTint="#10B981"
+            android:text="Schedule Call (in 10 Seconds)"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnSchedule30s"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:backgroundTint="#059669"
+            android:text="Schedule Call (in 30 Seconds)"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnImmediateCall"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:backgroundTint="#6366F1"
+            android:text="Test Immediate Call"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Scheduled Alarms in Room DB:"
+            android:textColor="#E5E7EB"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tvAlarmsList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1E293B"
+            android:padding="12dp"
+            android:text="No scheduled calls."
+            android:textColor="#CBD5E1"
+            android:textSize="12sp"
+            android:fontFamily="monospace" />
+
+    </LinearLayout>
+</ScrollView>
