@@ -12,6 +12,19 @@ services:
       - MNN_THREAD_NUM=4
       - HF_TOKEN=${HF_TOKEN:-}
       - HUGGINGFACE_HUB_TOKEN=${HUGGINGFACE_HUB_TOKEN:-}
+      - AI_API_KEY=${AI_API_KEY:-}
+      - AI_API_BASE_URL=${AI_API_BASE_URL:-https://integrate.api.nvidia.com/v1}
+      - AI_MODEL_CHAT=${AI_MODEL_CHAT:-meta/llama-3.1-8b-instruct}
+      - AI_MODEL_VOICE=${AI_MODEL_VOICE:-openai/gpt-oss-120b}
+      - OPENFDA_API_KEY=${OPENFDA_API_KEY:-}
+      - MEDI_CLIENT_ID=${MEDI_CLIENT_ID:-}
+      - MEDI_CLIENT_SECRET=${MEDI_CLIENT_SECRET:-}
+      - DATA_GOV_IN_API_KEY=${DATA_GOV_IN_API_KEY:-}
+      - EXOTEL_SID=${EXOTEL_SID:-}
+      - EXOTEL_TOKEN=${EXOTEL_TOKEN:-}
+      - EXOTEL_SUBDOMAIN=${EXOTEL_SUBDOMAIN:-api.exotel.com}
+      - EXOTEL_CALLER_ID=${EXOTEL_CALLER_ID:-}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
     volumes:
       - ./ai/mnn/model:/app/mnn/model
       - ./ai/tts:/app/tts

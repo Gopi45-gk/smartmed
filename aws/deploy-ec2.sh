@@ -60,9 +60,19 @@ fi
 TARGET_USER="${SUDO_USER:-ubuntu}"
 usermod -aG docker "$TARGET_USER" || true
 
-# 4. Download models if missing
+# 4. Download models and verify environment if missing
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
+
+if [ ! -f .env ] && [ -f .env.example ]; then
+  echo "[+] Initializing .env from template..."
+  cp .env.example .env
+fi
+
+if [ ! -f ai/.env ] && [ -f ai/.env.example ]; then
+  echo "[+] Initializing ai/.env from template..."
+  cp ai/.env.example ai/.env
+fi
 
 echo "[+] Verifying SmartMed model directories..."
 mkdir -p ai/mnn/model ai/tts ai/data ai/ocr/models

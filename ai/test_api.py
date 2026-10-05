@@ -211,14 +211,102 @@ def test_voice_intent():
         return False
 
 
+def test_nim_status():
+    """Test NVIDIA NIM status endpoint."""
+    print("\n" + "=" * 50)
+    print("TEST: NVIDIA NIM Router Status")
+    print("=" * 50)
+    try:
+        resp = requests.get(f"{BASE_URL}/api/ai/nim/status", timeout=5)
+        print(f"  Status: {resp.status_code}")
+        data = resp.json()
+        print(f"  NIM Configured: {data.get('configured')}")
+        print(f"  Chat Model: {data.get('chat_model')}")
+        assert resp.status_code == 200
+        print("  ✓ PASSED")
+        return True
+    except Exception as e:
+        print(f"  ✗ FAILED - {e}")
+        return False
+
+
+def test_openfda_fetcher():
+    """Test OpenFDA pharmacological lookup endpoint."""
+    print("\n" + "=" * 50)
+    print("TEST: OpenFDA Live Data Fetcher")
+    print("=" * 50)
+    try:
+        resp = requests.get(f"{BASE_URL}/api/medical/openfda?query=paracetamol", timeout=10)
+        print(f"  Status: {resp.status_code}")
+        data = resp.json()
+        print(f"  Drug: {data.get('drug')}")
+        print(f"  Found: {data.get('found')}")
+        assert resp.status_code == 200
+        print("  ✓ PASSED")
+        return True
+    except Exception as e:
+        print(f"  ✗ FAILED - {e}")
+        return False
+
+
+def test_icd11_auth():
+    """Test WHO ICD-11 authentication check endpoint."""
+    print("\n" + "=" * 50)
+    print("TEST: WHO ICD-11 Auth Check")
+    print("=" * 50)
+    try:
+        resp = requests.get(f"{BASE_URL}/api/medical/icd11/auth", timeout=5)
+        print(f"  Status: {resp.status_code}")
+        data = resp.json()
+        print(f"  Configured: {data.get('configured')}")
+        assert resp.status_code == 200
+        print("  ✓ PASSED")
+        return True
+    except Exception as e:
+        print(f"  ✗ FAILED - {e}")
+        return False
+
+
+def test_exotel_ivr():
+    """Test Exotel IVR webhook and DTMF endpoints."""
+    print("\n" + "=" * 50)
+    print("TEST: Exotel Telephony IVR Webhook")
+    print("=" * 50)
+    try:
+        # 1. Test status
+        status_resp = requests.get(f"{BASE_URL}/api/ivr/exotel/status", timeout=5)
+        assert status_resp.status_code == 200
+        print("  ✓ Exotel status checked")
+
+        # 2. Test webhook (returns ExoML)
+        wb_resp = requests.get(f"{BASE_URL}/api/ivr/exotel/webhook", timeout=5)
+        assert wb_resp.status_code == 200
+        assert "<Response>" in wb_resp.text
+        print("  ✓ Exotel ExoML webhook verified")
+
+        # 3. Test DTMF digit 1 (medicine taken)
+        digit_resp = requests.get(f"{BASE_URL}/api/ivr/exotel/response?Digits=1", timeout=5)
+        assert digit_resp.status_code == 200
+        assert "recorded as taken" in digit_resp.text
+        print("  ✓ Exotel DTMF response verified")
+        return True
+    except Exception as e:
+        print(f"  ✗ FAILED - {e}")
+        return False
+
+
 if __name__ == "__main__":
-    print("\n🏥 SmartMed AI - API Test Suite (Chat & Call AI)\n")
+    print("\n🏥 SmartMed AI - API Test Suite (Offline & AWS Hybrid)\n")
 
     results = []
     results.append(("Health Check", test_health()))
 
     if results[0][1]:  # Only continue if server is running
         results.append(("AI Status", test_status()))
+        results.append(("NVIDIA NIM Status", test_nim_status()))
+        results.append(("OpenFDA Data Fetcher", test_openfda_fetcher()))
+        results.append(("WHO ICD-11 Auth Check", test_icd11_auth()))
+        results.append(("Exotel IVR Telephony", test_exotel_ivr()))
         results.append(("Empty Message", test_empty_message()))
         results.append(("Chat (MNN)", test_chat()))
         results.append(("Chat with History", test_chat_with_history()))

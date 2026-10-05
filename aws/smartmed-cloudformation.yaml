@@ -114,6 +114,14 @@ Resources:
           chown -R ubuntu:ubuntu smartmed
           cd smartmed
 
+          # Initialize environment templates
+          if [ ! -f .env ] && [ -f .env.example ]; then
+            cp .env.example .env
+          fi
+          if [ ! -f ai/.env ] && [ -f ai/.env.example ]; then
+            cp ai/.env.example ai/.env
+          fi
+
           # Launch via Docker Compose
           docker compose up -d --build
           echo "SmartMed deployment complete!"

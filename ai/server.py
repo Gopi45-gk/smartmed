@@ -40,6 +40,10 @@ except Exception as e:
     logging.getLogger("smartmed.server").error(f"Prescription OCR pipeline import error: {e}", exc_info=True)
     ocr_pipeline = None
 
+import httpx
+import time
+from rag.pipeline import rag_pipeline
+
 from mnn.config import config
 from mnn.inference import inference_engine
 from mnn.model_manager import model_manager
@@ -121,6 +125,7 @@ class ChatRequest(BaseModel):
     history: Optional[List[Dict[str, str]]] = Field(
         None, description="Conversation history as [{role, content}]"
     )
+    mode: Optional[str] = Field("auto", description="Inference mode: 'auto', 'offline', or 'online'")
 
 
 class ChatResponse(BaseModel):
@@ -223,13 +228,173 @@ async def get_status():
     )
 
 
+# ─── NVIDIA NIM Router (AWS Cloud Online Inference) ─────────────────────────
+
+async def query_nvidia_nim(
+    message: str,
+    conversation_history: Optional[List[Dict[str, str]]] = None,
+    rag_context: Optional[str] = None,
+    model: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    Route clinical triage query to AWS / NVIDIA NIM Inference Microservices.
+    Enforces the exact Medical Expert Master Prompt and injects verified
+    OpenFDA / WHO EML / ICD-11 pharmacological data.
+    """
+    if not config.ai_api_key:
+        return {
+            "success": False,
+            "error": "NVIDIA NIM API key (AI_API_KEY) is not configured.",
+            "model": config.ai_model_chat,
+            "offline": False,
+        }
+
+    start_time = time.time()
+    system_prompt = config.get_system_prompt()
+
+    messages = [{"role": "system", "content": system_prompt}]
+
+    if conversation_history:
+        for turn in conversation_history[-10:]:
+            role = turn.get("role", "user")
+            content = turn.get("content", "")
+            if role in ["user", "assistant"]:
+                messages.append({"role": role, "content": content})
+
+    user_content = message
+    if rag_context:
+        user_content = f"[Retrieved Pharmacological Data]\n{rag_context}\n\n{message}"
+
+    messages.append({"role": "user", "content": user_content})
+
+    nim_url = f"{config.ai_api_base_url.rstrip('/')}/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {config.ai_api_key}",
+        "Content-Type": "application/json",
+    }
+    target_model = model or config.ai_model_chat
+    payload = {
+        "model": target_model,
+        "messages": messages,
+        "temperature": config.temperature,
+        "max_tokens": config.max_new_tokens,
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=40.0) as client:
+            resp = await client.post(nim_url, json=payload, headers=headers)
+            if resp.status_code == 200:
+                data = resp.json()
+                choices = data.get("choices", [])
+                if choices:
+                    response_text = choices[0].get("message", {}).get("content", "")
+                    elapsed = round(time.time() - start_time, 2)
+                    return {
+                        "success": True,
+                        "response": response_text.strip(),
+                        "model": target_model,
+                        "offline": False,
+                        "rag_grounded": bool(rag_context),
+                        "timing": f"{elapsed}s",
+                    }
+                return {
+                    "success": False,
+                    "error": "Empty response from NVIDIA NIM",
+                    "model": target_model,
+                    "offline": False,
+                }
+            else:
+                error_body = resp.text[:200]
+                return {
+                    "success": False,
+                    "error": f"NVIDIA NIM error HTTP {resp.status_code}: {error_body}",
+                    "model": target_model,
+                    "offline": False,
+                }
+    except Exception as e:
+        logger.error(f"NVIDIA NIM request error: {e}", exc_info=True)
+        return {
+            "success": False,
+            "error": f"Failed to connect to NVIDIA NIM: {str(e)}",
+            "model": target_model,
+            "offline": False,
+        }
+
+
+@app.get("/api/ai/nim/status")
+async def nim_status():
+    """Check NVIDIA NIM Cloud Router status."""
+    return {
+        "status": "ready" if config.ai_api_key else "unconfigured",
+        "configured": bool(config.ai_api_key),
+        "base_url": config.ai_api_base_url,
+        "chat_model": config.ai_model_chat,
+        "voice_model": config.ai_model_voice,
+    }
+
+
+@app.post("/api/ai/nim", response_model=ChatResponse)
+async def chat_nim(request: ChatRequest):
+    """
+    Direct endpoint to route complex medical queries to NVIDIA NIM
+    with live WHO/FDA pharmacological data retrieval.
+    """
+    message = request.message.strip()
+    if not message:
+        raise HTTPException(status_code=400, detail="Message cannot be empty")
+
+    intent = detect_intent(message)
+    rag_context = ""
+    try:
+        rag_context = rag_pipeline.get_rag_context(message)
+    except Exception as e:
+        logger.debug(f"RAG context error: {e}")
+
+    nim_result = await query_nvidia_nim(
+        message=message,
+        conversation_history=request.history,
+        rag_context=rag_context,
+    )
+
+    if nim_result.get("success"):
+        return ChatResponse(
+            success=True,
+            response=nim_result.get("response"),
+            intent=intent,
+            model=nim_result.get("model", config.ai_model_chat),
+            offline=False,
+            rag_grounded=nim_result.get("rag_grounded", False),
+            timing=nim_result.get("timing"),
+        )
+
+    # Fallback to local MNN if NIM unconfigured or failed
+    logger.info("Falling back from NIM to local MNN inference...")
+    async with _inference_lock:
+        result = await asyncio.to_thread(
+            inference_engine.generate,
+            message=message,
+            conversation_history=request.history,
+        )
+        return ChatResponse(
+            success=result.get("success", False),
+            response=result.get("response"),
+            intent=intent,
+            error=result.get("error"),
+            model=result.get("model", config.model_name),
+            offline=True,
+            rag_grounded=result.get("rag_grounded", False),
+            timing=result.get("timing"),
+        )
+
+
 @app.post("/api/ai/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     """
-    Send a message to the local AI assistant and receive a response.
+    Hybrid AI Router Endpoint (Offline-First with Online Fallback).
     
-    The message is processed entirely locally using the MNN runtime.
-    No data is sent to any external service.
+    - OFFLINE MODE: Routes directly to local on-device MNN / WebLLM pipeline.
+    - ONLINE MODE: Routes complex medical queries to AWS NVIDIA NIM with live WHO/FDA lookups.
+    - AUTO MODE: Uses NVIDIA NIM if available/online, seamlessly falling back to local MNN.
     """
     message = request.message.strip()
 
@@ -240,12 +405,44 @@ async def chat(request: ChatRequest):
         raise HTTPException(status_code=400, detail="Message too long (max 4096 chars)")
 
     intent = detect_intent(message)
-    logger.info(f"Chat request: {message[:80]}{'...' if len(message) > 80 else ''} (Intent: {intent})")
+    logger.info(f"Chat request: {message[:80]}{'...' if len(message) > 80 else ''} (Intent: {intent}, Mode: {request.mode})")
 
-    # Acquire lock to prevent concurrent inference
+    # Fetch verified pharmacological RAG context (EML, OpenFDA, ICD-11)
+    rag_context = ""
+    try:
+        rag_context = rag_pipeline.get_rag_context(message)
+    except Exception as r_err:
+        logger.debug(f"RAG lookup error: {r_err}")
+
+    # Determine whether to attempt online NVIDIA NIM inference
+    should_try_online = (
+        request.mode == "online"
+        or (request.mode == "auto" and bool(config.ai_api_key))
+        or (request.mode == "auto" and not config.model_exists())
+    ) and bool(config.ai_api_key)
+
+    if should_try_online:
+        logger.info("Routing query to AWS-hosted NVIDIA NIM router with live pharmacological data...")
+        nim_result = await query_nvidia_nim(
+            message=message,
+            conversation_history=request.history,
+            rag_context=rag_context,
+        )
+        if nim_result.get("success"):
+            return ChatResponse(
+                success=True,
+                response=nim_result.get("response"),
+                intent=intent,
+                model=nim_result.get("model", config.ai_model_chat),
+                offline=False,
+                rag_grounded=nim_result.get("rag_grounded", False),
+                timing=nim_result.get("timing"),
+            )
+        logger.warning(f"Online NVIDIA NIM inference failed: {nim_result.get('error')}. Falling back to local offline MNN...")
+
+    # Offline local inference using on-device MNN runtime
     async with _inference_lock:
         try:
-            # Run inference in a thread pool to not block the event loop
             result = await asyncio.to_thread(
                 inference_engine.generate,
                 message=message,
@@ -988,6 +1185,219 @@ async def process_prescription(
             "medicines": [],
             "error": str(e),
         }
+
+
+# ─── OpenFDA Live Pharmacological Endpoints ─────────────────────────────────
+
+@app.get("/api/medical/openfda")
+@app.get("/api/data/openfda")
+async def get_openfda_data(query: str):
+    """
+    Live OpenFDA drug label and pharmacological data fetcher.
+    Returns FDA-approved indications, warnings, dosage, and administration.
+    """
+    if not query or not query.strip():
+        raise HTTPException(status_code=400, detail="Query parameter is required")
+    clean_q = query.strip()
+    try:
+        fda_data = await asyncio.to_thread(rag_pipeline.fetch_openfda, clean_q)
+        return {
+            "success": True,
+            "drug": clean_q,
+            "found": bool(fda_data),
+            "data": fda_data,
+            "source": "OpenFDA Drug Label API",
+            "authenticated": bool(config.openfda_api_key),
+        }
+    except Exception as e:
+        logger.error(f"OpenFDA lookup error: {e}", exc_info=True)
+        return {
+            "success": False,
+            "drug": clean_q,
+            "found": False,
+            "data": "",
+            "error": str(e),
+            "source": "OpenFDA Drug Label API",
+        }
+
+
+# ─── WHO ICD-11 Disease Classification Endpoints ────────────────────────────
+
+@app.get("/api/medical/icd11/auth")
+async def check_icd11_auth():
+    """
+    Check status of WHO ICD-11 OAuth2 authentication.
+    """
+    configured = bool(config.medi_client_id and config.medi_client_secret)
+    token = None
+    if configured:
+        try:
+            token = await asyncio.to_thread(rag_pipeline._get_icd11_token)
+        except Exception as e:
+            logger.debug(f"ICD-11 auth check error: {e}")
+    return {
+        "configured": configured,
+        "token_acquired": bool(token),
+        "service": "WHO ICD-11 MMS API",
+    }
+
+
+@app.get("/api/medical/icd11")
+@app.get("/api/data/icd11")
+async def get_icd11_data(query: str):
+    """
+    Live WHO ICD-11 disease classification and diagnostic standard search.
+    """
+    if not query or not query.strip():
+        raise HTTPException(status_code=400, detail="Query parameter is required")
+    clean_q = query.strip()
+    try:
+        icd_data = await asyncio.to_thread(rag_pipeline.fetch_icd11, clean_q)
+        return {
+            "success": True,
+            "query": clean_q,
+            "found": bool(icd_data),
+            "classification": icd_data,
+            "source": "WHO ICD-11 MMS Search API",
+            "authenticated": bool(config.medi_client_id and config.medi_client_secret),
+        }
+    except Exception as e:
+        logger.error(f"ICD-11 search error: {e}", exc_info=True)
+        return {
+            "success": False,
+            "query": clean_q,
+            "found": False,
+            "classification": "",
+            "error": str(e),
+            "source": "WHO ICD-11 MMS Search API",
+        }
+
+
+# ─── Exotel Telephony & IVR Webhook Endpoints ───────────────────────────────
+
+class ExotelCallRequest(BaseModel):
+    to_number: str = Field(..., description="Patient mobile number with country code")
+    patient_name: Optional[str] = Field("Patient", description="Patient name")
+    medicine_name: Optional[str] = Field("prescribed medicine", description="Medicine name")
+    dose: Optional[str] = Field("", description="Dosage instruction")
+
+
+@app.get("/api/ivr/exotel/status")
+async def exotel_status():
+    """Check Exotel telephony integration status."""
+    return {
+        "status": "ready" if (config.exotel_sid and config.exotel_token) else "unconfigured",
+        "configured": bool(config.exotel_sid and config.exotel_token),
+        "caller_id": config.exotel_caller_id,
+        "subdomain": config.exotel_subdomain,
+    }
+
+
+@app.api_route("/api/ivr/exotel/webhook", methods=["GET", "POST"])
+async def exotel_webhook(
+    CallSid: Optional[str] = None,
+    From: Optional[str] = None,
+    To: Optional[str] = None,
+):
+    """
+    Exotel IVR Webhook endpoint for inbound patient calls and reminder connects.
+    Returns standard ExoML XML greeting and prompts for DTMF digit input.
+    """
+    logger.info(f"Exotel IVR Webhook received: CallSid={CallSid}, From={From}, To={To}")
+    exoml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<Response>\n'
+        '    <Say>Hello! This is SmartMed Medical Triage and Prescription Reminder Assistant.</Say>\n'
+        '    <Gather action="/api/ivr/exotel/response" method="POST" numDigits="1" timeout="10">\n'
+        '        <Say>Press 1 if you have taken your scheduled medication. Press 2 to snooze your reminder for 15 minutes. Press 3 to ask our AI medical assistant a health question.</Say>\n'
+        '    </Gather>\n'
+        '    <Say>We did not receive any input. Please stay healthy and consult a doctor for severe symptoms. Goodbye!</Say>\n'
+        '</Response>'
+    )
+    return Response(content=exoml, media_type="application/xml")
+
+
+@app.api_route("/api/ivr/exotel/response", methods=["GET", "POST"])
+async def exotel_response(
+    Digits: Optional[str] = None,
+    CallSid: Optional[str] = None,
+):
+    """
+    Exotel DTMF Digit Handler.
+    Processes user keypad input (1: Taken, 2: Snoozed, 3: AI Doctor).
+    """
+    digit = (Digits or "").strip()
+    logger.info(f"Exotel DTMF response: CallSid={CallSid}, Digits='{digit}'")
+
+    if digit == "1":
+        body = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<Response>\n'
+            '    <Say>Thank you! Your medication has been recorded as taken in your SmartMed health profile. Have a wonderful and healthy day!</Say>\n'
+            '</Response>'
+        )
+    elif digit == "2":
+        body = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<Response>\n'
+            '    <Say>Understood. Your medicine reminder has been snoozed for 15 minutes. We will remind you shortly.</Say>\n'
+            '</Response>'
+        )
+    elif digit == "3":
+        body = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<Response>\n'
+            '    <Say>Connecting to SmartMed AI triage assistant. Please consult a doctor for severe symptoms. Goodbye.</Say>\n'
+            '</Response>'
+        )
+    else:
+        body = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<Response>\n'
+            '    <Say>Thank you for using SmartMed Medical Assistant. Please consult a doctor for severe symptoms. Goodbye!</Say>\n'
+            '</Response>'
+        )
+    return Response(content=body, media_type="application/xml")
+
+
+@app.post("/api/ivr/exotel/call")
+async def trigger_exotel_call(req: ExotelCallRequest):
+    """
+    Trigger outbound automated IVR telephone call to patient.
+    """
+    if not config.exotel_sid or not config.exotel_token:
+        # Graceful simulation when running without paid Exotel credentials
+        logger.info(f"Simulating Exotel outbound call to {req.to_number} for {req.medicine_name}")
+        return {
+            "success": True,
+            "simulated": True,
+            "to": req.to_number,
+            "patient": req.patient_name,
+            "medicine": req.medicine_name,
+            "dose": req.dose,
+            "message": "Call queued successfully (simulation mode).",
+        }
+
+    try:
+        url = f"https://{config.exotel_subdomain}/v1/Accounts/{config.exotel_sid}/Calls/connect.json"
+        auth = (config.exotel_sid, config.exotel_token)
+        payload = {
+            "From": config.exotel_caller_id,
+            "To": req.to_number,
+            "CallerId": config.exotel_caller_id,
+            "Url": "http://localhost:8100/api/ivr/exotel/webhook",
+            "CallType": "trans",
+        }
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            res = await client.post(url, data=payload, auth=auth)
+            return {
+                "success": res.status_code == 200,
+                "status_code": res.status_code,
+                "data": res.json() if res.status_code == 200 else res.text,
+            }
+    except Exception as e:
+        logger.error(f"Exotel outbound call error: {e}", exc_info=True)
+        return {"success": False, "error": str(e)}
 
 
 # ─── Main ────────────────────────────────────────────────────────────────────

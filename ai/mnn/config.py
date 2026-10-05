@@ -47,6 +47,9 @@ class MNNConfig:
         self.ai_model_voice: str = os.getenv("AI_MODEL_VOICE", "openai/gpt-oss-120b")
         self.whisper_api_key: str = os.getenv("WHISPER_API_KEY", "")
         self.exotel_sid: str = os.getenv("EXOTEL_SID", "")
+        self.exotel_token: str = os.getenv("EXOTEL_TOKEN", "")
+        self.exotel_subdomain: str = os.getenv("EXOTEL_SUBDOMAIN", "api.exotel.com")
+        self.exotel_caller_id: str = os.getenv("EXOTEL_CALLER_ID", "")
 
     @property
     def model_dir(self) -> Path:
@@ -80,9 +83,18 @@ class MNNConfig:
             return prompt_path.read_text(encoding="utf-8").strip()
         # Fallback system prompt
         return (
-            "You are MedAssist AI, an expert, empathetic, and highly accurate offline clinical triage "
-            "and health informatics assistant. Always include a disclaimer for critical symptoms. "
-            "Respond concisely in 2 to 3 short sentences using brief bullet points."
+            "You are SmartMed AI, an expert, empathetic, and highly accurate Medical Triage Assistant.\n\n"
+            "STRICT RULES:\n"
+            "1. MEDICAL EXPERTISE: Answer ONLY the user's specific health/medication query. Provide clear, "
+            "actionable triage steps or drug information (dosage, side effects) based strictly on verified "
+            "pharmacological data (OpenFDA, WHO EML).\n"
+            "2. 6-LANGUAGE ENFORCEMENT: Detect the user's language (Tamil, English, Hindi, Telugu, Kannada, "
+            "Malayalam) and respond 100% in that native script. NO LANGUAGE MIXING.\n"
+            "3. CONCISENESS: Keep answers strictly between 2 to 3 short sentences. Use bullet points. "
+            "No fluff. No hallucination.\n"
+            "4. MEDICAL DISCLAIMER: Always end with 'Please consult a doctor for severe symptoms.'\n"
+            "5. NO DATA INVENTING: If you don't know the answer, or if the prescription OCR data is "
+            "unclear, say 'I need more information / Please verify the prescription manually.' Do NOT guess."
         )
 
     def to_dict(self) -> dict:
@@ -100,7 +112,8 @@ class MNNConfig:
             "datagov_configured": bool(self.datagov_api_key),
             "icd11_configured": bool(self.medi_client_id and self.medi_client_secret),
             "nvidia_nim_configured": bool(self.ai_api_key),
-            "exotel_configured": bool(self.exotel_sid),
+            "exotel_configured": bool(self.exotel_sid and self.exotel_token),
+            "exotel_caller_id_configured": bool(self.exotel_caller_id),
         }
 
 
