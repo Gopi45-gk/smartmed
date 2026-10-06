@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'motion/react';
-import { ScreenType, TabType, Language, Medicine } from './types';
+import { ScreenType, TabType, Language, Medicine, PatientProfile, defaultPatientProfile } from './types';
 import { translations } from './data/translations';
 import { initialMedicines } from './data/initialData';
 import { SplashScreen } from './components/SplashScreen';
@@ -23,6 +23,14 @@ export default function App() {
   const [lang, setLang] = useState<Language>('en');
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [medicines, setMedicines] = useState<Medicine[]>(initialMedicines);
+  const [patientProfile, setPatientProfile] = useState<PatientProfile>(() => {
+    try {
+      const saved = localStorage.getItem('smartmed_patient_profile');
+      return saved ? JSON.parse(saved) : defaultPatientProfile;
+    } catch {
+      return defaultPatientProfile;
+    }
+  });
 
   const t = translations[lang] || translations.en;
   const isRTL = lang === 'ur';
@@ -59,8 +67,13 @@ export default function App() {
       case 'login':
         return (
           <LoginScreen 
-            next={() => { setScreen('home'); setActiveTab('home'); }} 
+            next={(profile) => { 
+              if (profile) setPatientProfile(profile);
+              setScreen('home'); 
+              setActiveTab('home'); 
+            }} 
             t={t} 
+            currentProfile={patientProfile}
           />
         );
       case 'home':
@@ -68,6 +81,7 @@ export default function App() {
           <HomeScreen 
             medicines={medicines} 
             setMedicines={setMedicines} 
+            patientProfile={patientProfile}
             navigate={(sc) => {
               setScreen(sc);
               if (sc === 'medicines' || sc === 'caregiver' || sc === 'chat' || sc === 'profile' || sc === 'reports') {
@@ -100,6 +114,7 @@ export default function App() {
             close={() => setScreen('home')} 
             medicines={medicines} 
             setMedicines={setMedicines} 
+            patientProfile={patientProfile}
             t={t} 
             lang={lang}
           />
@@ -115,6 +130,7 @@ export default function App() {
           <ProfileScreen 
             currentLang={lang} 
             setLang={setLang} 
+            patientProfile={patientProfile}
             t={t} 
             logout={() => setScreen('login')} 
             onNavigateToCaregiver={() => setScreen('caregiver')}
@@ -125,6 +141,7 @@ export default function App() {
           <HomeScreen 
             medicines={medicines} 
             setMedicines={setMedicines} 
+            patientProfile={patientProfile}
             navigate={setScreen} 
             t={t} 
           />

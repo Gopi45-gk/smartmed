@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { motion } from 'motion/react';
-import { Medicine, ScreenType, TranslationStrings } from '../types';
+import { Medicine, ScreenType, TranslationStrings, PatientProfile, defaultPatientProfile } from '../types';
 import { Pill, PhoneCall, FileText, CheckCircle2, Clock, Sparkles, AlertCircle, ChevronRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
@@ -11,9 +11,21 @@ interface Props {
   setMedicines: Dispatch<SetStateAction<Medicine[]>>;
   navigate: (screen: ScreenType) => void;
   t: TranslationStrings;
+  patientProfile?: PatientProfile;
 }
 
-export function HomeScreen({ medicines, setMedicines, navigate, t }: Props) {
+export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfile }: Props) {
+  const profile = patientProfile || defaultPatientProfile;
+
+  const getInitials = (name?: string) => {
+    if (!name) return 'RK';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0].slice(0, 2).toUpperCase();
+  };
+
   // Find next upcoming medicine or fallback to first
   const nextMed = medicines.find(m => m.status === 'upcoming') || medicines[0];
   const takenCount = medicines.filter(m => m.status === 'taken').length;
@@ -56,7 +68,20 @@ export function HomeScreen({ medicines, setMedicines, navigate, t }: Props) {
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
             <span>{t.goodMorning}</span>
           </div>
-          <h1 className="text-2xl font-bold text-[#1D1D1F] tracking-tight">Ravi Kumar</h1>
+          <h1 className="text-2xl font-bold text-[#1D1D1F] tracking-tight">{profile.name}</h1>
+          <p className="text-[11px] font-medium text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
+            <span className="bg-blue-50 text-[#0071E3] font-semibold px-2 py-0.5 rounded-full border border-blue-100/70">
+              {profile.phone}
+            </span>
+            <span>•</span>
+            <span>Age {profile.age}</span>
+            {profile.condition && (
+              <>
+                <span>•</span>
+                <span className="truncate max-w-[140px] text-slate-600">{profile.condition}</span>
+              </>
+            )}
+          </p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -65,7 +90,7 @@ export function HomeScreen({ medicines, setMedicines, navigate, t }: Props) {
             className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white font-bold flex items-center justify-center text-sm shadow-sm active:scale-95 transition-transform"
             aria-label="Profile"
           >
-            RK
+            {getInitials(profile.name)}
           </button>
         </div>
       </div>

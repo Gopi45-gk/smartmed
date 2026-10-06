@@ -35,4 +35,5 @@ ai/ocr/models/fine_tuned_trocr/*.safetensors
 android/**/build/
 android/.idea/
 android/local.properties
+LITERATURE/
 

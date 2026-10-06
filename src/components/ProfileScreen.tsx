@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Language, TranslationStrings } from '../types';
+import { Language, TranslationStrings, PatientProfile, defaultPatientProfile } from '../types';
 import { Globe, LogOut, Heart, AlertCircle, ChevronRight, Check, Volume2, ShieldCheck, User, Users } from 'lucide-react';
 
 interface Props {
@@ -9,11 +9,22 @@ interface Props {
   t: TranslationStrings;
   logout: () => void;
   onNavigateToCaregiver?: () => void;
+  patientProfile?: PatientProfile;
 }
 
-export function ProfileScreen({ currentLang, setLang, t, logout, onNavigateToCaregiver }: Props) {
+export function ProfileScreen({ currentLang, setLang, t, logout, onNavigateToCaregiver, patientProfile }: Props) {
+  const profile = patientProfile || defaultPatientProfile;
   const [showLangModal, setShowLangModal] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+
+  const getInitials = (name?: string) => {
+    if (!name) return 'RK';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0].slice(0, 2).toUpperCase();
+  };
 
   const languages: { code: Language; name: string; native: string }[] = [
     { code: 'en', name: 'English', native: 'English' },
@@ -40,18 +51,23 @@ export function ProfileScreen({ currentLang, setLang, t, logout, onNavigateToCar
       {/* User Card */}
       <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
         <div className="w-16 h-16 bg-gradient-to-tr from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center font-extrabold text-2xl text-white shadow-md shadow-blue-500/25">
-          RK
+          {getInitials(profile.name)}
         </div>
         <div>
-          <h3 className="font-bold text-lg text-[#1D1D1F]">Ravi Kumar</h3>
-          <p className="text-xs text-[#86868B] mt-0.5">+91 98765 43210</p>
-          <div className="flex items-center gap-1.5 mt-2">
+          <h3 className="font-bold text-lg text-[#1D1D1F]">{profile.name}</h3>
+          <p className="text-xs text-[#86868B] mt-0.5">{profile.phone}</p>
+          <div className="flex items-center gap-1.5 mt-2 flex-wrap">
             <span className="text-[10px] bg-blue-50 text-[#0071E3] font-bold px-2.5 py-0.5 rounded-full border border-blue-100">
-              Age 64 • Male
+              Age {profile.age} • {profile.gender}
             </span>
             <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2.5 py-0.5 rounded-full border border-emerald-100">
               Active Patient
             </span>
+            {profile.condition && (
+              <span className="text-[10px] bg-purple-50 text-purple-700 font-bold px-2.5 py-0.5 rounded-full border border-purple-100 truncate max-w-[150px]">
+                {profile.condition}
+              </span>
+            )}
           </div>
         </div>
       </div>

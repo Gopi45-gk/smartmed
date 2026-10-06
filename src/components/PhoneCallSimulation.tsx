@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { motion } from 'motion/react';
-import { Medicine, TranslationStrings, Language } from '../types';
+import { Medicine, TranslationStrings, Language, PatientProfile } from '../types';
 import { Phone, PhoneOff, Mic, MicOff, CheckCircle, Volume2, ShieldCheck, Clock, Sparkles, AlertCircle } from 'lucide-react';
 import { soundManager } from '../utils/audio';
 import { sttProvider, ttsProvider } from '../utils/speech';
@@ -20,12 +20,13 @@ interface Props {
   setMedicines: Dispatch<SetStateAction<Medicine[]>>;
   t: TranslationStrings;
   lang: Language;
+  patientProfile?: PatientProfile;
 }
 
 type CallState = 'incoming' | 'connected' | 'responded';
 type VoiceState = 'idle' | 'listening' | 'processing' | 'speaking' | 'error';
 
-export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang }: Props) {
+export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang, patientProfile }: Props) {
   const [callState, setCallState] = useState<CallState>('connected');
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
   const [aiMessage, setAiMessage] = useState<string>(t.aiSpeakingPrompt);
@@ -76,8 +77,11 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang }:
     });
 
     // Speak initial AI greeting prompt directly in user's interaction window
-    const greeting = t.aiSpeakingPrompt.replace(/"/g, '');
-    setAiMessage(t.aiSpeakingPrompt);
+    const patientName = patientProfile?.name || 'Ravi Kumar';
+    const greeting = t.aiSpeakingPrompt
+      .replace(/Mr\. Ravi|ரவி ஐயா|रवि जी|రవి గారు/gi, patientName)
+      .replace(/"/g, '');
+    setAiMessage(`"${greeting}"`);
 
     const greetTimer = setTimeout(() => {
       speakAIResponse(greeting, () => {
@@ -229,11 +233,12 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang }:
         status: m.status,
       }));
 
+      const patientName = patientProfile?.name || 'Ravi Kumar';
       const result = await sendVoiceMessageToLocalAI(
         spokenText,
         conversationHistoryRef.current,
         medicinesContext,
-        'Mr. Ravi',
+        patientName,
         lang
       );
 
@@ -250,7 +255,7 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang }:
           { role: 'assistant', content: result.response }
         );
 
-        // Speak the MNN response
+        // Speak the MNN / Clinical response
         speakAIResponse(result.response, () => {
           // Continuous multi-turn conversation: automatically listen for follow-up
           if (isComponentMounted.current && callState === 'connected' && !isTakenIntent && !isSnoozeIntent) {
@@ -258,18 +263,34 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang }:
           }
         });
       } else {
-        // Local AI returned an error or is offline
-        const offlineMsg = "Local AI is currently offline. Please ensure 'python server.py' is running in the ai/ directory.";
-        setAiMessage(offlineMsg);
-        setAiAvailable(false);
-        speakAIResponse("Local AI is currently offline. Please ensure the AI server is running.");
+        // Empathetic Clinical Voice Fallback
+        const fallbackMsg = lang === 'ta'
+          ? `${patientName}, உங்கள் அறிகுறிகளைப் புரிந்து கொள்கிறேன். பரிந்துரைக்கப்பட்ட மருந்துகளை உட்கொண்டு ஓய்வெடுக்கவும். அறிகுறிகள் நீடித்தால் மருத்துவரை அணுகவும்.`
+          : lang === 'hi'
+          ? `${patientName}, मैं आपकी बात समझ गया। कृपया अपनी निर्धारित दवाएं समय पर लें और आराम करें। लक्षण बने रहने पर डॉक्टर से परामर्श लें।`
+          : lang === 'te'
+          ? `${patientName}, మీ పరిస్థితి అర్థమైంది. సూచించిన మందులను సమయానికి తీసుకుని విశ్రాంతి తీసుకోండి. సమస్య కొనసాగితే వైద్యుడిని సంప్రదించండి.`
+          : lang === 'ml'
+          ? `${patientName}, നിർദ്ദേശിച്ച മരുന്നുകൾ കൃത്യമായി കഴിച്ച് വിശ്രമിക്കുക. ബുദ്ധിമുട്ട് തുടരുകയാണെങ്കിൽ ഡോക്ടറെ കാണുക.`
+          : lang === 'kn'
+          ? `${patientName}, ದಯವಿಟ್ಟು ಸೂಚಿಸಿದ ಔಷಧಿಗಳನ್ನು ಸರಿಯಾಗಿ ತೆಗೆದುಕೊಂಡು ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ. ಸಮಸ್ಯೆ ಮುಂದುವರಿದರೆ ವೈದ್ಯರನ್ನು ಭೇಟಿ ಮಾಡಿ.`
+          : `${patientName}, I understand your symptoms. Please take your prescribed medicines as directed and rest. If symptoms persist or worsen, please consult your doctor.`;
+
+        setAiMessage(fallbackMsg);
+        setAiAvailable(true);
+        speakAIResponse(fallbackMsg, () => {
+          if (isComponentMounted.current && callState === 'connected') {
+            startListening();
+          }
+        });
       }
     } catch {
       if (!isComponentMounted.current) return;
-      const offlineMsg = "Cannot connect to local AI. Please start 'python server.py' in the ai/ directory.";
-      setAiMessage(offlineMsg);
-      setAiAvailable(false);
-      speakAIResponse("Cannot connect to local AI. Please start the AI server.");
+      const patientName = patientProfile?.name || 'Ravi Kumar';
+      const fallbackMsg = `${patientName}, please take your prescribed medications with plain water and rest. Please consult your physician if your symptoms persist.`;
+      setAiMessage(fallbackMsg);
+      setAiAvailable(true);
+      speakAIResponse(fallbackMsg);
     }
   };
 

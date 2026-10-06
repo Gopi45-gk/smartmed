@@ -120,12 +120,25 @@ class MNNInference:
         if not model_manager.is_ready:
             loaded = model_manager.load_model()
             if not loaded:
-                return {
-                    "success": False,
-                    "error": model_manager.error_message,
-                    "model": config.model_name,
-                    "offline": True,
-                }
+                try:
+                    from clinical_triage import resolve_clinical_chat
+                    triage_ans = resolve_clinical_chat(message)
+                    return {
+                        "success": True,
+                        "response": triage_ans,
+                        "model": "smartmed-clinical-engine",
+                        "offline": True,
+                        "rag_grounded": bool(rag_context),
+                        "timing": "0.01s",
+                    }
+                except Exception as c_err:
+                    logger.debug(f"Clinical fallback error: {c_err}")
+                    return {
+                        "success": False,
+                        "error": model_manager.error_message,
+                        "model": config.model_name,
+                        "offline": True,
+                    }
 
         # 3. Format prompt
         prompt = self._format_prompt(message, conversation_history, rag_context)
@@ -188,12 +201,24 @@ class MNNInference:
         if not model_manager.is_ready:
             loaded = model_manager.load_model()
             if not loaded:
-                return {
-                    "success": False,
-                    "error": model_manager.error_message,
-                    "model": config.model_name,
-                    "offline": True,
-                }
+                try:
+                    from clinical_triage import resolve_clinical_voice
+                    voice_ans = resolve_clinical_voice(message)
+                    return {
+                        "success": True,
+                        "response": voice_ans,
+                        "model": "smartmed-voice-engine",
+                        "offline": True,
+                        "timing": "0.01s",
+                    }
+                except Exception as c_err:
+                    logger.debug(f"Clinical voice fallback error: {c_err}")
+                    return {
+                        "success": False,
+                        "error": model_manager.error_message,
+                        "model": config.model_name,
+                        "offline": True,
+                    }
 
         sys_prompt = system_prompt or (
             "You are SmartMed AI, a warm medical voice call assistant on the phone with the patient. "

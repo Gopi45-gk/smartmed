@@ -46,6 +46,25 @@ export interface ChatMessage {
   time?: string;
 }
 
+export interface PatientProfile {
+  name: string;
+  phone: string;
+  age: string | number;
+  gender: string;
+  condition?: string;
+  bloodGroup?: string;
+  registeredAt?: string;
+}
+
+export const defaultPatientProfile: PatientProfile = {
+  name: 'Ravi Kumar',
+  phone: '+91 98765 43210',
+  age: '64',
+  gender: 'Male',
+  condition: 'Hypertension & Diabetes',
+  bloodGroup: 'B+',
+};
+
 export interface TranslationStrings {
   appName: string;
   tagline: string;

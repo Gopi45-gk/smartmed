@@ -668,6 +668,12 @@ class BrowserTTSProvider implements ITTSProvider {
         cleanup();
         if (e.error !== 'canceled' && e.error !== 'interrupted') {
           console.warn('[SmartMed TTS] Utterance error:', e.error);
+          // If synthesis-failed occurs on mobile or linux without local TTS voice packs,
+          // invoke onEnd so conversation state transitions cleanly without hanging
+          if (e.error === 'synthesis-failed') {
+            options.onEnd?.();
+            return;
+          }
           options.onError?.(e.error);
         } else {
           options.onEnd?.();
