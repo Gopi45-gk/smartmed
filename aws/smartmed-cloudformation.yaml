@@ -7,15 +7,17 @@ Parameters:
     Type: String
     Default: 't3.xlarge'
     AllowedValues:
+      - 't3.large'
       - 't3.xlarge'
       - 't3.2xlarge'
+      - 'c5a.xlarge'
       - 'c5a.2xlarge'
       - 'g4dn.xlarge'
 
   KeyName:
-    Description: 'Name of an existing EC2 KeyPair for SSH access'
-    Type: 'AWS::EC2::KeyPair::KeyName'
-    ConstraintDescription: 'Must be the name of an existing EC2 KeyPair.'
+    Description: '(Optional) Name of an existing EC2 KeyPair. Leave BLANK if you do not have one (you can use EC2 Instance Connect in the AWS Console).'
+    Type: String
+    Default: ''
 
   SSHLocation:
     Description: 'IP address range that can SSH to the EC2 instance'
@@ -31,21 +33,13 @@ Parameters:
     Type: String
     Default: 'https://github.com/Gopi45-gk/smartmed.git'
 
-Mappings:
-  # Ubuntu 24.04 LTS AMIs (Canonical Official)
-  Region2AMI:
-    us-east-1:
-      AMI: 'ami-0e2c8caa4b6378d8c'
-    us-east-2:
-      AMI: 'ami-036841078a4b68e14'
-    us-west-2:
-      AMI: 'ami-0075013580f5e0b77'
-    ap-south-1:
-      AMI: 'ami-0dee22c13ea7a9a67'
-    eu-west-1:
-      AMI: 'ami-0c1c30571d2dae5c9'
-    ap-southeast-1:
-      AMI: 'ami-060e277c0d4cce553'
+  LatestUbuntuAmiId:
+    Description: 'Automatically resolves the latest official Ubuntu 24.04 LTS AMI in the current region'
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/canonical/ubuntu/server/24.04/stable/current/amd64/hvm/ebs-gp3/ami-id'
+
+Conditions:
+  HasKeyName: !Not [!Equals [!Ref KeyName, '']]
 
 Resources:
   SmartMedSecurityGroup:
@@ -70,8 +64,8 @@ Resources:
     Type: 'AWS::EC2::Instance'
     Properties:
       InstanceType: !Ref InstanceType
-      KeyName: !Ref KeyName
-      ImageId: !FindInMap [Region2AMI, !Ref 'AWS::Region', AMI]
+      KeyName: !If [HasKeyName, !Ref KeyName, !Ref 'AWS::NoValue']
+      ImageId: !Ref LatestUbuntuAmiId
       SecurityGroups:
         - !Ref SmartMedSecurityGroup
       BlockDeviceMappings:
