@@ -124,11 +124,24 @@ def make_twilio_call(phone: str, medicine: str, dosage: str, patient_name: Optio
         }
 
     try:
-        call = client.calls.create(
-            to=formatted_phone,
-            from_=TWILIO_PHONE_NUMBER,
-            twiml=twiml_xml
+        from urllib.parse import quote
+        webhook_url = (
+            f"https://smart-med.duckdns.org/api/call/twiml"
+            f"?medicine={quote(medicine)}&dosage={quote(dosage)}&patient_name={quote(patient_name or 'Patient')}"
         )
+        try:
+            call = client.calls.create(
+                to=formatted_phone,
+                from_=TWILIO_PHONE_NUMBER,
+                url=webhook_url
+            )
+        except Exception as tw_url_err:
+            logger.warning(f"Twilio call with url failed ({tw_url_err}), retrying with inline twiml...")
+            call = client.calls.create(
+                to=formatted_phone,
+                from_=TWILIO_PHONE_NUMBER,
+                twiml=twiml_xml
+            )
         logger.info(f"✓ Twilio Call Created! SID: {call.sid}, Status: {call.status}")
         return {
             "success": True,
