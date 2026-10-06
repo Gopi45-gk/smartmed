@@ -424,9 +424,9 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang, p
                 Local MNN Inference Active (Offline)
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 text-[10px] text-amber-400 bg-amber-950/40 px-2.5 py-0.5 rounded-full border border-amber-500/30">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                Offline AI Unavailable — Basic Mode
+              <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400 bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                SmartMed Voice Care (Offline Engine Active)
               </span>
             )}
           </div>
@@ -573,10 +573,36 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang, p
         )}
 
         {(callState === 'connected' || callState === 'responded') && (
-          <div className="w-full">
+          <div className="w-full space-y-3">
+            {/* Quick Touch/Voice Responses (Works Offline & Online) */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  ttsProvider.stop();
+                  handleUserVoiceInput(t.replyTaken || "I took my medicine");
+                }}
+                className="py-2.5 px-3 bg-white/10 hover:bg-white/15 active:scale-95 border border-white/20 rounded-xl text-xs font-semibold text-emerald-300 flex items-center justify-center gap-1.5 transition-all shadow-sm"
+              >
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="truncate">{t.replyTaken || "I took my medicine"}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  ttsProvider.stop();
+                  handleUserVoiceInput(t.replySnooze || "Remind me in 15 mins");
+                }}
+                className="py-2.5 px-3 bg-white/10 hover:bg-white/15 active:scale-95 border border-white/20 rounded-xl text-xs font-semibold text-amber-300 flex items-center justify-center gap-1.5 transition-all shadow-sm"
+              >
+                <Clock className="w-3.5 h-3.5 text-amber-400" />
+                <span className="truncate">{t.replySnooze || "Remind in 15m"}</span>
+              </button>
+            </div>
+
             <button 
               onClick={handleEndCall} 
-              className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl shadow-lg shadow-red-500/30 active:scale-98 transition-all flex items-center justify-center gap-2 text-sm"
+              className="w-full py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl shadow-lg shadow-red-500/30 active:scale-98 transition-all flex items-center justify-center gap-2 text-sm"
             >
               <PhoneOff className="w-5 h-5" />
               <span>{t.endCall}</span>

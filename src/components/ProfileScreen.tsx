@@ -84,7 +84,7 @@ export function ProfileScreen({ currentLang, setLang, t, logout, onNavigateToCar
         <div className="grid grid-cols-2 gap-3 text-xs">
           <div className="p-3 bg-red-50/50 rounded-xl border border-red-100/80">
             <span className="text-[10px] uppercase font-bold text-red-500 block">Blood Group</span>
-            <span className="font-extrabold text-sm text-[#1D1D1F] mt-0.5 block">{t.bloodGroup}</span>
+            <span className="font-extrabold text-sm text-[#1D1D1F] mt-0.5 block">{profile.bloodGroup || t.bloodGroup}</span>
           </div>
 
           <div className="p-3 bg-red-50/50 rounded-xl border border-red-100/80">

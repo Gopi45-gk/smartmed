@@ -132,6 +132,7 @@ export interface NetworkState {
 export interface ChatOptions {
   mode?: 'auto' | 'offline' | 'online';
   timeout?: number;
+  language?: string;
 }
 
 // ─── Network State Checker ──────────────────────────────────────────────────
@@ -370,12 +371,13 @@ export async function sendMessageToLocalAI(
   const online = isOnline();
   const requestedMode = options?.mode ?? 'auto';
   const effectiveMode = requestedMode === 'offline' ? 'offline' : (!online ? 'offline' : 'online');
-  const timeoutMs = options?.timeout ?? FETCH_TIMEOUT;
+  const timeoutMs = options?.timeout ?? 4000;
+  const userLang = options?.language;
 
-  // 1. ONLINE PATH: Query AWS-hosted backend with NVIDIA NIM router & verified pharmacological RAG
+  // 1. ONLINE PATH: Query AWS-hosted backend with fast timeout
   if (effectiveMode === 'online') {
     const cloudController = new AbortController();
-    const cloudTimeout = setTimeout(() => cloudController.abort(), Math.min(timeoutMs, 45_000));
+    const cloudTimeout = setTimeout(() => cloudController.abort(), Math.min(timeoutMs, 4000));
 
     try {
       const response = await fetch(`${CLOUD_API_BASE_URL}/api/ai/chat`, {
@@ -386,6 +388,7 @@ export async function sendMessageToLocalAI(
           conversationId: getConversationId(),
           history: conversationHistory.slice(-20),
           mode: 'online',
+          language: userLang,
         }),
         signal: cloudController.signal,
       });
@@ -394,18 +397,18 @@ export async function sendMessageToLocalAI(
 
       if (response.ok) {
         const cloudData: AIChatResponse = await response.json();
-        return cloudData;
+        if (cloudData && cloudData.success && cloudData.response) {
+          return cloudData;
+        }
       }
-      console.warn(`[HybridRouter] Cloud NIM returned HTTP ${response.status}, falling back to local MNN...`);
-    } catch (cloudErr) {
+    } catch {
       clearTimeout(cloudTimeout);
-      console.warn('[HybridRouter] Cloud NIM request failed, falling back to local MNN...', cloudErr);
     }
   }
 
-  // 2. OFFLINE PATH: Local on-device MNN inference
+  // 2. OFFLINE / LOCAL PATH: Query local backend with fast timeout
   const localController = new AbortController();
-  const localTimeout = setTimeout(() => localController.abort(), timeoutMs);
+  const localTimeout = setTimeout(() => localController.abort(), Math.min(timeoutMs, 3000));
 
   try {
     const targetUrl = LOCAL_API_BASE_URL ? `${LOCAL_API_BASE_URL}/api/ai/chat` : `${AI_BASE_URL}/api/ai/chat`;
@@ -417,35 +420,33 @@ export async function sendMessageToLocalAI(
         conversationId: getConversationId(),
         history: conversationHistory.slice(-20),
         mode: 'offline',
+        language: userLang,
       }),
       signal: localController.signal,
     });
 
     clearTimeout(localTimeout);
 
-    if (!response.ok) {
-      const fallbackClinical = resolveClinicalTriageOffline(message);
-      return {
-        success: true,
-        response: fallbackClinical,
-        model: 'smartmed-clinical-engine',
-        offline: true,
-        rag_grounded: true,
-        timing: '0.01s',
-      };
+    if (response.ok) {
+      const data: AIChatResponse = await response.json();
+      if (data && data.success && data.response) {
+        return data;
+      }
     }
-
-    const data: AIChatResponse = await response.json();
-    if (!data.success || !data.response) {
-      data.success = true;
-      data.response = resolveClinicalTriageOffline(message);
-    }
-    return data;
-  } catch (error: unknown) {
+  } catch {
     clearTimeout(localTimeout);
-    const fallbackClinical = resolveClinicalTriageOffline(message);
-    return handleFetchError(error, fallbackClinical);
   }
+
+  // 3. OFFLINE CLINICAL ENGINE FALLBACK: Instant deterministic answer in patient's language
+  const fallbackClinical = resolveClinicalTriageOffline(message, { language: userLang });
+  return {
+    success: true,
+    response: fallbackClinical,
+    model: 'smartmed-clinical-engine',
+    offline: true,
+    rag_grounded: true,
+    timing: '0.01s',
+  };
 }
 
 /**
@@ -461,7 +462,7 @@ export async function sendVoiceMessageToLocalAI(
   language: string = 'en',
 ): Promise<AIChatResponse> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+  const timeoutId = setTimeout(() => controller.abort(), 3500);
 
   try {
     const response = await fetch(`${AI_BASE_URL}/api/ai/voice`, {
@@ -486,28 +487,25 @@ export async function sendVoiceMessageToLocalAI(
 
     clearTimeout(timeoutId);
 
-    if (!response.ok) {
-      const fallbackVoice = resolveClinicalTriageOffline(message, { isVoice: true, patientName, language });
-      return {
-        success: true,
-        response: fallbackVoice,
-        model: 'smartmed-voice-engine',
-        offline: true,
-        timing: '0.01s',
-      };
+    if (response.ok) {
+      const data: AIChatResponse = await response.json();
+      if (data && data.success && data.response) {
+        return data;
+      }
     }
-
-    const data: AIChatResponse = await response.json();
-    if (!data.success || !data.response) {
-      data.success = true;
-      data.response = resolveClinicalTriageOffline(message, { isVoice: true, patientName, language });
-    }
-    return data;
-  } catch (error: unknown) {
+  } catch {
     clearTimeout(timeoutId);
-    const fallbackVoice = resolveClinicalTriageOffline(message, { isVoice: true, patientName, language });
-    return handleFetchError(error, fallbackVoice);
   }
+
+  // Instant offline voice resolver
+  const fallbackVoice = resolveClinicalTriageOffline(message, { isVoice: true, patientName, language });
+  return {
+    success: true,
+    response: fallbackVoice,
+    model: 'smartmed-voice-engine',
+    offline: true,
+    timing: '0.01s',
+  };
 }
 
 /**

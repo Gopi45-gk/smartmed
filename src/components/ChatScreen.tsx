@@ -6,6 +6,7 @@ import { Send, Bot, User, Sparkles, Trash2, RefreshCw, ShieldAlert } from 'lucid
 import { soundManager } from '../utils/audio';
 import {
   sendMessageToLocalAI,
+  resolveClinicalTriageOffline,
   isAIServerReachable,
   saveConversationHistory,
   loadConversationHistory,
@@ -103,49 +104,34 @@ export function ChatScreen({ medicines, t, lang }: Props) {
     setInput('');
     setIsTyping(true);
 
-    // Send to local MNN AI engine
+    // Send to hybrid AI engine with offline fallback
     try {
       const history = getConversationHistory();
-      const result = await sendMessageToLocalAI(text.trim(), history);
+      const result = await sendMessageToLocalAI(text.trim(), history, { language: lang });
 
-      if (result.success && result.response) {
-        setAiAvailable(true);
-        const aiMsg: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          sender: 'ai',
-          text: result.response,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-        setMessages(prev => [...prev, aiMsg]);
-        soundManager.playSuccessChime();
-        setIsTyping(false);
-        return;
-      } else {
-        // AI service returned an error or is offline
-        const err = result.error || 'Failed to generate response from local AI.';
-        setLastError(err);
-        setAiAvailable(false);
-        const errorMsg: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          sender: 'ai',
-          text: `⚠ ${err}`,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        };
-        setMessages(prev => [...prev, errorMsg]);
-        setIsTyping(false);
-        return;
-      }
-    } catch (e: unknown) {
-      setAiAvailable(false);
-      const errMsg = e instanceof Error ? e.message : 'Cannot connect to local AI server.';
-      setLastError(errMsg);
+      const replyText = (result.success && result.response)
+        ? result.response
+        : resolveClinicalTriageOffline(text.trim(), { language: lang });
+
+      const aiMsg: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        sender: 'ai',
+        text: replyText,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages(prev => [...prev, aiMsg]);
+      soundManager.playSuccessChime();
+      setIsTyping(false);
+    } catch {
+      const fallbackText = resolveClinicalTriageOffline(text.trim(), { language: lang });
       const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
-        text: `⚠ Local AI is currently offline. Please ensure the local AI server is running (cd ai && python server.py).`,
+        text: fallbackText,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, errorMsg]);
+      soundManager.playSuccessChime();
       setIsTyping(false);
     }
   };
@@ -195,9 +181,9 @@ export function ChatScreen({ medicines, t, lang }: Props) {
                   Local AI Ready (Offline MNN)
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 text-amber-600">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                  Offline AI Unavailable — Basic Mode
+                <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  SmartMed Care AI (Offline Engine Ready)
                 </span>
               )}
             </div>

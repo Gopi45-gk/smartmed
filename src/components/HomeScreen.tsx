@@ -69,19 +69,24 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
             <span>{t.goodMorning}</span>
           </div>
           <h1 className="text-2xl font-bold text-[#1D1D1F] tracking-tight">{profile.name}</h1>
-          <p className="text-[11px] font-medium text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
+          <div className="text-[11px] font-medium text-slate-600 mt-1 flex items-center gap-1.5 flex-wrap">
             <span className="bg-blue-50 text-[#0071E3] font-semibold px-2 py-0.5 rounded-full border border-blue-100/70">
               {profile.phone}
             </span>
-            <span>•</span>
-            <span>Age {profile.age}</span>
-            {profile.condition && (
-              <>
-                <span>•</span>
-                <span className="truncate max-w-[140px] text-slate-600">{profile.condition}</span>
-              </>
+            <span className="bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded-full border border-slate-200">
+              Age {profile.age} • {profile.gender}
+            </span>
+            {profile.bloodGroup && (
+              <span className="bg-rose-50 text-rose-700 font-bold px-2 py-0.5 rounded-full border border-rose-100">
+                🩸 {profile.bloodGroup}
+              </span>
             )}
-          </p>
+            {profile.condition && (
+              <span className="bg-purple-50 text-purple-700 font-medium px-2 py-0.5 rounded-full border border-purple-100 truncate max-w-[200px]" title={profile.condition}>
+                🩺 {profile.condition}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
