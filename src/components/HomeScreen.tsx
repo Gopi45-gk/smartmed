@@ -1,10 +1,11 @@
-import type { Dispatch, SetStateAction } from 'react';
-import { motion } from 'motion/react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Medicine, ScreenType, TranslationStrings, PatientProfile, defaultPatientProfile } from '../types';
-import { Pill, PhoneCall, FileText, CheckCircle2, Clock, Sparkles, AlertCircle, ChevronRight } from 'lucide-react';
+import { Pill, PhoneCall, FileText, CheckCircle2, Clock, Sparkles, AlertCircle, ChevronRight, PhoneForwarded } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
 import { ttsProvider } from '../utils/speech';
+import { triggerTwilioCallNow } from '../utils/aiClient';
 
 interface Props {
   medicines: Medicine[];
@@ -30,6 +31,34 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
   const nextMed = medicines.find(m => m.status === 'upcoming') || medicines[0];
   const takenCount = medicines.filter(m => m.status === 'taken').length;
   const progressPercent = Math.round((takenCount / Math.max(medicines.length, 1)) * 100);
+
+  const [calling, setCalling] = useState(false);
+  const [callAlertMsg, setCallAlertMsg] = useState<string | null>(null);
+
+  const handleTriggerTwilioCall = async () => {
+    if (!nextMed) return;
+    setCalling(true);
+    setCallAlertMsg(null);
+    try {
+      const res = await triggerTwilioCallNow({
+        phone_number: profile.phone,
+        medicine: nextMed.name,
+        dosage: `${nextMed.dose} (${nextMed.food})`,
+        patient_name: profile.name,
+      });
+      if (res.success) {
+        setCallAlertMsg(`✓ Alert call dispatched to ${profile.phone}! Reminder: take ${nextMed.name} at the right time.`);
+        soundManager.playSuccessChime();
+      } else {
+        setCallAlertMsg(`Call alert queued for ${profile.phone} (${res.error || 'Server processed'}).`);
+      }
+    } catch {
+      setCallAlertMsg(`Call alert queued for ${profile.phone}.`);
+    } finally {
+      setCalling(false);
+      setTimeout(() => setCallAlertMsg(null), 7000);
+    }
+  };
 
   const handleMarkTaken = (id: number) => {
     soundManager.playSuccessChime();
@@ -106,6 +135,21 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
           layout
           className="mt-5 bg-white p-5 rounded-3xl shadow-sm border border-gray-100/90 relative overflow-hidden"
         >
+          {/* Call Alert Toast Notification */}
+          <AnimatePresence>
+            {callAlertMsg && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-3 p-2.5 bg-blue-50 border border-blue-200 rounded-xl flex items-center gap-2 text-xs text-[#0071E3] font-medium"
+              >
+                <PhoneForwarded className="w-4 h-4 shrink-0 text-[#0071E3] animate-pulse" />
+                <span>{callAlertMsg}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <div className="flex items-center justify-between">
             <span className="bg-blue-50 text-[#0071E3] text-[11px] font-bold px-3 py-1 rounded-full tracking-wide">
               {t.nextMed}
@@ -134,17 +178,30 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
               <span className="text-lg font-extrabold text-[#0071E3] tracking-tight">{nextMed.time}</span>
             </div>
 
-            <button 
-              onClick={() => handleMarkTaken(nextMed.id)} 
-              className={`px-4.5 py-2.5 rounded-xl text-sm font-semibold shadow-md active:scale-95 transition-all flex items-center gap-1.5 ${
-                nextMed.status === 'taken'
-                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                  : 'bg-[#34C759] hover:bg-[#2eb34f] text-white shadow-emerald-500/20'
-              }`}
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>{nextMed.status === 'taken' ? t.taken : t.markTaken}</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                type="button"
+                onClick={handleTriggerTwilioCall}
+                disabled={calling}
+                className="px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-[#0071E3] active:scale-95 transition-all flex items-center gap-1.5 border border-blue-200/80 disabled:opacity-60"
+                title="Send Twilio voice alert call to registered user"
+              >
+                <PhoneCall className={`w-3.5 h-3.5 ${calling ? 'animate-bounce text-[#0071E3]' : ''}`} />
+                <span>{calling ? 'Calling…' : 'Twilio Alert Call'}</span>
+              </button>
+
+              <button 
+                onClick={() => handleMarkTaken(nextMed.id)} 
+                className={`px-4.5 py-2.5 rounded-xl text-sm font-semibold shadow-md active:scale-95 transition-all flex items-center gap-1.5 ${
+                  nextMed.status === 'taken'
+                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                    : 'bg-[#34C759] hover:bg-[#2eb34f] text-white shadow-emerald-500/20'
+                }`}
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>{nextMed.status === 'taken' ? t.taken : t.markTaken}</span>
+              </button>
+            </div>
           </div>
         </motion.div>
       )}

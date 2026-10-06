@@ -82,19 +82,22 @@ def format_e164_phone(phone: str) -> str:
 def generate_twiml(medicine: str, dosage: str, patient_name: Optional[str] = None) -> str:
     """
     Generate TwiML XML string with Polly.Aditi voice for clear, natural speech.
+    Explicitly alerts patient to ensure tablets are taken at the right time.
     """
     greeting = f"Hello {patient_name}," if patient_name else "Hello,"
     spoken_text = (
-        f"{greeting} this is your SmartMed automated care assistant. "
-        f"It is time to take your scheduled medicine: {medicine}, dosage: {dosage}. "
-        f"Please take it with a glass of water as directed by your doctor. Thank you and stay healthy!"
+        f"{greeting} this is your SmartMed automated healthcare alert. "
+        f"Please ensure your tablets are taken at the right time. "
+        f"Your scheduled prescription is {medicine}, dosage: {dosage}. "
+        f"Taking your tablets at the right time as directed by your doctor is essential for your recovery and well-being. "
+        f"Please take your prescribed tablets now with plain water. Thank you and stay healthy!"
     )
     
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say voice="Polly.Aditi" language="en-IN">{spoken_text}</Say>
   <Pause length="1"/>
-  <Say voice="Polly.Aditi" language="en-IN">Repeating: {dosage} of {medicine}. Take care!</Say>
+  <Say voice="Polly.Aditi" language="en-IN">Important healthcare alert: Please verify your tablets are taken at the right time. Take care!</Say>
 </Response>"""
 
 

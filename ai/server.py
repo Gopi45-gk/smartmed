@@ -1511,7 +1511,7 @@ async def get_twilio_twiml_endpoint(
         xml_content = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<Response>\n'
-            f'  <Say voice="Polly.Aditi" language="en-IN">Hello, this is your SmartMed reminder to take {dosage} of {medicine}. Thank you!</Say>\n'
+            f'  <Say voice="Polly.Aditi" language="en-IN">Hello, this is your SmartMed automated healthcare alert. Please ensure your tablets are taken at the right time. Scheduled prescription: {dosage} of {medicine}. Thank you and stay healthy!</Say>\n'
             '</Response>'
         )
     return Response(content=xml_content, media_type="application/xml")
