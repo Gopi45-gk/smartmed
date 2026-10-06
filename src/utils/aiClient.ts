@@ -737,3 +737,104 @@ export function clearConversationHistory(): void {
   localStorage.removeItem('smartmed-chat-history');
   localStorage.removeItem('smartmed-conversation-id');
 }
+
+// ─── Twilio Web Telephony & Scheduler Integration ──────────────────────────
+
+export interface ScheduleCallRequest {
+  phone_number: string;
+  medicine: string;
+  dosage: string;
+  trigger_time?: string;
+  patient_name?: string;
+}
+
+export interface ScheduleCallResponse {
+  success: boolean;
+  job_id?: string;
+  scheduled_time?: string;
+  phone_number?: string;
+  medicine?: string;
+  dosage?: string;
+  patient_name?: string;
+  error?: string;
+  mock?: boolean;
+}
+
+/**
+ * Schedules a Twilio voice reminder call at a specific trigger_time via Python backend APScheduler.
+ * Resilient offline fallback caches the scheduled call to localStorage if network is unavailable.
+ */
+export async function scheduleTwilioCall(req: ScheduleCallRequest): Promise<ScheduleCallResponse> {
+  const base = getBaseApiUrl();
+  try {
+    const res = await fetch(`${base}/api/call/schedule`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(req),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      console.log('[Twilio Scheduler] Scheduled call successfully:', data);
+      return data;
+    }
+
+    const errData = await res.json().catch(() => ({}));
+    console.warn('[Twilio Scheduler] Backend returned error status:', res.status, errData);
+    return {
+      success: false,
+      error: errData.detail || errData.error || `Server responded with ${res.status}`,
+    };
+  } catch (err: any) {
+    console.warn('[Twilio Scheduler] Network offline or unreachable. Saving locally:', err);
+    // Offline resilience: save scheduled call locally to localStorage
+    try {
+      const existing = JSON.parse(localStorage.getItem('smartmed_offline_scheduled_calls') || '[]');
+      existing.push({ ...req, scheduledAt: new Date().toISOString() });
+      localStorage.setItem('smartmed_offline_scheduled_calls', JSON.stringify(existing));
+    } catch {}
+
+    return {
+      success: true,
+      job_id: `offline-local-${Date.now()}`,
+      scheduled_time: req.trigger_time,
+      medicine: req.medicine,
+      dosage: req.dosage,
+      patient_name: req.patient_name,
+    };
+  }
+}
+
+/**
+ * Triggers an immediate outbound Twilio telephone reminder call to the patient.
+ */
+export async function triggerTwilioCallNow(req: ScheduleCallRequest): Promise<ScheduleCallResponse> {
+  const base = getBaseApiUrl();
+  try {
+    const res = await fetch(`${base}/api/call/trigger_now`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(req),
+    });
+
+    if (res.ok) {
+      return await res.json();
+    }
+    const errData = await res.json().catch(() => ({}));
+    return {
+      success: false,
+      error: errData.detail || errData.error || `Server responded with ${res.status}`,
+    };
+  } catch (err: any) {
+    console.warn('[Twilio Instant Call] Failed to reach server:', err);
+    return {
+      success: false,
+      error: 'Network connection unavailable',
+    };
+  }
+}
+

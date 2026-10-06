@@ -1436,6 +1436,108 @@ async def trigger_exotel_call(req: ExotelCallRequest):
         return {"success": False, "error": str(e)}
 
 
+# ─── Twilio Web Telephony & Background Job Scheduler ────────────────────────
+
+class TwilioCallScheduleRequest(BaseModel):
+    phone_number: str = Field(..., description="E.164 phone number, e.g. +919876543210")
+    medicine: str = Field(..., description="Medicine name")
+    dosage: str = Field(..., description="Dosage and instructions")
+    trigger_time: Optional[str] = Field(None, description="ISO8601 Datetime string for scheduled call")
+    patient_name: Optional[str] = Field(None, description="Patient name for personalized greeting")
+
+
+@app.post("/api/call/schedule")
+async def schedule_twilio_call_endpoint(req: TwilioCallScheduleRequest):
+    """
+    Schedule an automated medication reminder phone call via Twilio and APScheduler.
+    Accepts: {"phone_number": "+91...", "medicine": "...", "dosage": "...", "trigger_time": "ISO8601 String"}
+    """
+    try:
+        from twilio_service import schedule_call_job
+        return schedule_call_job(
+            phone=req.phone_number,
+            medicine=req.medicine,
+            dosage=req.dosage,
+            trigger_time_str=req.trigger_time,
+            patient_name=req.patient_name
+        )
+    except Exception as e:
+        logger.error(f"Error scheduling call: {e}", exc_info=True)
+        return {
+            "success": False,
+            "error": str(e),
+            "phone_number": req.phone_number,
+            "medicine": req.medicine
+        }
+
+
+@app.post("/api/call/trigger_now")
+async def trigger_twilio_call_endpoint(req: TwilioCallScheduleRequest):
+    """
+    Trigger an immediate outbound Twilio telephone call to patient.
+    """
+    try:
+        from twilio_service import make_twilio_call
+        return make_twilio_call(
+            phone=req.phone_number,
+            medicine=req.medicine,
+            dosage=req.dosage,
+            patient_name=req.patient_name
+        )
+    except Exception as e:
+        logger.error(f"Error triggering Twilio call: {e}", exc_info=True)
+        return {
+            "success": False,
+            "error": str(e),
+            "phone_number": req.phone_number,
+            "medicine": req.medicine
+        }
+
+
+@app.get("/api/call/twiml")
+@app.post("/api/call/twiml")
+async def get_twilio_twiml_endpoint(
+    medicine: str = "your medicine",
+    dosage: str = "as prescribed",
+    patient_name: Optional[str] = None
+):
+    """
+    Return TwiML XML with Polly.Aditi voice for Twilio telephony.
+    """
+    try:
+        from twilio_service import generate_twiml
+        xml_content = generate_twiml(medicine=medicine, dosage=dosage, patient_name=patient_name)
+    except Exception:
+        xml_content = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<Response>\n'
+            f'  <Say voice="Polly.Aditi" language="en-IN">Hello, this is your SmartMed reminder to take {dosage} of {medicine}. Thank you!</Say>\n'
+            '</Response>'
+        )
+    return Response(content=xml_content, media_type="application/xml")
+
+
+@app.get("/api/call/status")
+async def get_twilio_service_status():
+    """
+    Returns Twilio telephony configuration and scheduler status.
+    """
+    try:
+        from twilio_service import get_scheduler, get_twilio_client, TWILIO_PHONE_NUMBER
+        sched = get_scheduler()
+        client = get_twilio_client()
+        return {
+            "status": "ok",
+            "service": "smartmed-twilio-telephony",
+            "scheduler_running": sched.running if sched else False,
+            "scheduled_jobs_count": len(sched.get_jobs()) if sched else 0,
+            "twilio_configured": bool(client),
+            "twilio_phone_number": TWILIO_PHONE_NUMBER
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+
 # ─── Main ────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":

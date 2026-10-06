@@ -5,6 +5,7 @@ import { Medicine, ScreenType, TranslationStrings } from '../types';
 import { Plus, CheckCircle2, Clock, Trash2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
+import { scheduleTwilioCall } from '../utils/aiClient';
 
 interface Props {
   medicines: Medicine[];
@@ -63,6 +64,48 @@ export function MedicinesScreen({ medicines, setMedicines, navigate, t }: Props)
     };
 
     setMedicines(prev => [...prev, newMed]);
+
+    // Schedule Twilio voice reminder
+    try {
+      let patientPhone = '+919876543210';
+      let patientName = 'Patient';
+      try {
+        const storedProfile = localStorage.getItem('smartmed_patient_profile');
+        if (storedProfile) {
+          const profile = JSON.parse(storedProfile);
+          if (profile.phone) patientPhone = profile.phone;
+          if (profile.name) patientName = profile.name;
+        }
+      } catch {}
+
+      const now = new Date();
+      let triggerIso = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+      const match = newMedTime.trim().match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+      if (match) {
+        let hours = parseInt(match[1], 10);
+        const minutes = parseInt(match[2], 10);
+        const meridiem = match[3] ? match[3].toUpperCase() : null;
+        if (meridiem === 'PM' && hours < 12) hours += 12;
+        if (meridiem === 'AM' && hours === 12) hours = 0;
+        const target = new Date();
+        target.setHours(hours, minutes, 0, 0);
+        if (target.getTime() <= now.getTime()) {
+          target.setDate(target.getDate() + 1);
+        }
+        triggerIso = target.toISOString();
+      }
+
+      scheduleTwilioCall({
+        phone_number: patientPhone,
+        medicine: newMedName.trim(),
+        dosage: newMedDose.trim(),
+        trigger_time: triggerIso,
+        patient_name: patientName,
+      }).catch(err => console.warn('[Twilio Manual Schedule Error]', err));
+    } catch (e) {
+      console.warn('[Twilio] Error scheduling manual call:', e);
+    }
+
     setNewMedName('');
     setShowAddManual(false);
   };

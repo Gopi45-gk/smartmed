@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Medicine, TranslationStrings } from '../types';
 import { X, UploadCloud, Camera, Sparkles, Check, FileCheck, RefreshCw } from 'lucide-react';
 import { soundManager } from '../utils/audio';
-import { processPrescriptionOCR } from '../utils/aiClient';
+import { processPrescriptionOCR, scheduleTwilioCall } from '../utils/aiClient';
 
 interface Props {
   close: () => void;
@@ -196,6 +196,30 @@ export function AddPrescriptionFlow({ close, setMedicines, t }: Props) {
     }
   };
 
+  const parseTimeToIso = (timeStr: string): string => {
+    try {
+      const now = new Date();
+      const match = timeStr.trim().match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+      if (match) {
+        let hours = parseInt(match[1], 10);
+        const minutes = parseInt(match[2], 10);
+        const meridiem = match[3] ? match[3].toUpperCase() : null;
+
+        if (meridiem === 'PM' && hours < 12) hours += 12;
+        if (meridiem === 'AM' && hours === 12) hours = 0;
+
+        const target = new Date();
+        target.setHours(hours, minutes, 0, 0);
+        if (target.getTime() <= now.getTime()) {
+          target.setDate(target.getDate() + 1);
+        }
+        return target.toISOString();
+      }
+    } catch {}
+    // Fallback: schedule 5 minutes from now
+    return new Date(Date.now() + 5 * 60 * 1000).toISOString();
+  };
+
   const handleConfirmSave = () => {
     const invalidMed = medicationsList.find(
       m => !m.name.trim() || m.name.trim().toLowerCase() === 'needs verification'
@@ -218,6 +242,34 @@ export function AddPrescriptionFlow({ close, setMedicines, t }: Props) {
 
     setMedicines(prev => [...prev, ...newMeds]);
     soundManager.playSuccessChime();
+
+    // Schedule automated Twilio call via backend APScheduler
+    try {
+      let patientPhone = '+919876543210';
+      let patientName = 'Patient';
+      try {
+        const storedProfile = localStorage.getItem('smartmed_patient_profile');
+        if (storedProfile) {
+          const profile = JSON.parse(storedProfile);
+          if (profile.phone) patientPhone = profile.phone;
+          if (profile.name) patientName = profile.name;
+        }
+      } catch {}
+
+      for (const m of medicationsList) {
+        const triggerIso = parseTimeToIso(m.time);
+        scheduleTwilioCall({
+          phone_number: patientPhone,
+          medicine: m.name.trim(),
+          dosage: m.dose.trim() || 'Standard dose',
+          trigger_time: triggerIso,
+          patient_name: patientName,
+        }).catch(err => console.warn('[Twilio Schedule Error]', err));
+      }
+    } catch (e) {
+      console.warn('[Twilio] Error scheduling calls:', e);
+    }
+
     close();
   };
 
