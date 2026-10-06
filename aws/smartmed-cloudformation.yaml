@@ -3,16 +3,24 @@ Description: 'SmartMed - Production EC2 Deployment with Docker, Nginx, and FastA
 
 Parameters:
   InstanceType:
-    Description: 'EC2 Instance Type (t3.xlarge recommended for CPU inference; g4dn.xlarge for GPU)'
+    Description: 'EC2 Instance Type (t2.micro or t3.micro for 100% AWS Free Tier; t3.xlarge for paid CPU inference)'
     Type: String
-    Default: 't3.xlarge'
+    Default: 't2.micro'
     AllowedValues:
+      - 't2.micro'
+      - 't3.micro'
+      - 't3.small'
+      - 't3.medium'
       - 't3.large'
       - 't3.xlarge'
-      - 't3.2xlarge'
-      - 'c5a.xlarge'
-      - 'c5a.2xlarge'
       - 'g4dn.xlarge'
+
+  VolumeSize:
+    Description: 'EBS Root Volume Size in GB (30 GB is 100% AWS Free Tier eligible)'
+    Type: Number
+    Default: 30
+    MinValue: 20
+    MaxValue: 100
 
   KeyName:
     Description: '(Optional) Name of an existing EC2 KeyPair. Leave BLANK if you do not have one (you can use EC2 Instance Connect in the AWS Console).'
@@ -71,7 +79,7 @@ Resources:
       BlockDeviceMappings:
         - DeviceName: '/dev/sda1'
           Ebs:
-            VolumeSize: 50
+            VolumeSize: !Ref VolumeSize
             VolumeType: 'gp3'
             DeleteOnTermination: true
       Tags:
@@ -115,6 +123,8 @@ Resources:
           if [ ! -f ai/.env ] && [ -f ai/.env.example ]; then
             cp ai/.env.example ai/.env
           fi
+
+          mkdir -p ai/mnn/model ai/tts ai/data ai/ocr/models
 
           # Launch via Docker Compose
           docker compose up -d --build
