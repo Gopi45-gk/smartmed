@@ -3,13 +3,13 @@ Description: 'SmartMed - Production EC2 Deployment with Docker, Nginx, and FastA
 
 Parameters:
   InstanceType:
-    Description: 'EC2 Instance Type (t2.micro or t3.micro for 100% AWS Free Tier; t3.xlarge for paid CPU inference)'
+    Description: 'EC2 Instance Type (t3.micro is the standard AWS Free Tier instance type in ap-south-1)'
     Type: String
-    Default: 't2.micro'
+    Default: 't3.micro'
     AllowedValues:
-      - 't2.micro'
       - 't3.micro'
       - 't3.small'
+      - 't2.micro'
       - 't3.medium'
       - 't3.large'
       - 't3.xlarge'
