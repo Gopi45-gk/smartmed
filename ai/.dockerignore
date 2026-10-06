@@ -1,0 +1,13 @@
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.git
+.gitignore
+data/hard_cases/
+data/prescription_dataset/
+data/trocr_dataset/
+*.png
+*.jpeg
+*.jpg

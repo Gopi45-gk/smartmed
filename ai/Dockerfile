@@ -17,14 +17,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     espeak-ng \
     curl \
     git \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install uv for fast, reliable package management
 RUN pip install --no-cache-dir uv
 
-# Copy and install python dependencies
+# Copy and install python dependencies (CPU-optimized PyTorch saves ~4.5GB disk)
 COPY requirements.txt .
-RUN uv pip install --system --no-cache -r requirements.txt
+RUN uv pip install --system --no-cache --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple torch torchvision && \
+    uv pip install --system --no-cache --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
 
 # Copy backend application source
 COPY . /app
