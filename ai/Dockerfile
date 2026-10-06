@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# Install OS libraries for OpenCV, audio processing, PaddleOCR, and PyTorch
+# Install OS libraries for OpenCV, audio processing, PaddleOCR
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     ffmpeg \
@@ -22,10 +22,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install uv for fast, reliable package management
 RUN pip install --no-cache-dir uv
 
-# Copy and install python dependencies (CPU-optimized PyTorch saves ~4.5GB disk)
+# Copy and install python dependencies
 COPY requirements.txt .
-RUN uv pip install --system --no-cache --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple torch torchvision && \
-    uv pip install --system --no-cache --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
+RUN uv pip install --system --no-cache -r requirements.txt
 
 # Copy backend application source
 COPY . /app

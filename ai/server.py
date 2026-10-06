@@ -1155,12 +1155,19 @@ async def get_ocr_status():
     """
     Check status of the Prescription OCR pipeline and loaded models.
     """
-    import torch
+    try:
+        import torch
+        gpu_avail = torch.cuda.is_available()
+        gpu_device = torch.cuda.get_device_name(0) if gpu_avail else None
+    except Exception:
+        gpu_avail = False
+        gpu_device = None
+
     return {
         "status": "ready" if ocr_pipeline else "unavailable",
         "service": "smartmed-prescription-ocr",
-        "gpu_available": torch.cuda.is_available(),
-        "gpu_device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+        "gpu_available": gpu_avail,
+        "gpu_device": gpu_device,
         "trocr_fine_tuned": (ocr_pipeline.handwriting_fallback.is_available() and getattr(ocr_pipeline.handwriting_fallback, "is_fine_tuned", False)) if ocr_pipeline else False,
         "vlm_cloud_available": ocr_pipeline.vlm_engine.is_available() if ocr_pipeline and hasattr(ocr_pipeline, "vlm_engine") else False,
         "paddleocr_available": ocr_pipeline.ocr_engine.is_available() if ocr_pipeline else False,

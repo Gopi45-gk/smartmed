@@ -7,9 +7,14 @@ Supports English, Tamil, Hindi, Telugu, Urdu, Malayalam, and Kannada offline.
 import io
 import logging
 from typing import Optional, Tuple
-import torch
 
 logger = logging.getLogger("smartmed.ai.stt")
+
+try:
+    import torch
+    _HAS_CUDA = torch.cuda.is_available()
+except Exception:
+    _HAS_CUDA = False
 
 # Language code normalization for Whisper
 WHISPER_LANG_MAP = {
@@ -32,7 +37,7 @@ class STTManager:
     def __init__(self, model_size: str = "tiny"):
         self.model_size = model_size
         self._model = None
-        self._device = "cuda" if torch.cuda.is_available() else "cpu"
+        self._device = "cuda" if _HAS_CUDA else "cpu"
         self._compute_type = "float16" if self._device == "cuda" else "int8"
 
     def get_model(self):
