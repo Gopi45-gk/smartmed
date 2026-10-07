@@ -639,30 +639,18 @@ def make_twilio_call(
             f"?medicine={quote(medicine)}&dosage={quote(dosage)}"
             f"&patient_name={quote(patient_name or 'Patient')}"
             f"&preferred_language={quote(lang_key)}"
+            f"&meal_relation={quote(meal_relation or '')}"
             f"&reminder_id={quote(reminder_id or '')}"
         )
         webhook_url = f"{BASE_WEBHOOK_URL}/api/call/twiml{query_str}"
         status_callback_url = f"{BASE_WEBHOOK_URL}/api/call/webhook/status?reminder_id={quote(reminder_id or '')}"
 
-        try:
-            call = client.calls.create(
-                to=formatted_phone,
-                from_=TWILIO_PHONE_NUMBER,
-                url=webhook_url,
-                status_callback=status_callback_url,
-                status_callback_event=['initiated', 'ringing', 'answered', 'completed'],
-                status_callback_method='POST'
-            )
-        except Exception as tw_url_err:
-            logger.warning(f"Twilio call with URL failed ({tw_url_err}), falling back to inline TwiML...")
-            call = client.calls.create(
-                to=formatted_phone,
-                from_=TWILIO_PHONE_NUMBER,
-                twiml=twiml_xml,
-                status_callback=status_callback_url,
-                status_callback_event=['initiated', 'ringing', 'answered', 'completed'],
-                status_callback_method='POST'
-            )
+        # Twilio trial accounts require strictly standard parameters: to, from_, and url
+        call = client.calls.create(
+            to=formatted_phone,
+            from_=TWILIO_PHONE_NUMBER,
+            url=webhook_url
+        )
 
         logger.info(f"✓ Twilio Call Created! SID: {call.sid}, Status: {call.status}")
         if reminder_id:

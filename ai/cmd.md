@@ -5,36 +5,46 @@ Both the **Frontend** and **Backend** are currently **RUNNING in the background*
 ---
 
 ## 1. Access the Application
-- **Frontend Web UI**: [http://localhost:3000](http://localhost:3000)
+- **Frontend (Vite Dev Server)**: [http://localhost:3000](http://localhost:3000)
+- **Frontend (Docker Nginx)**: [http://localhost](http://localhost) (Port 80)
 - **AI Backend API**: [http://localhost:8100](http://localhost:8100)
 - **API Docs (Swagger UI)**: [http://localhost:8100/docs](http://localhost:8100/docs)
+- **Twilio Status Check**: [http://localhost:8100/api/call/status](http://localhost:8100/api/call/status)
 
 ---
 
-## 2. Directory Structure Note
-- **Backend folder**: `ai/` (contains `server.py`, `mnn/`, `prompts/`)
-- **Frontend folder**: project root `/` (contains `src/`, `package.json`, `vite.config.ts`)
+## 2. Option A: Run via Docker (Recommended)
+
+From the project root (`~/Documents/smart_med`):
+```bash
+# Start both frontend and backend in background
+docker compose up -d
+
+# If you made changes and want to rebuild:
+docker compose up -d --build
+
+# View real-time logs:
+docker compose logs -f
+
+# Stop containers:
+docker compose down
+```
 
 ---
 
-## 3. How to Run Manually (Future Reference)
+## 3. Option B: Run Locally via Terminals (Dev Mode)
 
-> **Note**: If you see `[Errno 98] address already in use`, it means the server is **already running**.
+> **Note**: If Docker is running, stop it first (`docker compose down`) to free port 8100.
 
 ### Terminal 1: Backend (AI Server)
-From project root:
 ```bash
-python3 ai/server.py
-```
-*Or from the `ai` directory:*
-```bash
-cd ai
+cd ~/Documents/smart_med/ai
 python3 server.py
 ```
 
 ### Terminal 2: Frontend (React / Vite)
-From project root:
 ```bash
+cd ~/Documents/smart_med
 npm run dev
 ```
 
