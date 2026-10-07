@@ -36,4 +36,6 @@ android/**/build/
 android/.idea/
 android/local.properties
 LITERATURE/
+ai/data/reminders.json
+ai/data/adherence.json
 

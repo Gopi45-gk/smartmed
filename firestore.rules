@@ -1,0 +1,26 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Patients collection: used for registration, login verification, and profile updates
+    match /patients/{patientId} {
+      allow read, write: if true;
+    }
+
+    // Reminders collection: used to store medication schedules
+    match /reminders/{reminderId} {
+      allow read, write: if true;
+    }
+
+    // Adherence collection: used to record taken/missed dose history
+    match /adherence/{adherenceId} {
+      allow read, write: if true;
+    }
+
+    // Default: Deny access to any other unspecified collection
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

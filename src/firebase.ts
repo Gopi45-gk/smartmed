@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
-import type { PatientProfile, Language } from "./types";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
+import type { PatientProfile, Language, MedicationReminder, MedicationAdherenceRecord, ReminderStatus } from "./types";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAhyJmP9eZvKIbO2Tb-GU_msRH3TmK1Mkw",
@@ -171,5 +171,158 @@ export async function updatePatientLanguage(
     });
   } catch (err) {
     console.warn("Firestore language update skipped (offline/unreachable):", err);
+  }
+}
+
+// ─── Medication Reminders & Adherence Persistence ───────────────────────────
+
+/**
+ * Save medication reminder to local cache and Firestore 'reminders' collection.
+ */
+export async function saveMedicationReminder(reminder: MedicationReminder): Promise<void> {
+  // 1. Update offline cache
+  try {
+    const raw = localStorage.getItem("smartmed_offline_reminders");
+    const list: MedicationReminder[] = raw ? JSON.parse(raw) : [];
+    const idx = list.findIndex(r => r.id === reminder.id);
+    if (idx >= 0) {
+      list[idx] = reminder;
+    } else {
+      list.push(reminder);
+    }
+    localStorage.setItem("smartmed_offline_reminders", JSON.stringify(list));
+  } catch (err) {
+    console.warn("Error caching reminder locally:", err);
+  }
+
+  // 2. Persist to Firestore
+  try {
+    const docRef = doc(db, "reminders", reminder.id);
+    await setDoc(docRef, { ...reminder }, { merge: true });
+    console.log(`[Firestore] Reminder saved: ${reminder.id}`);
+  } catch (err) {
+    console.warn("Firestore save reminder skipped (offline/unreachable):", err);
+  }
+}
+
+/**
+ * Retrieve medication reminders from Firestore or fallback to offline cache.
+ */
+export async function getMedicationReminders(patientId?: string): Promise<MedicationReminder[]> {
+  try {
+    const remindersCol = collection(db, "reminders");
+    const q = patientId ? query(remindersCol, where("patientId", "==", patientId)) : remindersCol;
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      const records: MedicationReminder[] = [];
+      snapshot.forEach(d => records.push(d.data() as MedicationReminder));
+      // update offline cache
+      try {
+        localStorage.setItem("smartmed_offline_reminders", JSON.stringify(records));
+      } catch {}
+      return records;
+    }
+  } catch (err) {
+    console.warn("Firestore getMedicationReminders failed, using offline cache:", err);
+  }
+
+  // Fallback to local cache
+  try {
+    const raw = localStorage.getItem("smartmed_offline_reminders");
+    const list: MedicationReminder[] = raw ? JSON.parse(raw) : [];
+    if (patientId) {
+      return list.filter(r => r.patientId === patientId);
+    }
+    return list;
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Update status of a medication reminder.
+ */
+export async function updateMedicationReminderStatus(
+  reminderId: string,
+  status: ReminderStatus
+): Promise<void> {
+  const updatedAt = new Date().toISOString();
+  try {
+    const raw = localStorage.getItem("smartmed_offline_reminders");
+    const list: MedicationReminder[] = raw ? JSON.parse(raw) : [];
+    const item = list.find(r => r.id === reminderId);
+    if (item) {
+      item.reminderStatus = status;
+      item.updatedAt = updatedAt;
+      localStorage.setItem("smartmed_offline_reminders", JSON.stringify(list));
+    }
+  } catch {}
+
+  try {
+    const docRef = doc(db, "reminders", reminderId);
+    await updateDoc(docRef, { reminderStatus: status, updatedAt });
+  } catch (err) {
+    console.warn("Firestore update reminder skipped (offline):", err);
+  }
+}
+
+/**
+ * Save adherence record to local cache and Firestore 'adherence' collection.
+ */
+export async function saveMedicationAdherence(adherence: MedicationAdherenceRecord): Promise<void> {
+  // 1. Local cache
+  try {
+    const raw = localStorage.getItem("smartmed_offline_adherence");
+    const list: MedicationAdherenceRecord[] = raw ? JSON.parse(raw) : [];
+    const idx = list.findIndex(a => a.id === adherence.id);
+    if (idx >= 0) {
+      list[idx] = adherence;
+    } else {
+      list.push(adherence);
+    }
+    localStorage.setItem("smartmed_offline_adherence", JSON.stringify(list));
+  } catch (err) {
+    console.warn("Error caching adherence locally:", err);
+  }
+
+  // 2. Persist to Firestore
+  try {
+    const docRef = doc(db, "adherence", adherence.id);
+    await setDoc(docRef, { ...adherence }, { merge: true });
+    console.log(`[Firestore] Adherence record saved: ${adherence.id}`);
+  } catch (err) {
+    console.warn("Firestore save adherence skipped (offline/unreachable):", err);
+  }
+}
+
+/**
+ * Retrieve adherence records.
+ */
+export async function getMedicationAdherenceRecords(patientId?: string): Promise<MedicationAdherenceRecord[]> {
+  try {
+    const adherenceCol = collection(db, "adherence");
+    const q = patientId ? query(adherenceCol, where("patientId", "==", patientId)) : adherenceCol;
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      const records: MedicationAdherenceRecord[] = [];
+      snapshot.forEach(d => records.push(d.data() as MedicationAdherenceRecord));
+      try {
+        localStorage.setItem("smartmed_offline_adherence", JSON.stringify(records));
+      } catch {}
+      return records;
+    }
+  } catch (err) {
+    console.warn("Firestore getMedicationAdherenceRecords failed, using offline cache:", err);
+  }
+
+  try {
+    const raw = localStorage.getItem("smartmed_offline_adherence");
+    const list: MedicationAdherenceRecord[] = raw ? JSON.parse(raw) : [];
+    if (patientId) {
+      return list.filter(a => a.patientId === patientId);
+    }
+    return list;
+  } catch {
+    return [];
   }
 }

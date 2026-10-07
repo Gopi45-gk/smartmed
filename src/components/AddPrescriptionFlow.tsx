@@ -1,10 +1,30 @@
 import { useState, useRef } from 'react';
 import type { Dispatch, SetStateAction, ChangeEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Medicine, TranslationStrings } from '../types';
-import { X, UploadCloud, Camera, Sparkles, Check, FileCheck, RefreshCw } from 'lucide-react';
+import { Medicine, TranslationStrings, MedicationReminder, Language } from '../types';
+import { X, UploadCloud, Camera, Sparkles, Check, FileCheck, RefreshCw, AlertTriangle } from 'lucide-react';
 import { soundManager } from '../utils/audio';
 import { processPrescriptionOCR, scheduleTwilioCall } from '../utils/aiClient';
+import { saveMedicationReminder } from '../firebase';
+
+const UNCERTAIN_MESSAGES: Record<string, string> = {
+  ta: '⚠️ தயவுசெய்து மாத்திரை பெயர், நேரம் மற்றும் அளவை சரிபார்க்கவும்.',
+  en: '⚠️ Please verify medicine name, scheduled time, and dosage before scheduling.',
+  hi: '⚠️ कृपया शेड्यूल करने से पहले दवा का नाम, समय और खुराक सत्यापित करें।',
+  te: '⚠️ దయచేసి మందు పేరు, సమయం మరియు మోతాదును ధృవీకరించండి.',
+  kn: '⚠️ ದಯವಿಟ್ಟು ಔಷಧಿಯ ಹೆಸರು, ಸಮಯ ಮತ್ತು ಪ್ರಮಾಣವನ್ನು ಪರಿಶೀಲಿಸಿ.',
+  ml: '⚠️ ഷെഡ്യൂൾ ചെയ്യുന്നതിന് മുൻപ് മരുന്നിന്റെ പേരും സമയവും അളവും പരിശോധിക്കുക.',
+  ur: '⚠️ براہ کرم دوا کا نام، وقت اور خوراک کی تصدیق کریں۔',
+};
+
+const LOCALE_MAP: Record<string, string> = {
+  ta: 'ta-IN',
+  hi: 'hi-IN',
+  te: 'te-IN',
+  kn: 'kn-IN',
+  ml: 'ml-IN',
+  en: 'en-IN',
+};
 
 interface Props {
   close: () => void;
@@ -15,15 +35,19 @@ interface Props {
 interface ExtractedMedItem {
   id: number;
   name: string;
+  strength?: string;
   time: string;
   dose: string;
+  frequency?: string;
   food: string;
   type: Medicine['type'];
   confidence: number;
   requires_review: boolean;
+  uncertain?: boolean;
 }
 
 export function AddPrescriptionFlow({ close, setMedicines, t }: Props) {
+  const currentLang = (typeof localStorage !== 'undefined' ? localStorage.getItem('smartmed_preferred_language') : 'en') || 'en';
   const [step, setStep] = useState<'select' | 'scanning' | 'review'>('select');
   const [ocrStatusMessage, setOcrStatusMessage] = useState<string>('Ready to scan prescription');
   const [patientInfo, setPatientInfo] = useState<{ name?: string | null; age?: string | null; gender?: string | null } | null>(null);
@@ -114,6 +138,8 @@ export function AddPrescriptionFlow({ close, setMedicines, t }: Props) {
         m => m.name && m.name.trim().length > 0 && !m.name.toLowerCase().includes('name vivek')
       );
 
+      console.log(`[OCR] Prescription detected: ${validMeds.length} medications`);
+
       if (validMeds.length > 0) {
         const formatted: ExtractedMedItem[] = validMeds.map((m, idx) => {
           const displayName = m.name
@@ -122,15 +148,34 @@ export function AddPrescriptionFlow({ close, setMedicines, t }: Props) {
                 : m.name)
             : '';
 
+          // Validate critical fields: NEVER GUESS CRITICAL MEDICATION INFO
+          const isUncertain = (
+            !displayName ||
+            displayName.trim().length < 2 ||
+            displayName.toLowerCase().includes('needs verification') ||
+            !m.dosage ||
+            !m.scheduled_time ||
+            (m.confidence !== undefined && m.confidence < 0.6) ||
+            m.requires_review
+          );
+
+          console.log(
+            `[OCR] Medication extracted: ${displayName}, dosage=${m.dosage || 'N/A'}, ` +
+            `time=${m.scheduled_time || 'N/A'}, meal=${m.food_instruction || m.instructions || 'N/A'}, uncertain=${Boolean(isUncertain)}`
+          );
+
           return {
             id: Date.now() + idx,
             name: displayName,
+            strength: m.strength || '',
             time: m.scheduled_time || '',
             dose: m.dosage || '',
+            frequency: m.frequency || 'Daily',
             food: m.food_instruction || m.instructions || '',
             type: (m.type as Medicine['type']) || 'tablet',
             confidence: m.confidence || 0.85,
-            requires_review: m.requires_review || false,
+            requires_review: Boolean(isUncertain),
+            uncertain: Boolean(isUncertain),
           };
         });
 
@@ -225,45 +270,99 @@ export function AddPrescriptionFlow({ close, setMedicines, t }: Props) {
       m => !m.name.trim() || m.name.trim().toLowerCase() === 'needs verification'
     );
     if (invalidMed) {
-      alert('Please enter or verify the medication name before saving.');
+      const alertMsg = UNCERTAIN_MESSAGES[currentLang] || UNCERTAIN_MESSAGES['en'];
+      alert(alertMsg);
       return;
     }
 
-    const newMeds: Medicine[] = medicationsList.map((m, idx) => ({
-      id: Date.now() + idx,
-      name: m.name.trim(),
-      time: m.time.trim() || 'As directed',
-      dose: m.dose.trim() || 'Standard dose',
-      food: m.food.trim() || 'As directed',
-      status: 'upcoming',
-      type: m.type,
-      color: idx % 2 === 0 ? '#34C759' : '#0071E3'
-    }));
+    let patientPhone = '+919876543210';
+    let patientName = 'Patient';
+    try {
+      const storedProfile = localStorage.getItem('smartmed_patient_profile');
+      if (storedProfile) {
+        const profile = JSON.parse(storedProfile);
+        if (profile.phone) patientPhone = profile.phone;
+        if (profile.name) patientName = profile.name;
+      }
+    } catch {}
+
+    const newMeds: Medicine[] = [];
+    const timeGroups: Record<string, ExtractedMedItem[]> = {};
+
+    // 1. Independent Schedule in Firestore & localStorage for each medicine
+    for (let idx = 0; idx < medicationsList.length; idx++) {
+      const m = medicationsList[idx];
+      const triggerIso = parseTimeToIso(m.time);
+      const reminderId = `rem_${Date.now()}_${idx}`;
+
+      const reminder: MedicationReminder = {
+        id: reminderId,
+        patientId: patientPhone,
+        patientName: patientName,
+        phoneNumber: patientPhone,
+        medicineId: Date.now() + idx,
+        medicineName: m.name.trim(),
+        strength: m.strength || '',
+        dosage: m.dose.trim() || 'Standard dose',
+        frequency: m.frequency || 'Daily',
+        scheduledTime: triggerIso,
+        mealRelation: m.food.trim() || 'After Food',
+        startDate: new Date().toISOString(),
+        language: (currentLang as Language) || 'en',
+        locale: LOCALE_MAP[currentLang] || 'en-IN',
+        timezone: 'Asia/Kolkata',
+        reminderStatus: 'PENDING',
+        ocrConfidence: m.confidence || 0.85,
+        source: 'OCR_PRESCRIPTION',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      saveMedicationReminder(reminder).catch(err =>
+        console.warn('[Firestore] Failed to save medication reminder:', err)
+      );
+
+      console.log(`[Medication Scheduler] Reminder created: ${reminder.id} at ${reminder.scheduledTime} in ${reminder.locale}`);
+
+      newMeds.push({
+        id: Date.now() + idx,
+        name: m.name.trim(),
+        time: m.time.trim() || 'As directed',
+        dose: m.dose.trim() || 'Standard dose',
+        food: m.food.trim() || 'As directed',
+        status: 'upcoming',
+        type: m.type,
+        color: idx % 2 === 0 ? '#34C759' : '#0071E3',
+      });
+
+      if (!timeGroups[triggerIso]) {
+        timeGroups[triggerIso] = [];
+      }
+      timeGroups[triggerIso].push(m);
+    }
 
     setMedicines(prev => [...prev, ...newMeds]);
     soundManager.playSuccessChime();
 
-    // Schedule automated Twilio call via backend APScheduler
+    // 2. Schedule Twilio Call: Group medicines with identical scheduledTime into one call
     try {
-      let patientPhone = '+919876543210';
-      let patientName = 'Patient';
-      try {
-        const storedProfile = localStorage.getItem('smartmed_patient_profile');
-        if (storedProfile) {
-          const profile = JSON.parse(storedProfile);
-          if (profile.phone) patientPhone = profile.phone;
-          if (profile.name) patientName = profile.name;
-        }
-      } catch {}
+      for (const [triggerIso, group] of Object.entries(timeGroups)) {
+        const combinedMedicine = group.map(g => g.name.trim()).join(' and ');
+        const combinedDosage = group.map(g => g.dose.trim() || 'Standard dose').join(', ');
+        const combinedMeal = group.map(g => g.food.trim()).filter(Boolean).join('; ');
+        const callReminderId = `call_${Date.now()}_${group[0].id}`;
 
-      for (const m of medicationsList) {
-        const triggerIso = parseTimeToIso(m.time);
         scheduleTwilioCall({
           phone_number: patientPhone,
-          medicine: m.name.trim(),
-          dosage: m.dose.trim() || 'Standard dose',
+          medicine: combinedMedicine,
+          dosage: combinedDosage,
           trigger_time: triggerIso,
           patient_name: patientName,
+          preferred_language: currentLang,
+          patient_id: patientPhone,
+          medicine_id: group[0].id,
+          meal_relation: combinedMeal,
+          reminder_id: callReminderId,
         }).catch(err => console.warn('[Twilio Schedule Error]', err));
       }
     } catch (e) {
@@ -444,6 +543,13 @@ export function AddPrescriptionFlow({ close, setMedicines, t }: Props) {
                     {idx + 1}. {m.name || 'Needs Verification'}
                   </button>
                 ))}
+              </div>
+            )}
+
+            {currentMed.requires_review && (
+              <div className="flex items-center gap-2 text-amber-800 bg-amber-50 p-3 rounded-2xl border border-amber-200 text-xs font-semibold">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>{UNCERTAIN_MESSAGES[currentLang] || UNCERTAIN_MESSAGES['en']}</span>
               </div>
             )}
 

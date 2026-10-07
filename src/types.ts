@@ -128,3 +128,47 @@ export interface TranslationStrings {
   callingState?: string;
   scheduledLabel?: string;
 }
+
+export type ReminderStatus = 'PENDING' | 'CALLING' | 'COMPLETED' | 'DELAYED' | 'SKIPPED' | 'UNCERTAIN' | 'FAILED';
+
+export interface MedicationReminder {
+  id: string;
+  patientId: string;
+  patientName: string;
+  phoneNumber: string;
+  medicineId: string | number;
+  medicineName: string;
+  strength?: string;
+  dosage: string;
+  frequency?: string;
+  scheduledTime: string;
+  mealRelation?: string;
+  startDate?: string;
+  endDate?: string;
+  language: Language;
+  locale: string;
+  timezone: string;
+  reminderStatus: ReminderStatus;
+  ocrConfidence?: number;
+  source: 'OCR_PRESCRIPTION';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type AdherenceStatus = 'TAKEN' | 'WILL_TAKE_NOW' | 'DELAYED' | 'SKIPPED' | 'UNCERTAIN' | 'NO_ANSWER';
+
+export interface MedicationAdherenceRecord {
+  id: string;
+  reminderId: string;
+  patientId: string;
+  medicineId: string | number;
+  medicineName: string;
+  scheduledTime: string;
+  status: AdherenceStatus;
+  confirmationMethod: 'TWILIO_VOICE' | 'MANUAL' | 'APP';
+  confirmedAt: string;
+  patientResponse?: string;
+  callSid?: string;
+  language: string;
+  delayMinutes?: number;
+}

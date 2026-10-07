@@ -788,6 +788,10 @@ export interface ScheduleCallRequest {
   trigger_time?: string;
   patient_name?: string;
   preferred_language?: string;
+  patient_id?: string;
+  medicine_id?: string | number;
+  meal_relation?: string;
+  reminder_id?: string;
 }
 
 export interface ScheduleCallResponse {

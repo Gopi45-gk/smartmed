@@ -29,7 +29,7 @@ if os.path.exists(_venv_python) and sys.executable != os.path.realpath(_venv_pyt
     except ImportError:
         os.execv(_venv_python, [_venv_python] + sys.argv)
 
-from fastapi import FastAPI, HTTPException, Response, UploadFile, File
+from fastapi import FastAPI, HTTPException, Response, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import uvicorn
@@ -1483,13 +1483,17 @@ class TwilioCallScheduleRequest(BaseModel):
     trigger_time: Optional[str] = Field(None, description="ISO8601 Datetime string for scheduled call")
     patient_name: Optional[str] = Field(None, description="Patient name for personalized greeting")
     preferred_language: Optional[str] = Field("en", description="Preferred language (ta, en, hi, te, kn, ml)")
+    patient_id: Optional[str] = Field(None, description="Patient ID")
+    medicine_id: Optional[Any] = Field(None, description="Medicine ID")
+    meal_relation: Optional[str] = Field(None, description="Meal relation instruction (e.g. after food)")
+    reminder_id: Optional[str] = Field(None, description="Unique reminder ID for tracking")
 
 
 @app.post("/api/call/schedule")
 async def schedule_twilio_call_endpoint(req: TwilioCallScheduleRequest):
     """
-    Schedule an automated medication reminder phone call via Twilio and APScheduler.
-    Accepts: {"phone_number": "+91...", "medicine": "...", "dosage": "...", "trigger_time": "ISO8601 String", "preferred_language": "ta|hi|te|kn|ml|en"}
+    Schedule an automated interactive medication reminder phone call via Twilio and APScheduler.
+    Supports 6 languages, persistent state, and idempotency checks.
     """
     try:
         from twilio_service import schedule_call_job
@@ -1499,7 +1503,11 @@ async def schedule_twilio_call_endpoint(req: TwilioCallScheduleRequest):
             dosage=req.dosage,
             trigger_time_str=req.trigger_time,
             patient_name=req.patient_name,
-            preferred_language=req.preferred_language
+            preferred_language=req.preferred_language,
+            patient_id=req.patient_id,
+            medicine_id=req.medicine_id,
+            meal_relation=req.meal_relation,
+            reminder_id=req.reminder_id
         )
     except Exception as e:
         logger.error(f"Error scheduling call: {e}", exc_info=True)
@@ -1514,7 +1522,7 @@ async def schedule_twilio_call_endpoint(req: TwilioCallScheduleRequest):
 @app.post("/api/call/trigger_now")
 async def trigger_twilio_call_endpoint(req: TwilioCallScheduleRequest):
     """
-    Trigger an immediate outbound Twilio telephone call to patient.
+    Trigger an immediate outbound interactive Twilio phone call to the patient.
     """
     try:
         from twilio_service import make_twilio_call
@@ -1523,7 +1531,10 @@ async def trigger_twilio_call_endpoint(req: TwilioCallScheduleRequest):
             medicine=req.medicine,
             dosage=req.dosage,
             patient_name=req.patient_name,
-            preferred_language=req.preferred_language
+            preferred_language=req.preferred_language,
+            meal_relation=req.meal_relation,
+            reminder_id=req.reminder_id,
+            patient_id=req.patient_id
         )
     except Exception as e:
         logger.error(f"Error triggering Twilio call: {e}", exc_info=True)
@@ -1541,27 +1552,108 @@ async def get_twilio_twiml_endpoint(
     medicine: str = "your medicine",
     dosage: str = "as prescribed",
     patient_name: Optional[str] = None,
-    preferred_language: Optional[str] = "en"
+    preferred_language: Optional[str] = "en",
+    meal_relation: Optional[str] = None,
+    reminder_id: Optional[str] = None
 ):
     """
-    Return TwiML XML with Amazon Polly Neural Voice for Twilio telephony.
+    Return interactive TwiML XML with Amazon Polly Voice and <Gather input="speech">.
     """
     try:
-        from twilio_service import generate_twiml
-        xml_content = generate_twiml(
+        from twilio_service import generate_interactive_twiml
+        xml_content = generate_interactive_twiml(
             medicine=medicine,
             dosage=dosage,
             patient_name=patient_name,
-            preferred_language=preferred_language
+            meal_relation=meal_relation,
+            preferred_language=preferred_language,
+            reminder_id=reminder_id
         )
-    except Exception:
-        xml_content = (
-            '<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<Response>\n'
-            f'  <Say voice="Polly.Aditi" language="en-IN">Hello, this is your SmartMed automated healthcare alert. Please ensure your tablets are taken at the right time. Scheduled prescription: {dosage} of {medicine}. Thank you and stay healthy!</Say>\n'
-            '</Response>'
-        )
+    except Exception as e:
+        logger.error(f"Error generating interactive TwiML: {e}", exc_info=True)
+        from twilio_service import generate_twiml
+        xml_content = generate_twiml(medicine, dosage, patient_name, preferred_language)
     return Response(content=xml_content, media_type="application/xml")
+
+
+@app.post("/api/call/response")
+@app.get("/api/call/response")
+async def handle_call_response_endpoint(request: Request):
+    """
+    Twilio Speech webhook callback: Receives speech transcription from <Gather>,
+    classifies intent (TAKEN, WILL_TAKE_NOW, DELAYED, SKIPPED, MEDICAL_SAFETY_QUERY, UNCLEAR),
+    saves adherence record, handles rescheduling if delayed, and returns responsive TwiML.
+    """
+    form_data = {}
+    if request.method == "POST":
+        try:
+            form_data = await request.form()
+        except Exception:
+            form_data = {}
+
+    speech_result = str(form_data.get("SpeechResult") or request.query_params.get("SpeechResult", ""))
+    confidence_val = form_data.get("Confidence") or request.query_params.get("Confidence", "0.0")
+    try:
+        confidence = float(confidence_val)
+    except ValueError:
+        confidence = 0.0
+
+    call_sid = str(form_data.get("CallSid") or request.query_params.get("CallSid", ""))
+    reminder_id = request.query_params.get("reminder_id") or form_data.get("reminder_id")
+    lang = request.query_params.get("lang") or form_data.get("lang", "en")
+    try:
+        attempt = int(request.query_params.get("attempt", 1))
+    except ValueError:
+        attempt = 1
+
+    from twilio_service import process_call_speech_response
+    xml_content = process_call_speech_response(
+        speech_result=speech_result,
+        confidence=confidence,
+        call_sid=call_sid,
+        reminder_id=reminder_id,
+        language=lang,
+        attempt=attempt
+    )
+    return Response(content=xml_content, media_type="application/xml")
+
+
+@app.post("/api/call/webhook/status")
+@app.get("/api/call/webhook/status")
+async def handle_call_status_webhook(request: Request):
+    """
+    Twilio call status callback (initiated, ringing, answered, completed, busy, no-answer, failed).
+    Handles automated retries for un-answered calls.
+    """
+    form_data = {}
+    if request.method == "POST":
+        try:
+            form_data = await request.form()
+        except Exception:
+            form_data = {}
+
+    call_sid = str(form_data.get("CallSid") or request.query_params.get("CallSid", ""))
+    call_status = str(form_data.get("CallStatus") or request.query_params.get("CallStatus", ""))
+    reminder_id = request.query_params.get("reminder_id") or form_data.get("reminder_id")
+
+    from twilio_service import handle_call_status_update
+    handle_call_status_update(call_sid, call_status, reminder_id)
+    return {"status": "ok", "call_status": call_status}
+
+
+@app.get("/api/call/adherence")
+async def get_adherence_records_endpoint():
+    """Returns all recorded medication adherence events."""
+    from twilio_service import load_adherence
+    return {"success": True, "records": load_adherence()}
+
+
+@app.get("/api/call/reminders")
+async def get_reminders_endpoint():
+    """Returns all medication reminder schedules and their current status."""
+    from twilio_service import load_reminders
+    reminders = load_reminders()
+    return {"success": True, "reminders": list(reminders.values())}
 
 
 @app.get("/api/call/status")
@@ -1583,6 +1675,7 @@ async def get_twilio_service_status():
         }
     except Exception as e:
         return {"status": "error", "error": str(e)}
+
 
 
 # ─── Main ────────────────────────────────────────────────────────────────────
