@@ -17,10 +17,11 @@ import { ProfileScreen } from './components/ProfileScreen';
 import { BottomNav } from './components/BottomNav';
 import { soundManager } from './utils/audio';
 import { ttsProvider } from './utils/speech';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 
-export default function App() {
+function MainApp() {
   const [screen, setScreen] = useState<ScreenType>('splash');
-  const [lang, setLang] = useState<Language>('en');
+  const { language: lang, setLanguage: setLang, t, isRTL } = useLanguage();
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [medicines, setMedicines] = useState<Medicine[]>(initialMedicines);
   const [patientProfile, setPatientProfile] = useState<PatientProfile>(() => {
@@ -31,9 +32,6 @@ export default function App() {
       return defaultPatientProfile;
     }
   });
-
-  const t = translations[lang] || translations.en;
-  const isRTL = lang === 'ur';
 
   // Splash auto-transition
   useEffect(() => {
@@ -207,5 +205,13 @@ export default function App() {
         />
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <MainApp />
+    </LanguageProvider>
   );
 }

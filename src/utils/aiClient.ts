@@ -40,6 +40,22 @@ STRICT RULES:
 4. MEDICAL DISCLAIMER: Always end with 'Please consult a doctor for severe symptoms.'
 5. NO DATA INVENTING: If you don't know the answer, or if the prescription OCR data is unclear, say 'I need more information / Please verify the prescription manually.' Do NOT guess.`;
 
+export function getAugmentedSystemPrompt(language: string = 'en'): string {
+  const langNameMap: Record<string, string> = {
+    ta: 'Tamil (தமிழ்)',
+    hi: 'Hindi (हिन्दी)',
+    te: 'Telugu (తెలుగు)',
+    kn: 'Kannada (ಕನ್ನಡ)',
+    ml: 'Malayalam (മലയാളം)',
+    en: 'English',
+    ur: 'Urdu (اردو)',
+  };
+  const targetName = langNameMap[language] || language;
+  return `${MASTER_SYSTEM_PROMPT}
+
+CRITICAL RULE: You must translate and reply entirely in ${targetName} script. Do NOT mix languages. Do NOT use English unless the preferred language is English.`;
+}
+
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export interface AIMessage {
@@ -242,15 +258,21 @@ export function subscribeNetworkStatus(callback: (state: NetworkState) => void):
 // ─── Client-Side Clinical Triage Engine (Offline Resilient) ─────────────────
 
 export function detectLanguageFromText(text: string, fallback: string = 'en'): string {
-  if (!text) return fallback;
-  if (/[\u0B80-\u0BFF]/.test(text)) return 'ta';
-  if (/[\u0900-\u097F]/.test(text)) return 'hi';
-  if (/[\u0C00-\u0C7F]/.test(text)) return 'te';
-  if (/[\u0D00-\u0D7F]/.test(text)) return 'ml';
-  if (/[\u0C80-\u0CFF]/.test(text)) return 'kn';
-  if (/[\u0600-\u06FF]/.test(text)) return 'ur';
-  const norm = fallback.toLowerCase().split('-')[0].trim();
-  return ['en', 'ta', 'hi', 'te', 'ml', 'kn', 'ur'].includes(norm) ? norm : 'en';
+  if (!text) {
+    if (typeof localStorage !== 'undefined') {
+      const stored = localStorage.getItem('smartmed_preferred_language');
+      if (stored && ['ta', 'en', 'hi', 'te', 'kn', 'ml'].includes(stored)) return stored;
+    }
+    return fallback;
+  }
+  const s = text.toLowerCase();
+  if (/[\u0B80-\u0BFF]/.test(s) || s.includes('ta') || s.includes('tamil')) return 'ta';
+  if (/[\u0900-\u097F]/.test(s) || s.includes('hi') || s.includes('hindi')) return 'hi';
+  if (/[\u0C00-\u0C7F]/.test(s) || s.includes('te') || s.includes('telugu')) return 'te';
+  if (/[\u0C80-\u0CFF]/.test(s) || s.includes('kn') || s.includes('kannada')) return 'kn';
+  if (/[\u0D00-\u0D7F]/.test(s) || s.includes('ml') || s.includes('malayalam')) return 'ml';
+  if (s.includes('en') || s.includes('english')) return 'en';
+  return fallback;
 }
 
 export function resolveClinicalTriageOffline(
@@ -259,27 +281,33 @@ export function resolveClinicalTriageOffline(
 ): string {
   const isVoice = options?.isVoice ?? false;
   const patientName = options?.patientName || 'Patient';
-  const lang = detectLanguageFromText(message, options?.language || 'en');
+  const lang = options?.language ? detectLanguageFromText('', options.language) : detectLanguageFromText(message, 'en');
   const q = message.toLowerCase().trim();
 
   // If Voice requested (1 to 2 spoken sentences)
   if (isVoice) {
-    if (q.includes('chest pain') || q.includes('heart') || q.includes('breathe') || /நெஞ்சு|சீने|ఛాతీ/.test(q)) {
+    if (q.includes('chest pain') || q.includes('heart') || q.includes('breathe') || /நெஞ்சு|சீने|ఛాతీ|നെഞ്ചുവേദന|ಎದೆ ನೋವು/.test(q)) {
       if (lang === 'ta') return `${patientName}, நெஞ்சு வலி அவசர சிகிச்சை தேவைப்படும் அறிகுறி. உடனே அவசர மருத்துவ சேவையைத் தொடர்பு கொள்ளவும்.`;
       if (lang === 'hi') return `${patientName}, सीने में दर्द आपातकालीन लक्षण है। कृपया तुरंत नजदीकी अस्पताल जाएं।`;
       if (lang === 'te') return `${patientName}, ఛాతీ నొప్పి అత్యవసర పరిస్థితి. వెంటనే వైద్య సహాయం తీసుకోండి.`;
+      if (lang === 'kn') return `${patientName}, ಎದೆ ನೋವು ತುರ್ತು ವೈದ್ಯಕೀಯ ಚಿಕಿತ್ಸೆ ಅಗತ್ಯವಿರುವ ಲಕ್ಷಣ. ದಯವಿಟ್ಟು ತಕ್ಷಣವೇ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
+      if (lang === 'ml') return `${patientName}, നെഞ്ചുവേദന അടിയന്തിര വൈദ്യസഹായം ആവശ്യമുള്ള ലക്ഷണമാണ്. ഉടൻ ആശുപത്രിയിൽ ചികിത്സ തേടുക.`;
       return `${patientName}, chest pain requires immediate emergency medical care. Please call emergency services right away.`;
     }
-    if (q.includes('head') || q.includes('தலை') || q.includes('सिर') || q.includes('తల')) {
+    if (q.includes('head') || q.includes('தலை') || q.includes('सिर') || q.includes('తల') || q.includes('തല') || q.includes('ತಲೆ')) {
       if (lang === 'ta') return `${patientName}, தலைவலிக்கு அமைதியான அறையில் ஓய்வெடுத்து போதுமான தண்ணீர் குடியுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை எடுத்துக்கொள்ளுங்கள்.`;
       if (lang === 'hi') return `${patientName}, सिरदर्द के लिए शांत कमरे में आराम करें और पानी पिएं। अपनी दवाएं समय पर लें।`;
       if (lang === 'te') return `${patientName}, తలనొప్పికి ప్రశాంతంగా విశ్రాంతి తీసుకోండి మరియు తగినంత నీరు త్రాగండి.`;
+      if (lang === 'kn') return `${patientName}, ತಲೆನೋವಿಗೆ ಶಾಂತವಾದ ಕೋಣೆಯಲ್ಲಿ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ.`;
+      if (lang === 'ml') return `${patientName}, തലവേദനയ്ക്ക് ശാന്തമായ മുറിയിൽ വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക.`;
       return `${patientName}, for a headache, please rest in a quiet room and drink plenty of water. Take your prescribed medicines as directed.`;
     }
-    if (q.includes('slight') || q.includes('pain') || q.includes('வலி') || q.includes('दर्द') || q.includes('నొప్పి')) {
+    if (q.includes('slight') || q.includes('pain') || q.includes('வலி') || q.includes('दर्द') || q.includes('నొప్పి') || q.includes('വേദന') || q.includes('ನೋವು')) {
       if (lang === 'ta') return `${patientName}, லேசான வலிக்கு ஓய்வெடுத்து தண்ணீர் குடியுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை எடுத்துக்கொள்ளுங்கள்.`;
       if (lang === 'hi') return `${patientName}, हल्के दर्द के लिए आराम करें और पर्याप्त पानी पिएं। अपनी निर्धारित दवाएं समय पर लें।`;
       if (lang === 'te') return `${patientName}, తేలికపాటి నొప్పికి విశ్రాంతి తీసుకోండి మరియు తగినంత నీరు త్రాగండి.`;
+      if (lang === 'kn') return `${patientName}, ಸೌಮ್ಯವಾದ ನೋವಿಗೆ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ.`;
+      if (lang === 'ml') return `${patientName}, നേരിയ വേദനയ്ക്ക് വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക.`;
       return `${patientName}, for mild pain, please rest and drink plenty of water. Take your prescribed medicines as directed.`;
     }
     if (lang === 'ta') return `${patientName}, உங்கள் உடல்நலனை கவனித்துக் கொள்ளுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை சரியான நேரத்தில் உட்கொள்ளவும்.`;
@@ -291,38 +319,48 @@ export function resolveClinicalTriageOffline(
   }
 
   // If Chat requested (Master System Prompt 5 Rules)
-  if (q.includes('chest pain') || q.includes('heart attack') || q.includes('breathe') || /நெஞ்சு|சீने|ఛాతీ/.test(q)) {
+  if (q.includes('chest pain') || q.includes('heart attack') || q.includes('breathe') || /நெஞ்சு|சீने|ఛాతీ|നെഞ്ചുവേദന|ಎದೆ ನೋವು/.test(q)) {
     if (lang === 'ta') return `⚠️ அவசர எச்சரிக்கை:\n• நெஞ்சு வலி மற்றும் மூச்சுத் திணறல் உடனடி மருத்துவ அவசர சிகிச்சை தேவைப்படும் அறிகுறிகள் ஆகும்.\n• உடனே அவசர மருத்துவ பிரிவை அணுகவும்.\nகடுமையான அறிகுறிகளுக்கு தயவுசெய்து மருத்துவரை அணுகவும்.`;
     if (lang === 'hi') return `⚠️ तत्काल चेतावनी:\n• सीने में दर्द और सांस लेने में कठिनाई गंभीर आपातकालीन लक्षण हैं।\n• कृपया तुरंत नजदीकी अस्पताल जाएं।\nगंभीर लक्षणों के लिए कृपया डॉक्टर से परामर्श लें।`;
     if (lang === 'te') return `⚠️ అత్యవసర హెచ్చరిక:\n• ఛాతీ నొప్పి మరియు శ్వాస ఇబ్బంది అత్యవసర పరిస్థితి.\n• వెంటనే ఆసుపత్రికి వెళ్లండి.\nతీవ్రమైన లక్షణాల కోసం దయచేసి వైద్యుడిని సంప్రదించండి.`;
+    if (lang === 'kn') return `⚠️ ತುರ್ತು ವೈದ್ಯಕೀಯ ಎಚ್ಚರಿಕೆ:\n• ಎದೆ ನೋವು ಮತ್ತು ಉಸಿರಾಟದ ತೊಂದರೆಗೆ ತಕ್ಷಣ ತುರ್ತು ಚಿಕಿತ್ಸೆ ಅಗತ್ಯವಿದೆ.\n• ದಯವಿಟ್ಟು ತಕ್ಷಣವೇ ಹತ್ತಿರದ ತುರ್ತು ಚಿಕಿತ್ಸಾ ಕೇಂದ್ರಕ್ಕೆ ಭೇಟಿ ನೀಡಿ.\nತೀವ್ರವಾದ ರೋಗಲಕ್ಷಣಗಳಿಗಾಗಿ ದಯವಿಟ್ಟು ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
+    if (lang === 'ml') return `⚠️ അടിയന്തര വൈദ്യസഹായം:\n• നെഞ്ചുവേദനയും ശ്വാസതടസ്സവും അടിയന്തിര ചികിത്സ ആവശ്യമുള്ള ലക്ഷണങ്ങളാണ്.\n• ദയവായി ഉടൻ തന്നെ അടുത്തുള്ള ആശുപത്രിയിൽ എത്തുക.\nഗുരുതരമായ ലക്ഷണങ്ങൾക്ക് ദയവായി ഒരു ഡോക്ടറെ കാണുക.`;
     return `⚠️ IMMEDIATE MEDICAL ALERT:\n• Acute chest pain or difficulty breathing requires emergency medical care.\n• Please seek emergency hospital attention immediately.\nPlease consult a doctor for severe symptoms.`;
   }
 
-  if (q.includes('head') || q.includes('தலை') || q.includes('सिर') || q.includes('తల')) {
+  if (q.includes('head') || q.includes('தலை') || q.includes('सिर') || q.includes('తల') || q.includes('തല') || q.includes('ತಲೆ')) {
     if (lang === 'ta') return `• தலைவலிக்கு, அமைதியான அறையில் ஓய்வெடுத்து போதுமான அளவு தண்ணீர் குடிக்கவும்.\n• நீரிழப்பு மற்றும் மன அழுத்தம் தலைவலிக்கு பொதுவான காரணங்கள்.\nகடுமையான அறிகுறிகளுக்கு தயவுசெய்து மருத்துவரை அணுகவும்.`;
     if (lang === 'hi') return `• सिरदर्द के लिए शांत कमरे में आराम करें और पर्याप्त पानी पिएं।\n• तनाव से बचें और अपनी नियमित दवाएं समय पर लें।\nगंभीर लक्षणों के लिए कृपया डॉक्टर से परामर्श लें।`;
     if (lang === 'te') return `• తలనొప్పికి నిశ్శబ్ద ప్రదేశంలో విశ్రాంతి తీసుకోండి మరియు తగినంత నీరు త్రాగండి.\n• అలసట మరియు డిహైడ్రేషన్ తగ్గించండి.\nతీవ్రమైన లక్షణాల కోసం దయచేసి వైద్యుడిని సంప్రదించండి.`;
+    if (lang === 'kn') return `• ತಲೆನೋವಿಗೆ ಶಾಂತವಾದ ಕೋಣೆಯಲ್ಲಿ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ.\n• ಆಯಾಸ ಮತ್ತು ನಿರ್ಜಲೀಕರಣದಿಂದ ದೂರವಿರಿ.\nತೀವ್ರವಾದ ರೋಗಲಕ್ಷಣಗಳಿಗಾಗಿ ದಯವಿಟ್ಟು ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
+    if (lang === 'ml') return `• തലവേദനയ്ക്ക് ശാന്തമായ മുറിയിൽ വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക.\n• കൂടുതൽ ആയാസകരമായ ജോലികൾ ഒഴിവാക്കുക.\nഗുരുതരമായ ലക്ഷണങ്ങൾക്ക് ദയവായി ഒരു ഡോക്ടറെ കാണുക.`;
     return `• For head pain, rest in a quiet, dim room and drink plenty of water to ensure hydration.\n• Over-the-counter paracetamol may help mild tension headaches if not contraindicated.\nPlease consult a doctor for severe symptoms.`;
   }
 
-  if (q.includes('slight') || q.includes('pain') || q.includes('body') || q.includes('வலி') || q.includes('दर्द') || q.includes('నొప్పి')) {
+  if (q.includes('slight') || q.includes('pain') || q.includes('body') || q.includes('வலி') || q.includes('दर्द') || q.includes('నొప్పి') || q.includes('വേദന') || q.includes('ನೋವು')) {
     if (lang === 'ta') return `• லேசான உடல் வலிக்கு, கனமான வேலைகளைத் தவிர்த்து நல்ல ஓய்வெடுக்கவும்.\n• வெதுவெதுப்பான ஒத்தடம் மற்றும் போதிய தண்ணீர் குடிப்பது தசை வலியைத் தணிக்கும்.\nகடுமையான அறிகுறிகளுக்கு தயவுசெய்து மருத்துவரை அணுகவும்.`;
     if (lang === 'hi') return `• हल्के बदन दर्द के लिए आराम करें और भारी काम करने से बचें।\n• गुनगुने पानी की सिकाई और पर्याप्त पानी पीने से आराम मिलता है।\nगंभीर लक्षणों के लिए कृपया डॉक्टर से परामर्श लें।`;
     if (lang === 'te') return `• తేలికపాటి నొప్పులకు తగినంత విశ్రాంతి తీసుకోండి మరియు శ్రమ తగ్గించండి.\n• గోరువెచ్చని నీటితో స్నానం ఉపశమనం ఇస్తుంది.\nతీవ్రమైన లక్షణాల కోసం దయచేసి వైద్యుడిని సంప్రదించండి.`;
+    if (lang === 'kn') return `• ಸೌಮ್ಯವಾದ ದೇಹದ ನೋವಿಗೆ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಶ್ರಮವನ್ನು ಕಡಿಮೆ ಮಾಡಿ.\n• ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯುವುದು ಸ್ನಾಯು ನೋವನ್ನು ಕಡಿಮೆ ಮಾಡಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ.\nತೀವ್ರವಾದ ರೋಗಲಕ್ಷಣಗಳಿಗಾಗಿ ದಯವಿಟ್ಟು ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
+    if (lang === 'ml') return `• നേരിയ ശരീരവേദനയ്ക്ക് വിശ്രമിക്കുകയും കഠിനമായ ജോലികൾ ഒഴിവാക്കുകയും ചെയ്യുക.\n• ആവശ്യത്തിന് വെള്ളം കുടിക്കുന്നത് പേശിവേദന കുറയ്ക്കാൻ സഹായിക്കും.\nഗുരുതരമായ ലക്ഷണങ്ങൾക്ക് ദയവായി ഒരു ഡോക്ടറെ കാണുക.`;
     return `• For mild or slight body pain, avoid heavy physical exertion and rest the affected area.\n• Gentle warmth and good hydration can help soothe muscular discomfort.\nPlease consult a doctor for severe symptoms.`;
   }
 
-  if (q.includes('coffee') || q.includes('tea') || q.includes('காபி') || q.includes('कॉफी') || q.includes('కాఫీ')) {
+  if (q.includes('coffee') || q.includes('tea') || q.includes('காபி') || q.includes('कॉफी') || q.includes('కాఫీ') || q.includes('കാപ്പി') || q.includes('ಕಾಫಿ')) {
     if (lang === 'ta') return `• இரத்த அழுத்த மாத்திரைகளை எப்போதும் சுத்தமான தண்ணீருடன் மட்டுமே உட்கொள்ள வேண்டும், காபியுடன் அல்ல.\n• காபியில் உள்ள காஃபின் தற்காலிகமாக இரத்த அழுத்தத்தை அதிகரிக்கலாம்.\nகடுமையான அறிகுறிகளுக்கு தயவுசெய்து மருத்துவரை அணுகவும்.`;
     if (lang === 'hi') return `• ब्लड प्रेशर की दवा हमेशा सादे पानी के साथ ही लें, कॉफी या चाय के साथ नहीं।\n• कैफीन रक्तचाप को अस्थायी रूप से बढ़ा सकता है।\nगंभीर लक्षणों के लिए कृपया डॉक्टर से परामर्श लें।`;
     if (lang === 'te') return `• బీపీ మందులను మంచి నీటితో మాత్రమే తీసుకోవాలి, కాఫీతో తీసుకోకూడదు.\n• కెఫిన్ వల్ల రక్తపోటు పెరిగే అవకాశం ఉంది.\nతీవ్రమైన లక్షణాల కోసం దయచేసి వైద్యుడిని సంప్రదించండి.`;
+    if (lang === 'kn') return `• ರಕ್ತದೊತ್ತಡದ ಮಾತ್ರೆಗಳನ್ನು ಯಾವಾಗಲೂ ನೀರಿನೊಂದಿಗೆ ಮಾತ್ರ ತೆಗೆದುಕೊಳ್ಳಬೇಕು, ಕಾಫಿಯೊಂದಿಗೆ ಅಲ್ಲ.\n• ಕೆಫೀನ್ ತಾತ್ಕಾಲಿಕವಾಗಿ ರಕ್ತದೊತ್ತಡವನ್ನು ಹೆಚ್ಚಿಸಬಹುದು.\nತೀವ್ರವಾದ ರೋಗಲಕ್ಷಣಗಳಿಗಾಗಿ ದಯವಿಟ್ಟು ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
+    if (lang === 'ml') return `• രക്തസമ്മർദ്ദത്തിനുള്ള മരുന്നുകൾ എപ്പോഴും ശുദ്ധജലത്തോടൊപ്പം മാത്രം കഴിക്കുക, കാപ്പിയോടൊപ്പം കഴിക്കരുത്.\n• കഫീൻ രക്തസമ്മർദ്ദം താൽക്കാലികമായി വർദ്ധിപ്പിച്ചേക്കാം.\nഗുരുതരമായ ലക്ഷണങ്ങൾക്ക് ദയവായി ഒരു ഡോക്ടറെ കാണുക.`;
     return `• It is strongly recommended to take blood pressure medications with plain water, not coffee.\n• Caffeine can temporarily spike blood pressure and interfere with drug absorption.\nPlease consult a doctor for severe symptoms.`;
   }
 
-  if (q.includes('miss') || q.includes('forgot') || q.includes('மறந்து') || q.includes('भूल') || q.includes('మర్చి')) {
+  if (q.includes('miss') || q.includes('forgot') || q.includes('மறந்து') || q.includes('भूल') || q.includes('మర్చి') || q.includes('മറന്നു') || q.includes('ಮರೆತು')) {
     if (lang === 'ta') return `• மருந்தை எடுக்க மறந்துவிட்டால், நினைவுக்கு வந்தவுடன் உட்கொள்ளவும்.\n• அடுத்த வேளைக்கு அருகிலிருந்தால் தவறவிட்டதை விட்டுவிடுங்கள். இரட்டை மாத்திரை எடுக்க வேண்டாம்.\nகடுமையான அறிகுறிகளுக்கு தயவுசெய்து மருத்துவரை அணுகவும்.`;
     if (lang === 'hi') return `• यदि कोई खुराक छूट जाए, तो याद आते ही ले लें।\n• अगली खुराक का समय पास हो तो छूटी खुराक छोड़ दें। कभी भी दो गोलियां एक साथ न लें।\nगंभीर लक्षणों के लिए कृपया डॉक्टर से परामर्श लें।`;
     if (lang === 'te') return `• డోస్ మర్చిపోతే గుర్తుకు రాగానే తీసుకోండి.\n• తదుపరి డోస్ సమయం దగ్గరగా ఉంటే రెండు డోస్‌లు కలిపి తీసుకోవద్దు.\nతీవ్రమైన లక్షణాల కోసం దయచేసి వైద్యుడిని సంప్రదించండి.`;
+    if (lang === 'kn') return `• ಔಷಧಿ ತೆಗೆದುಕೊಳ್ಳಲು ಮರೆತರೆ, ನೆನಪಾದ ತಕ್ಷಣ ತೆಗೆದುಕೊಳ್ಳಿ.\n• ಮುಂದಿನ ಡೋಸ್ ಸಮಯ ಹತ್ತಿರವಿದ್ದರೆ ಮರೆತ ಡೋಸ್ ಬಿಟ್ಟುಬಿಡಿ. ಡಬಲ್ ಡೋಸ್ ತೆಗೆದುಕೊಳ್ಳಬೇಡಿ.\nತೀವ್ರವಾದ ರೋಗಲಕ್ಷಣಗಳಿಗಾಗಿ ದಯವಿಟ್ಟು ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
+    if (lang === 'ml') return `• മരുന്ന് കഴിക്കാൻ മറന്നുപോയാൽ, ഓർമ്മവരുമ്പോൾ തന്നെ കഴിക്കുക.\n• അടുത്ത ഡോസിന്റെ സമയമായിട്ടുണ്ടെങ്കിൽ വിട്ടുപോയത് ഒഴിവാക്കുക. ഇരട്ടി ഡോസ് കഴിക്കരുത്.\nഗുരുതരമായ ലക്ഷണങ്ങൾക്ക് ദയവായി ഒരു ഡോക്ടറെ കാണുക.`;
     return `• If you miss a dose, take it as soon as you remember that day.\n• If it is almost time for your next scheduled dose, skip the missed one. Never take a double dose.\nPlease consult a doctor for severe symptoms.`;
   }
 
@@ -372,7 +410,8 @@ export async function sendMessageToLocalAI(
   const requestedMode = options?.mode ?? 'auto';
   const effectiveMode = requestedMode === 'offline' ? 'offline' : (!online ? 'offline' : 'online');
   const timeoutMs = options?.timeout ?? 4000;
-  const userLang = options?.language;
+  const userLang = options?.language || 'en';
+  const augmentedPrompt = getAugmentedSystemPrompt(userLang);
 
   // 1. ONLINE PATH: Query AWS-hosted backend with fast timeout
   if (effectiveMode === 'online') {
@@ -389,6 +428,8 @@ export async function sendMessageToLocalAI(
           history: conversationHistory.slice(-20),
           mode: 'online',
           language: userLang,
+          preferred_language: userLang,
+          system_prompt: augmentedPrompt,
         }),
         signal: cloudController.signal,
       });
@@ -421,6 +462,8 @@ export async function sendMessageToLocalAI(
         history: conversationHistory.slice(-20),
         mode: 'offline',
         language: userLang,
+        preferred_language: userLang,
+        system_prompt: augmentedPrompt,
       }),
       signal: localController.signal,
     });
@@ -744,6 +787,7 @@ export interface ScheduleCallRequest {
   dosage: string;
   trigger_time?: string;
   patient_name?: string;
+  preferred_language?: string;
 }
 
 export interface ScheduleCallResponse {
@@ -754,6 +798,7 @@ export interface ScheduleCallResponse {
   medicine?: string;
   dosage?: string;
   patient_name?: string;
+  preferred_language?: string;
   error?: string;
   mock?: boolean;
 }
@@ -764,13 +809,15 @@ export interface ScheduleCallResponse {
  */
 export async function scheduleTwilioCall(req: ScheduleCallRequest): Promise<ScheduleCallResponse> {
   const base = getBaseApiUrl();
+  const lang = req.preferred_language || (typeof localStorage !== 'undefined' ? localStorage.getItem('smartmed_preferred_language') : null) || 'en';
+  const payload = { ...req, preferred_language: lang };
   try {
     const res = await fetch(`${base}/api/call/schedule`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(req),
+      body: JSON.stringify(payload),
     });
 
     if (res.ok) {
@@ -790,7 +837,7 @@ export async function scheduleTwilioCall(req: ScheduleCallRequest): Promise<Sche
     // Offline resilience: save scheduled call locally to localStorage
     try {
       const existing = JSON.parse(localStorage.getItem('smartmed_offline_scheduled_calls') || '[]');
-      existing.push({ ...req, scheduledAt: new Date().toISOString() });
+      existing.push({ ...payload, scheduledAt: new Date().toISOString() });
       localStorage.setItem('smartmed_offline_scheduled_calls', JSON.stringify(existing));
     } catch {}
 
@@ -801,6 +848,7 @@ export async function scheduleTwilioCall(req: ScheduleCallRequest): Promise<Sche
       medicine: req.medicine,
       dosage: req.dosage,
       patient_name: req.patient_name,
+      preferred_language: lang,
     };
   }
 }
@@ -810,13 +858,15 @@ export async function scheduleTwilioCall(req: ScheduleCallRequest): Promise<Sche
  */
 export async function triggerTwilioCallNow(req: ScheduleCallRequest): Promise<ScheduleCallResponse> {
   const base = getBaseApiUrl();
+  const lang = req.preferred_language || (typeof localStorage !== 'undefined' ? localStorage.getItem('smartmed_preferred_language') : null) || 'en';
+  const payload = { ...req, preferred_language: lang };
   try {
     const res = await fetch(`${base}/api/call/trigger_now`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(req),
+      body: JSON.stringify(payload),
     });
 
     if (res.ok) {

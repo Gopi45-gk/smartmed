@@ -54,6 +54,7 @@ export interface PatientProfile {
   condition?: string;
   bloodGroup?: string;
   registeredAt?: string;
+  preferred_language?: Language;
 }
 
 export const defaultPatientProfile: PatientProfile = {
@@ -63,6 +64,7 @@ export const defaultPatientProfile: PatientProfile = {
   gender: 'Male',
   condition: 'Hypertension & Diabetes',
   bloodGroup: 'B+',
+  preferred_language: 'en',
 };
 
 export interface TranslationStrings {
@@ -122,4 +124,7 @@ export interface TranslationStrings {
   emergencyInfo: string;
   allergies: string;
   bloodGroup: string;
+  twilioAlertCall?: string;
+  callingState?: string;
+  scheduledLabel?: string;
 }

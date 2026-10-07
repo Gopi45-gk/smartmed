@@ -473,13 +473,17 @@ def resolve_clinical_voice(
     p_name = patient_name or "Patient"
 
     # Emergency
-    if any(k in q for k in ["chest pain", "heart attack", "can't breathe", "நெஞ்சு வலி", "सीने में दर्द", "ఛాతీ నొప్పి"]):
+    if any(k in q for k in ["chest pain", "heart attack", "can't breathe", "நெஞ்சு வலி", "சீने में दर्द", "ఛాతీ నొప్పి", "നെഞ്ചുവേദന", "ಎದೆ ನೋವು"]):
         if lang == "ta":
             return f"{p_name}, நெஞ்சு வலி அவசர சிகிச்சை தேவைப்படும் அறிகுறி. தயவுசெய்து உடனடியாக அவசர மருத்துவ சேவையைத் தொடர்பு கொள்ளவும்."
         elif lang == "hi":
             return f"{p_name}, सीने में दर्द आपातकालीन लक्षण है। कृपया तुरंत नजदीकी अस्पताल की आपातकालीन सेवा से संपर्क करें।"
         elif lang == "te":
             return f"{p_name}, ఛాతీ నొప్పి అత్యవసర పరిస్థితి. దయచేసి వెంటనే సమీప ఆసుపత్రికి వెళ్లండి."
+        elif lang == "kn":
+            return f"{p_name}, ಎದೆ ನೋವು ತುರ್ತು ವೈದ್ಯಕೀಯ ಚಿಕಿತ್ಸೆ ಅಗತ್ಯವಿರುವ ಲಕ್ಷಣ. ದಯವಿಟ್ಟು ತಕ್ಷಣವೇ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ."
+        elif lang == "ml":
+            return f"{p_name}, നെഞ്ചുവേദന അടിയന്തിര വൈദ്യസഹായം ആവശ്യമുള്ള ലക്ഷണമാണ്. ഉടൻ ആശുപത്രിയിൽ ചികിത്സ തേടുക."
         return f"{p_name}, chest pain requires immediate emergency medical care. Please call emergency services right away."
 
     # Slight pain / Body pain
@@ -490,16 +494,24 @@ def resolve_clinical_voice(
             return f"{p_name}, हल्के दर्द के लिए आराम करें और पर्याप्त पानी पिएं। अपनी निर्धारित दवाएं समय पर लें।"
         elif lang == "te":
             return f"{p_name}, తేలికపాటి నొప్పికి విశ్రాంతి తీసుకోండి మరియు నీరు త్రాగండి. సూచించిన మందులను వేసుకోండి."
+        elif lang == "kn":
+            return f"{p_name}, ಸೌಮ್ಯವಾದ ನೋವಿಗೆ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ."
+        elif lang == "ml":
+            return f"{p_name}, നേരിയ വേദനയ്ക്ക് വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക."
         return f"{p_name}, for mild pain, please rest and drink plenty of water. Take your prescribed medicines as directed."
 
     # Head pain / Headache
-    if any(k in q for k in ["head pain", "headache", "தலைவலி", "सिरदर्द", "తలనొప్పి"]):
+    if any(k in q for k in ["head pain", "headache", "தலைவலி", "सिरदर्द", "తలనొప్పి", "തലവേദന", "ತಲೆನೋವು"]):
         if lang == "ta":
             return f"{p_name}, தலைவலிக்கு அமைதியான அறையில் ஓய்வெடுத்து தண்ணீர் குடியுங்கள். வலி நீடித்தால் மருத்துவரை அணுகவும்."
         elif lang == "hi":
             return f"{p_name}, सिरदर्द के लिए शांत कमरे में आराम करें और पानी पिएं। यदि सिरदर्द बना रहे तो डॉक्टर को दिखाएं।"
         elif lang == "te":
             return f"{p_name}, తలనొప్పికి నిశ్శబ్దంగా విశ్రాంతి తీసుకోండి మరియు తగినంత నీరు త్రాగండి."
+        elif lang == "kn":
+            return f"{p_name}, ತಲೆನೋವಿಗೆ ಶಾಂತವಾದ ಕೋಣೆಯಲ್ಲಿ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ."
+        elif lang == "ml":
+            return f"{p_name}, തലവേദനയ്ക്ക് ശാന്തമായ മുറിയിൽ വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക."
         return f"{p_name}, for a headache, please rest in a quiet room and stay well hydrated with water."
 
     # General voice fallback

@@ -142,13 +142,17 @@ class SoundManager {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       
+      const effectiveLang = (lang && lang !== 'en') ? lang : (typeof localStorage !== 'undefined' ? (localStorage.getItem('smartmed_preferred_language') || lang) : lang);
       const langMap: Record<string, string> = {
         en: 'en-US',
         ta: 'ta-IN',
         hi: 'hi-IN',
-        ur: 'ur-PK'
+        ur: 'ur-PK',
+        te: 'te-IN',
+        kn: 'kn-IN',
+        ml: 'ml-IN',
       };
-      utterance.lang = langMap[lang] || 'en-US';
+      utterance.lang = langMap[effectiveLang] || 'en-US';
       utterance.rate = 0.95;
       utterance.pitch = 1.05;
 

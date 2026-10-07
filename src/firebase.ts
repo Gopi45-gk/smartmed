@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
-import type { PatientProfile } from "./types";
+import { getFirestore, doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
+import type { PatientProfile, Language } from "./types";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAhyJmP9eZvKIbO2Tb-GU_msRH3TmK1Mkw",
@@ -49,12 +49,14 @@ function saveLocalPatient(docId: string, record: StoredPatientRecord): void {
 /**
  * Register a new patient.
  * Doc ID = normalized mobile number.
- * Features automatic offline-first caching for resilience when offline.
+ * Features automatic offline-first caching and preferred_language persistence.
  */
 export async function registerPatient(
   patientData: PatientProfile & { password: string }
 ): Promise<{ success: boolean; error?: string }> {
   const docId = phoneToDocId(patientData.phone);
+  const preferredLang: Language = patientData.preferred_language || 'en';
+
   const patientRecord: StoredPatientRecord = {
     profile: {
       name: patientData.name,
@@ -64,11 +66,12 @@ export async function registerPatient(
       condition: patientData.condition || "",
       bloodGroup: patientData.bloodGroup || "",
       registeredAt: new Date().toISOString(),
+      preferred_language: preferredLang,
     },
     password: patientData.password,
   };
 
-  // Cache locally immediately
+  // Cache locally immediately (100% offline resilience)
   saveLocalPatient(docId, patientRecord);
 
   // Sync to Firestore if online
@@ -84,6 +87,7 @@ export async function registerPatient(
       gender: patientData.gender,
       condition: patientData.condition || "",
       bloodGroup: patientData.bloodGroup || "",
+      preferred_language: preferredLang,
       password: patientData.password,
       registeredAt: patientRecord.profile.registeredAt,
     });
@@ -97,7 +101,7 @@ export async function registerPatient(
 
 /**
  * Login a patient by verifying phone + password against Firestore (or local offline cache).
- * Returns the patient profile on success.
+ * Returns the patient profile on success including preferred_language.
  */
 export async function loginPatient(
   phone: string,
@@ -121,6 +125,7 @@ export async function loginPatient(
         condition: data.condition,
         bloodGroup: data.bloodGroup,
         registeredAt: data.registeredAt,
+        preferred_language: (data.preferred_language as Language) || 'en',
       };
       // Update local cache
       saveLocalPatient(docId, { profile, password });
@@ -141,4 +146,30 @@ export async function loginPatient(
   }
 
   return { success: false, error: "No account found with this number. Please register first." };
+}
+
+/**
+ * Update patient preferred language in Firestore and offline cache.
+ */
+export async function updatePatientLanguage(
+  phone: string,
+  preferred_language: Language
+): Promise<void> {
+  const docId = phoneToDocId(phone);
+
+  // 1. Update offline cache
+  const localPatients = getLocalPatients();
+  if (localPatients[docId]) {
+    localPatients[docId].profile.preferred_language = preferred_language;
+    localStorage.setItem("smartmed_offline_patients", JSON.stringify(localPatients));
+  }
+
+  // 2. Update Firestore if online
+  try {
+    await updateDoc(doc(db, "patients", docId), {
+      preferred_language,
+    });
+  } catch (err) {
+    console.warn("Firestore language update skipped (offline/unreachable):", err);
+  }
 }

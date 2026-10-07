@@ -31,15 +31,33 @@ class MNNInference:
         message: str,
         conversation_history: Optional[List[Dict[str, str]]] = None,
         rag_context: Optional[str] = None,
+        preferred_language: Optional[str] = "en",
     ) -> str:
         """
         Format the prompt for the MNN-LLM model in ChatML template.
-        Injects verified medical RAG context when available.
+        Injects verified medical RAG context and multilingual rules.
         """
         parts = []
 
         # System prompt
         system_prompt = self._get_system_prompt()
+        if preferred_language and preferred_language != "en":
+            lang_name_map = {
+                "ta": "Tamil",
+                "en": "English",
+                "hi": "Hindi",
+                "te": "Telugu",
+                "kn": "Kannada",
+                "ml": "Malayalam",
+                "ur": "Urdu",
+            }
+            target_lang_name = lang_name_map.get(preferred_language.lower(), preferred_language.capitalize())
+            strict_rule = (
+                f"\nCRITICAL RULE: You must translate and reply entirely in {target_lang_name} script. "
+                f"Do NOT mix languages. Do NOT use English unless the preferred language is English."
+            )
+            system_prompt += strict_rule
+
         parts.append(f"<|im_start|>system\n{system_prompt}<|im_end|>")
 
         # Conversation history (if any)
@@ -84,17 +102,10 @@ class MNNInference:
         message: str,
         conversation_history: Optional[List[Dict[str, str]]] = None,
         use_rag: bool = True,
+        preferred_language: Optional[str] = "en",
     ) -> Dict:
         """
         Generate a clinically grounded response for a user message.
-        
-        Args:
-            message: The user's input message.
-            conversation_history: Previous messages in [{role, content}] format.
-            use_rag: Whether to perform local EML / OpenFDA / RxNorm retrieval.
-            
-        Returns:
-            Dict with 'success', 'response', 'model', 'offline', 'timing' keys.
         """
         if not message or not message.strip():
             return {
@@ -122,7 +133,7 @@ class MNNInference:
             if not loaded:
                 try:
                     from clinical_triage import resolve_clinical_chat
-                    triage_ans = resolve_clinical_chat(message)
+                    triage_ans = resolve_clinical_chat(message, fallback_lang=preferred_language or "en")
                     return {
                         "success": True,
                         "response": triage_ans,
@@ -141,7 +152,7 @@ class MNNInference:
                     }
 
         # 3. Format prompt
-        prompt = self._format_prompt(message, conversation_history, rag_context)
+        prompt = self._format_prompt(message, conversation_history, rag_context, preferred_language)
 
         try:
             # Run inference
@@ -149,6 +160,21 @@ class MNNInference:
 
             # Clean up response
             response_text = self._clean_response(response_text)
+
+            # Enforce native language script if regional language is requested
+            if preferred_language and preferred_language != "en":
+                import re
+                script_regexes = {
+                    "ta": r"[\u0B80-\u0BFF]",
+                    "hi": r"[\u0900-\u097F]",
+                    "te": r"[\u0C00-\u0C7F]",
+                    "kn": r"[\u0C80-\u0CFF]",
+                    "ml": r"[\u0D00-\u0D7F]",
+                }
+                rx = script_regexes.get(preferred_language)
+                if rx and not re.search(rx, response_text):
+                    from clinical_triage import resolve_clinical_chat
+                    response_text = resolve_clinical_chat(message, fallback_lang=preferred_language)
 
             elapsed = round(time.time() - start_time, 2)
 

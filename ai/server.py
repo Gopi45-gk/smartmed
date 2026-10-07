@@ -127,6 +127,8 @@ class ChatRequest(BaseModel):
         None, description="Conversation history as [{role, content}]"
     )
     mode: Optional[str] = Field("auto", description="Inference mode: 'auto', 'offline', or 'online'")
+    preferred_language: Optional[str] = Field("en", description="User preferred language (ta, en, hi, te, kn, ml)")
+    language: Optional[str] = Field(None, description="Alias for preferred_language")
 
 
 class ChatResponse(BaseModel):
@@ -236,6 +238,7 @@ async def query_nvidia_nim(
     conversation_history: Optional[List[Dict[str, str]]] = None,
     rag_context: Optional[str] = None,
     model: Optional[str] = None,
+    preferred_language: Optional[str] = "en",
 ) -> Dict[str, Any]:
     """
     Route clinical triage query to AWS / NVIDIA NIM Inference Microservices.
@@ -252,6 +255,24 @@ async def query_nvidia_nim(
 
     start_time = time.time()
     system_prompt = config.get_system_prompt()
+
+    # Multilingual Master System Prompt Injection
+    lang_name_map = {
+        "ta": "Tamil",
+        "en": "English",
+        "hi": "Hindi",
+        "te": "Telugu",
+        "kn": "Kannada",
+        "ml": "Malayalam",
+        "ur": "Urdu",
+    }
+    target_lang = (preferred_language or "en").lower().strip()
+    target_lang_name = lang_name_map.get(target_lang, target_lang.capitalize())
+    strict_multilingual_rule = (
+        f"\nCRITICAL RULE: You must translate and reply entirely in {target_lang_name} script. "
+        f"Do NOT mix languages. Do NOT use English unless the preferred language is English."
+    )
+    system_prompt = f"{system_prompt}\n{strict_multilingual_rule}"
 
     messages = [{"role": "system", "content": system_prompt}]
 
@@ -344,6 +365,7 @@ async def chat_nim(request: ChatRequest):
     if not message:
         raise HTTPException(status_code=400, detail="Message cannot be empty")
 
+    pref_lang = request.preferred_language or request.language or "en"
     intent = detect_intent(message)
     rag_context = ""
     try:
@@ -355,6 +377,7 @@ async def chat_nim(request: ChatRequest):
         message=message,
         conversation_history=request.history,
         rag_context=rag_context,
+        preferred_language=pref_lang,
     )
 
     if nim_result.get("success"):
@@ -375,7 +398,19 @@ async def chat_nim(request: ChatRequest):
             inference_engine.generate,
             message=message,
             conversation_history=request.history,
+            preferred_language=pref_lang,
         )
+        if not result.get("success") or not result.get("response"):
+            clinical_text = resolve_clinical_chat(message, fallback_lang=pref_lang)
+            return ChatResponse(
+                success=True,
+                response=clinical_text,
+                intent=intent,
+                model="smartmed-clinical-engine",
+                offline=True,
+                rag_grounded=bool(rag_context),
+                timing="0.01s",
+            )
         return ChatResponse(
             success=result.get("success", False),
             response=result.get("response"),
@@ -405,8 +440,9 @@ async def chat(request: ChatRequest):
     if len(message) > 4096:
         raise HTTPException(status_code=400, detail="Message too long (max 4096 chars)")
 
+    pref_lang = request.preferred_language or request.language or "en"
     intent = detect_intent(message)
-    logger.info(f"Chat request: {message[:80]}{'...' if len(message) > 80 else ''} (Intent: {intent}, Mode: {request.mode})")
+    logger.info(f"Chat request: {message[:80]}{'...' if len(message) > 80 else ''} (Intent: {intent}, Mode: {request.mode}, Lang: {pref_lang})")
 
     # Fetch verified pharmacological RAG context (EML, OpenFDA, ICD-11)
     rag_context = ""
@@ -428,6 +464,7 @@ async def chat(request: ChatRequest):
             message=message,
             conversation_history=request.history,
             rag_context=rag_context,
+            preferred_language=pref_lang,
         )
         if nim_result.get("success"):
             return ChatResponse(
@@ -448,10 +485,11 @@ async def chat(request: ChatRequest):
                 inference_engine.generate,
                 message=message,
                 conversation_history=request.history,
+                preferred_language=pref_lang,
             )
 
             if not result.get("success") or not result.get("response"):
-                clinical_text = resolve_clinical_chat(message)
+                clinical_text = resolve_clinical_chat(message, fallback_lang=pref_lang)
                 return ChatResponse(
                     success=True,
                     response=clinical_text,
@@ -474,7 +512,7 @@ async def chat(request: ChatRequest):
 
         except Exception as e:
             logger.error(f"Chat endpoint error: {e}", exc_info=True)
-            clinical_text = resolve_clinical_chat(message)
+            clinical_text = resolve_clinical_chat(message, fallback_lang=pref_lang)
             return ChatResponse(
                 success=True,
                 response=clinical_text,
@@ -1444,13 +1482,14 @@ class TwilioCallScheduleRequest(BaseModel):
     dosage: str = Field(..., description="Dosage and instructions")
     trigger_time: Optional[str] = Field(None, description="ISO8601 Datetime string for scheduled call")
     patient_name: Optional[str] = Field(None, description="Patient name for personalized greeting")
+    preferred_language: Optional[str] = Field("en", description="Preferred language (ta, en, hi, te, kn, ml)")
 
 
 @app.post("/api/call/schedule")
 async def schedule_twilio_call_endpoint(req: TwilioCallScheduleRequest):
     """
     Schedule an automated medication reminder phone call via Twilio and APScheduler.
-    Accepts: {"phone_number": "+91...", "medicine": "...", "dosage": "...", "trigger_time": "ISO8601 String"}
+    Accepts: {"phone_number": "+91...", "medicine": "...", "dosage": "...", "trigger_time": "ISO8601 String", "preferred_language": "ta|hi|te|kn|ml|en"}
     """
     try:
         from twilio_service import schedule_call_job
@@ -1459,7 +1498,8 @@ async def schedule_twilio_call_endpoint(req: TwilioCallScheduleRequest):
             medicine=req.medicine,
             dosage=req.dosage,
             trigger_time_str=req.trigger_time,
-            patient_name=req.patient_name
+            patient_name=req.patient_name,
+            preferred_language=req.preferred_language
         )
     except Exception as e:
         logger.error(f"Error scheduling call: {e}", exc_info=True)
@@ -1482,7 +1522,8 @@ async def trigger_twilio_call_endpoint(req: TwilioCallScheduleRequest):
             phone=req.phone_number,
             medicine=req.medicine,
             dosage=req.dosage,
-            patient_name=req.patient_name
+            patient_name=req.patient_name,
+            preferred_language=req.preferred_language
         )
     except Exception as e:
         logger.error(f"Error triggering Twilio call: {e}", exc_info=True)
@@ -1499,14 +1540,20 @@ async def trigger_twilio_call_endpoint(req: TwilioCallScheduleRequest):
 async def get_twilio_twiml_endpoint(
     medicine: str = "your medicine",
     dosage: str = "as prescribed",
-    patient_name: Optional[str] = None
+    patient_name: Optional[str] = None,
+    preferred_language: Optional[str] = "en"
 ):
     """
-    Return TwiML XML with Polly.Aditi voice for Twilio telephony.
+    Return TwiML XML with Amazon Polly Neural Voice for Twilio telephony.
     """
     try:
         from twilio_service import generate_twiml
-        xml_content = generate_twiml(medicine=medicine, dosage=dosage, patient_name=patient_name)
+        xml_content = generate_twiml(
+            medicine=medicine,
+            dosage=dosage,
+            patient_name=patient_name,
+            preferred_language=preferred_language
+        )
     except Exception:
         xml_content = (
             '<?xml version="1.0" encoding="UTF-8"?>\n'

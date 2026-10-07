@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { TranslationStrings, PatientProfile, defaultPatientProfile } from '../types';
 import { ShieldCheck, ArrowRight, User, Phone, Calendar, HeartPulse, Activity, Lock, Loader2, AlertTriangle } from 'lucide-react';
 import { registerPatient, loginPatient } from '../firebase';
+import { useLanguage } from '../context/LanguageContext';
 
 interface Props {
   next: (profile?: PatientProfile) => void;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function LoginScreen({ next, t, currentProfile }: Props) {
+  const { preferred_language, setLanguage } = useLanguage();
   const initial = currentProfile || defaultPatientProfile;
 
   const [mode, setMode] = useState<'register' | 'login'>('register');
@@ -49,6 +51,7 @@ export function LoginScreen({ next, t, currentProfile }: Props) {
       condition: condition.trim(),
       bloodGroup,
       password,
+      preferred_language,
     });
     setLoading(false);
 
@@ -66,6 +69,7 @@ export function LoginScreen({ next, t, currentProfile }: Props) {
       condition: condition.trim() || 'N/A',
       bloodGroup,
       registeredAt: new Date().toISOString(),
+      preferred_language,
     };
     try { localStorage.setItem('smartmed_patient_profile', JSON.stringify(profile)); } catch { /* ignore */ }
     next(profile);
@@ -87,6 +91,9 @@ export function LoginScreen({ next, t, currentProfile }: Props) {
     }
 
     const profile = result.profile!;
+    if (profile.preferred_language) {
+      setLanguage(profile.preferred_language, profile.phone);
+    }
     try { localStorage.setItem('smartmed_patient_profile', JSON.stringify(profile)); } catch { /* ignore */ }
     next(profile);
   };

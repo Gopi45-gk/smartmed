@@ -6,6 +6,7 @@ import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
 import { ttsProvider } from '../utils/speech';
 import { triggerTwilioCallNow } from '../utils/aiClient';
+import { useLanguage } from '../context/LanguageContext';
 
 interface Props {
   medicines: Medicine[];
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfile }: Props) {
+  const { preferred_language } = useLanguage();
   const profile = patientProfile || defaultPatientProfile;
 
   const getInitials = (name?: string) => {
@@ -45,6 +47,7 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
         medicine: nextMed.name,
         dosage: `${nextMed.dose} (${nextMed.food})`,
         patient_name: profile.name,
+        preferred_language: profile.preferred_language || preferred_language,
       });
       if (res.success) {
         setCallAlertMsg(`✓ Alert call dispatched to ${profile.phone}! Reminder: take ${nextMed.name} at the right time.`);
@@ -174,7 +177,7 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
 
           <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-3.5">
             <div className="flex flex-col">
-              <span className="text-[11px] uppercase font-semibold text-[#86868B]">Scheduled</span>
+              <span className="text-[11px] uppercase font-semibold text-[#86868B]">{t.scheduledLabel || 'Scheduled'}</span>
               <span className="text-lg font-extrabold text-[#0071E3] tracking-tight">{nextMed.time}</span>
             </div>
 
@@ -187,7 +190,7 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
                 title="Send Twilio voice alert call to registered user"
               >
                 <PhoneCall className={`w-3.5 h-3.5 ${calling ? 'animate-bounce text-[#0071E3]' : ''}`} />
-                <span>{calling ? 'Calling…' : 'Twilio Alert Call'}</span>
+                <span>{calling ? (t.callingState || 'Calling…') : (t.twilioAlertCall || 'Twilio Alert Call')}</span>
               </button>
 
               <button 

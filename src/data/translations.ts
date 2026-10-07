@@ -57,7 +57,10 @@ export const translations: Record<Language, TranslationStrings> = {
     logout: "Logout",
     emergencyInfo: "Emergency Medical ID",
     allergies: "Penicillin, Sulfa",
-    bloodGroup: "O+ Positive"
+    bloodGroup: "O+ Positive",
+    twilioAlertCall: "Twilio Alert Call",
+    callingState: "Calling…",
+    scheduledLabel: "Scheduled"
   },
   ta: {
     appName: "ஸ்மார்ட்மெட்",
@@ -115,7 +118,10 @@ export const translations: Record<Language, TranslationStrings> = {
     logout: "வெளியேறு",
     emergencyInfo: "அவசர மருத்துவ விவரம்",
     allergies: "பெனிசிலின்",
-    bloodGroup: "O+ பாசிட்டிவ்"
+    bloodGroup: "O+ பாசிட்டிவ்",
+    twilioAlertCall: "Twilio அழைப்பு எச்சரிக்கை",
+    callingState: "அழைக்கிறது…",
+    scheduledLabel: "திட்டமிடப்பட்டது"
   },
   hi: {
     appName: "स्मार्टमेड",
@@ -173,7 +179,10 @@ export const translations: Record<Language, TranslationStrings> = {
     logout: "लॉग आउट",
     emergencyInfo: "आपातकालीन मेडिकल आईडी",
     allergies: "पेनिसिलिन",
-    bloodGroup: "O+ पॉजिटिव"
+    bloodGroup: "O+ पॉजिटिव",
+    twilioAlertCall: "Twilio अलर्ट कॉल",
+    callingState: "कॉल हो रहा है…",
+    scheduledLabel: "निर्धारित समय"
   },
   ur: {
     appName: "اسمارٹ میڈ",
@@ -231,7 +240,10 @@ export const translations: Record<Language, TranslationStrings> = {
     logout: "لاگ آؤٹ",
     emergencyInfo: "ہنگامی طبی معلومات",
     allergies: "پینسلین",
-    bloodGroup: "O+ مثبت"
+    bloodGroup: "O+ مثبت",
+    twilioAlertCall: "Twilio الرٹ کال",
+    callingState: "کال کی جا رہی ہے…",
+    scheduledLabel: "مقررہ وقت"
   },
   te: {
     appName: "SmartMed",
@@ -289,7 +301,10 @@ export const translations: Record<Language, TranslationStrings> = {
     logout: "లాగ్ అవుట్",
     emergencyInfo: "అత్యవసర వైద్య సమాచారం",
     allergies: "పెన్సిలిన్, సల్ఫా",
-    bloodGroup: "O+ పాజిటివ్"
+    bloodGroup: "O+ పాజిటివ్",
+    twilioAlertCall: "Twilio అలర్ట్ కాల్",
+    callingState: "కాల్ చేస్తోంది…",
+    scheduledLabel: "షెడ్యూల్ చేయబడింది"
   },
   ml: {
     appName: "SmartMed",
@@ -347,7 +362,10 @@ export const translations: Record<Language, TranslationStrings> = {
     logout: "ലോഗ് ഔട്ട്",
     emergencyInfo: "അടിയന്തര വിവരങ്ങൾ",
     allergies: "പെൻസിലിൻ",
-    bloodGroup: "O+ പോസിറ്റീവ്"
+    bloodGroup: "O+ പോസിറ്റീവ്",
+    twilioAlertCall: "Twilio കോൾ അലേർട്ട്",
+    callingState: "വിളിക്കുന്നു…",
+    scheduledLabel: "ഷെഡ്യൂൾ ചെയ്തത്"
   },
   kn: {
     appName: "SmartMed",
@@ -405,6 +423,9 @@ export const translations: Record<Language, TranslationStrings> = {
     logout: "ಲಾಗ್ ಔಟ್",
     emergencyInfo: "ತುರ್ತು ವೈದ್ಯಕೀಯ ಮಾಹಿತಿ",
     allergies: "ಪೆನ್ಸಿಲಿನ್",
-    bloodGroup: "O+ ಪಾಸಿಟಿವ್"
+    bloodGroup: "O+ ಪಾಸಿಟಿವ್",
+    twilioAlertCall: "Twilio ಕರೆ ಎಚ್ಚರಿಕೆ",
+    callingState: "ಕರೆ ಮಾಡಲಾಗುತ್ತಿದೆ…",
+    scheduledLabel: "ನಿಗದಿತ ಸಮಯ"
   }
 };
