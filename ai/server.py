@@ -147,7 +147,7 @@ class VoiceChatRequest(BaseModel):
     conversationId: Optional[str] = Field(None, description="Local conversation session ID")
     history: Optional[List[Dict[str, str]]] = Field(None, description="Conversation history")
     medicinesContext: Optional[List[Dict[str, Any]]] = Field(None, description="Patient's scheduled medications")
-    patientName: Optional[str] = Field("Mr. Ravi", description="Patient name")
+    patientName: Optional[str] = Field(None, description="Patient registered name")
     language: Optional[str] = Field("en", description="User selected language (en, ta, hi, te, ur, ml, kn)")
 
 
@@ -585,7 +585,7 @@ def clean_voice_output(text: str) -> str:
 def resolve_voice_query(
     message: str,
     medicines: Optional[List[Dict[str, Any]]],
-    patient_name: str = "Mr. Ravi",
+    patient_name: str = "",
     language: str = "en",
 ) -> Tuple[Optional[str], str]:
     """
@@ -993,7 +993,7 @@ async def voice_endpoint(request: VoiceChatRequest):
     resolved_answer, intent = resolve_voice_query(
         message=message,
         medicines=request.medicinesContext,
-        patient_name=request.patientName or "Patient",
+        patient_name=(request.patientName or "").strip(),
         language=request.language or "en",
     )
 

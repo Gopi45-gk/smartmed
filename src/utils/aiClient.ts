@@ -501,7 +501,7 @@ export async function sendVoiceMessageToLocalAI(
   message: string,
   conversationHistory: AIMessage[] = [],
   medicinesContext?: Array<{ name: string; time?: string; status?: string; dose?: string; food?: string }>,
-  patientName: string = 'Mr. Ravi',
+  patientName: string = '',
   language: string = 'en',
 ): Promise<AIChatResponse> {
   const controller = new AbortController();

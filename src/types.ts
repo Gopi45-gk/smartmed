@@ -58,12 +58,12 @@ export interface PatientProfile {
 }
 
 export const defaultPatientProfile: PatientProfile = {
-  name: 'Ravi Kumar',
-  phone: '+91 98765 43210',
-  age: '64',
-  gender: 'Male',
-  condition: 'Hypertension & Diabetes',
-  bloodGroup: 'B+',
+  name: '',
+  phone: '',
+  age: '',
+  gender: '',
+  condition: '',
+  bloodGroup: '',
   preferred_language: 'en',
 };
 

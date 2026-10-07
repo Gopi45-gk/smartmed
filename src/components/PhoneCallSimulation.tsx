@@ -25,20 +25,214 @@ interface Props {
 
 type CallState = 'incoming' | 'connected' | 'responded';
 type VoiceState = 'idle' | 'listening' | 'processing' | 'speaking' | 'error';
+type VoicePromptType = 'GREETING' | 'TAKEN_ACK' | 'DELAY_ACK' | 'SKIP_ACK' | 'CLARIFY' | 'MAX_CLARIFY';
+type MedicationIntent = 'TAKEN' | 'NOT_TAKEN' | 'DELAYED' | 'SKIPPED' | 'CLINICAL_QUERY' | 'UNCLEAR';
+
+// ─── Voice Script Generator (User Registered Data Only - No Hallucinations) ──
+function buildVoiceScript(
+  type: VoicePromptType,
+  patientName: string,
+  lang: Language,
+  medicineName?: string,
+): string {
+  const pName = patientName.trim();
+  const med = medicineName?.trim();
+
+  switch (type) {
+    case 'GREETING':
+      if (lang === 'ta') {
+        const greeting = pName ? `வணக்கம் ${pName}.` : 'வணக்கம்.';
+        const medPart = med ? ` உங்கள் ${med} மருந்தை எடுத்துக்கொள்ள வேண்டிய நேரம் இது.` : ' உங்கள் மருந்தை எடுத்துக்கொள்ள வேண்டிய நேரம் இது.';
+        return `${greeting} இது உங்கள் SmartMed AI உதவியாளர்.${medPart}`;
+      } else if (lang === 'hi') {
+        const greeting = pName ? `नमस्ते ${pName}।` : 'नमस्ते।';
+        const medPart = med ? ` आपकी ${med} दवा लेने का समय हो गया है।` : ' आपकी दवा लेने का समय हो गया है।';
+        return `${greeting} यह आपका SmartMed AI सहायक है।${medPart}`;
+      } else if (lang === 'te') {
+        const greeting = pName ? `నమస్కారం ${pName}.` : 'నమస్కారం.';
+        const medPart = med ? ` మీ ${med} మందు వేసుకునే సమయం ఇది.` : ' మీ మందు వేసుకునే సమయం ఇది.';
+        return `${greeting} ఇది మీ SmartMed AI సహాయకుడు.${medPart}`;
+      } else if (lang === 'kn') {
+        const greeting = pName ? `ನಮಸ್ಕಾರ ${pName}.` : 'ನಮಸ್ಕಾರ.';
+        const medPart = med ? ` ನಿಮ್ಮ ${med} ಔಷಧಿ ತೆಗೆದುಕೊಳ್ಳುವ ಸಮಯವಿದು.` : ' ನಿಮ್ಮ ಔಷಧಿ ತೆಗೆದುಕೊಳ್ಳುವ ಸಮಯವಿದು.';
+        return `${greeting} ಇದು ನಿಮ್ಮ SmartMed AI ಸಹಾಯಕ.${medPart}`;
+      } else if (lang === 'ml') {
+        const greeting = pName ? `നമസ്കാരം ${pName}.` : 'നമസ്കാരം.';
+        const medPart = med ? ` നിങ്ങളുടെ ${med} മരുന്ന് കഴിക്കാനുള്ള സമയമായി.` : ' നിങ്ങളുടെ മരുന്ന് കഴിക്കാനുള്ള സമയമായി.';
+        return `${greeting} ഇത് നിങ്ങളുടെ SmartMed AI സഹായിയാണ്.${medPart}`;
+      } else {
+        const greeting = pName ? `Hello ${pName}.` : 'Hello.';
+        const medPart = med ? ` It is time to take your ${med}.` : ' It is time to take your medicine.';
+        return `${greeting} This is your SmartMed AI assistant.${medPart}`;
+      }
+
+    case 'TAKEN_ACK':
+      if (lang === 'ta') {
+        return pName
+          ? `மிக்க நன்றி ${pName}! உங்கள் மருந்து உட்கொள்ளல் பதிவு செய்யப்பட்டது. உடலை நன்றாகப் பார்த்துக் கொள்ளுங்கள்.`
+          : 'மிக்க நன்றி! உங்கள் மருந்து உட்கொள்ளல் பதிவு செய்யப்பட்டது. உடலை நன்றாகப் பார்த்துக் கொள்ளுங்கள்.';
+      } else if (lang === 'hi') {
+        return pName
+          ? `धन्यवाद ${pName}! आपकी दवा लेने की पुष्टि दर्ज कर ली गई है। अपना ख्याल रखें।`
+          : 'धन्यवाद! आपकी दवा लेने की पुष्टि दर्ज कर ली गई है। अपना ख्याल रखें।';
+      } else if (lang === 'te') {
+        return pName
+          ? `ధన్యవాదాలు ${pName}! మీ మందుల వివరాలు నమోదు చేయబడ్డాయి. జాగ్రత్తగా ఉండండి.`
+          : 'ధన్యవాదాలు! మీ మందుల వివరాలు నమోదు చేయబడ్డాయి. జాగ్రత్తగా ఉండండి.';
+      } else if (lang === 'kn') {
+        return pName
+          ? `ಧನ್ಯವಾದಗಳು ${pName}! ನಿಮ್ಮ ಔಷಧಿ ವಿವರ ದಾಖಲಾಗಿದೆ. ಆರೋಗ್ಯವಾಗಿರಿ.`
+          : 'ಧನ್ಯವಾದಗಳು! ನಿಮ್ಮ ಔಷಧಿ ವಿವರ ದಾಖಲಾಗಿದೆ. ಆರೋಗ್ಯವಾಗಿರಿ.';
+      } else if (lang === 'ml') {
+        return pName
+          ? `നന്ദി ${pName}! നിങ്ങൾ മരുന്ന് കഴിച്ചത് രേഖപ്പെടുത്തി. ആരോഗ്യം ശ്രദ്ധിക്കുക.`
+          : 'നന്ദി! നിങ്ങൾ മരുന്ന് കഴിച്ചത് രേഖപ്പെടുത്തി. ആരോഗ്യം ശ്രദ്ധിക്കുക.';
+      } else {
+        return pName
+          ? `Thank you ${pName}! Your medication has been marked as taken. Take care!`
+          : 'Thank you! Your medication has been marked as taken. Take care!';
+      }
+
+    case 'DELAY_ACK':
+      if (lang === 'ta') {
+        return pName
+          ? `சரி ${pName}, 15 நிமிடங்களுக்குப் பிறகு மீண்டும் நினைவூட்டுகிறேன். தயவுசெய்து விரைவில் மருந்தை எடுத்துக் கொள்ளுங்கள்.`
+          : 'சரி, 15 நிமிடங்களுக்குப் பிறகு மீண்டும் நினைவூட்டுகிறேன். தயவுசெய்து விரைவில் மருந்தை எடுத்துக் கொள்ளுங்கள்.';
+      } else if (lang === 'hi') {
+        return pName
+          ? `समझ गया ${pName}। मैं 15 मिनट बाद दोबारा याद दिलाऊंगा। कृपया समय पर दवा लें।`
+          : 'समझ गया। मैं 15 मिनट बाद दोबारा याद दिलाऊंगा। कृपया समय पर दवा लें।';
+      } else if (lang === 'te') {
+        return pName
+          ? `సరే ${pName}, 15 నిమిషాల తర్వాత మళ్లీ గుర్తుచేస్తాను. దయచేసి త్వరగా మందు తీసుకోండి.`
+          : 'సరే, 15 నిమిషాల తర్వాత మళ్లీ గుర్తుచేస్తాను. దయచేసి త్వరగా మందు తీసుకోండి.';
+      } else if (lang === 'kn') {
+        return pName
+          ? `ಸರಿ ${pName}, 15 ನಿಮಿಷಗಳ ನಂತರ ಮತ್ತೆ ನೆನಪಿಸುತ್ತೇನೆ. ದಯವಿಟ್ಟು ಬೇಗ ಔಷಧಿ ತೆಗೆದುಕೊಳ್ಳಿ.`
+          : 'ಸರಿ, 15 ನಿಮಿಷಗಳ ನಂತರ ಮತ್ತೆ ನೆನಪಿಸುತ್ತೇನೆ. ದಯವಿಟ್ಟು ಬೇಗ ಔಷಧಿ ತೆಗೆದುಕೊಳ್ಳಿ.';
+      } else if (lang === 'ml') {
+        return pName
+          ? `ശരി ${pName}, 15 മിനിറ്റിനു ശേഷം വീണ്ടും ഓർമ്മിപ്പിക്കാം. ദയവായി വേഗം മരുന്ന് കഴിക്കുക.`
+          : 'ശരി, 15 മിനിറ്റിനു ശേഷം വീണ്ടും ഓർമ്മിപ്പിക്കാം. ദയവായി വേഗം മരുന്ന് കഴിക്കുക.';
+      } else {
+        return pName
+          ? `Understood ${pName}. I will remind you again in 15 minutes. Please remember to take your medicine.`
+          : 'Understood. I will remind you again in 15 minutes. Please remember to take your medicine.';
+      }
+
+    case 'SKIP_ACK':
+      if (lang === 'ta') return 'சரி, இந்த முறை மருந்து தவிர்க்கப்பட்டதாகக் குறிக்கப்பட்டுள்ளது. தேவைப்பட்டால் மருத்துவரை அணுகவும்.';
+      if (lang === 'hi') return 'समझ गया। इस खुराक को छोड़ दिया गया है। अधिक खुराक छूटने पर डॉक्टर से परामर्श करें।';
+      if (lang === 'te') return 'సరే, ఈ మోతాదు తీసుకోలేదని నమోదు చేయబడింది.';
+      if (lang === 'kn') return 'ಸರಿ, ಈ ಡೋಸ್ ತೆಗೆದುಕೊಳ್ಳಲಾಗಿಲ್ಲ ಎಂದು ನಮೂದಿಸಲಾಗಿದೆ.';
+      if (lang === 'ml') return 'ശരി, ഈ ഡോസ് ഒഴിവാക്കിയതായി രേഖപ്പെടുത്തി.';
+      return 'Understood. I have recorded this dose as skipped. Please consult your physician if you miss multiple doses.';
+
+    case 'CLARIFY':
+      if (lang === 'ta') return 'மன்னிக்கவும், எனக்கு புரியவில்லை. உங்கள் மருந்தை எடுத்துவிட்டீர்களா?';
+      if (lang === 'hi') return 'क्षमा करें, मुझे समझ नहीं आया। क्या आपने अपनी दवा ले ली है?';
+      if (lang === 'te') return 'క్షమించండి, నాకు అర్థం కాలేదు. మీరు మీ మందులు వేసుకున్నారా?';
+      if (lang === 'kn') return 'ಕ್ಷಮಿಸಿ, ಅರ್ಥವಾಗಲಿಲ್ಲ. ನೀವು ಔಷಧಿ ತೆಗೆದುಕೊಂಡಿದ್ದೀರಾ?';
+      if (lang === 'ml') return 'ക്ഷമിക്കണം, വ്യക്തമായില്ല. നിങ്ങൾ മരുന്ന് കഴിച്ചോ?';
+      return "Sorry, I didn't understand. Did you take your medicine?";
+
+    case 'MAX_CLARIFY':
+      if (lang === 'ta') return 'உங்கள் பதிலை உறுதிப்படுத்த முடியவில்லை. திரையில் உள்ள பொத்தான்களைப் பயன்படுத்தி உறுதிப்படுத்தவும்.';
+      if (lang === 'hi') return 'दवा लेने की पुष्टि नहीं हो सकी। कृपया स्क्रीन पर दिए गए बटन का उपयोग करें।';
+      if (lang === 'te') return 'స్పష్టత రాలేదు. దయచేసి స్క్రీన్‌పై ఉన్న బటన్లను ఉపయోగించండి.';
+      if (lang === 'kn') return 'ಖಚಿತಪಡಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಪರದೆಯ ಮೇಲಿನ ಬಟನ್ ಬಳಸಿ.';
+      if (lang === 'ml') return 'സ്ഥിരീകരിക്കാൻ കഴിഞ്ഞില്ല. ദയവായി സ്ക്രീനിലെ ബട്ടണുകൾ ഉപയോഗിക്കുക.';
+      return 'I could not confirm if you took your medicine. Please use the buttons on your screen.';
+  }
+}
+
+// ─── Intent Detection Classifier (Natural Multilingual Conversational STT) ─
+function classifyVoiceIntent(spokenText: string): MedicationIntent {
+  const lower = spokenText.toLowerCase().trim();
+  const tokens = lower.split(/[\s,?.!]+/);
+
+  // Negative / NOT TAKEN
+  const negativeKeywords = [
+    'haven\'t', 'havent', 'not yet', 'have not', 'didn\'t', 'did not', 'no', 'nope',
+    'not now', 'not taken', 'still not', 'wont', 'won\'t',
+    'இல்லை', 'இல்ல', 'இன்னும் எடுக்கவில்லை', 'இன்னும் இல்லை', 'இன்னும் இல்ல', 'எடுக்கல', 'சாப்பிடல', 'போடல',
+    'illa', 'illai', 'edukala', 'sappidala',
+    'नहीं', 'नहीं ली', 'अभी नहीं', 'nahi', 'nahi li', 'abhi nahi',
+    'లేదు', 'ఇంకా తీసుకోలేదు', 'ledu', 'inka ledu',
+    'ಇಲ್ಲ', 'ಇನ್ನೂ ತೆಗೆದುಕೊಂಡಿಲ್ಲ',
+    'ഇല്ല', 'ഇതുവരെ കഴിച്ചില്ല',
+  ];
+
+  const hasNegative = negativeKeywords.some(kw => lower.includes(kw) || tokens.includes(kw));
+
+  // Delay / Snooze Keywords
+  const delayKeywords = [
+    'later', 'remind', 'snooze', '15 min', '30 min', 'after', 'busy',
+    'பிறகு', 'நினைவூட்டு', 'அப்புறம்',
+    'बाद में', 'याद',
+    'తర్వాత', 'గుర్తు',
+    'ಆಮೇಲೆ', 'ನೆನ',
+    'പിന്നെ', 'ഓർമ്മി',
+  ];
+
+  const hasDelay = delayKeywords.some(kw => lower.includes(kw));
+
+  if (hasNegative && hasDelay) return 'DELAYED';
+  if (hasNegative) return 'NOT_TAKEN';
+  if (hasDelay) return 'DELAYED';
+
+  // Positive / TAKEN Keywords
+  const takenKeywords = [
+    'took', 'already taken', 'already took', 'had my', 'finished', 'done',
+    'yes', 'yeah', 'yup', 'yes i did', 'mark taken', 'swallowed', 'taken',
+    'i took it', 'i have taken',
+    'எடுத்துக்கிட்டேன்', 'எடுத்துட்டேன்', 'எடுத்தாச்சு', 'சாப்பிட்டேன்', 'சாப்பிட்டாச்சு',
+    'குடிச்சேன்', 'குடிச்சாச்சு', 'போட்டேன்', 'போட்டாச்சு', 'முடிஞ்சது', 'ஆம்', 'ஆமாம்',
+    'eduthen', 'eduthuten', 'eduthachu', 'aamam', 'aam',
+    'ले ली', 'खा ली', 'ले लिया', 'खा लिया', 'हाँ', 'हो गया', 'दवा ले ली', 'haa', 'haan',
+    'తీసుకున్నాను', 'వేసుకున్నాను', 'అవును', 'అయింది', 'తీసుకున్నా', 'avunu', 'teesukunna',
+    'ತಗೊಂಡೆ', 'ತೆಗೆದುಕೊಂಡೆ', 'ಹೌದು', 'ಆಯಿತು', 'haudu',
+    'കഴിച്ചു', 'എടുത്തു', 'ഉവ്വ്', 'കഴിഞ്ഞു', 'athe', 'kazhichu',
+  ];
+
+  const hasTaken = takenKeywords.some(kw => lower.includes(kw) || tokens.includes(kw));
+  if (hasTaken) return 'TAKEN';
+
+  // Skip Keywords
+  const skipKeywords = [
+    'skip', 'skipped', 'missed', 'won\'t take',
+    'தவிர்த்து', 'வேண்டாம்', 'छोड़', 'వద్దు', 'ಬೇಡ', 'വേണ്ട'
+  ];
+  if (skipKeywords.some(kw => lower.includes(kw))) return 'SKIPPED';
+
+  // Clinical / Informational Queries (delegated to local AI)
+  const queryKeywords = [
+    'what', 'why', 'how', 'when', 'side effect', 'food', 'water', 'doctor', 'fever', 'pain',
+    'என்ன', 'எப்படி', 'எப்போது', 'வலி', 'சாப்பாடு',
+    'क्या', 'कैसे', 'कब', 'दर्द',
+    'ఏమిటి', 'ఎలా', 'ఎప్పుడు',
+    'ಏನು', 'ಹೇಗೆ', 'ಯಾವಾಗ',
+    'എന്ത്', 'എങ്ങനെ', 'എപ്പോൾ'
+  ];
+  if (queryKeywords.some(kw => lower.includes(kw))) return 'CLINICAL_QUERY';
+
+  return 'UNCLEAR';
+}
 
 export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang, patientProfile }: Props) {
   const [callState, setCallState] = useState<CallState>('connected');
   const [voiceState, setVoiceState] = useState<VoiceState>('idle');
-  const [aiMessage, setAiMessage] = useState<string>(t.aiSpeakingPrompt);
+  const [aiMessage, setAiMessage] = useState<string>('');
   const [patientReply, setPatientReply] = useState<string>('');
   const [aiAvailable, setAiAvailable] = useState<boolean | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [transcriptInterim, setTranscriptInterim] = useState<string>('');
+  const [clarificationAttempts, setClarificationAttempts] = useState<number>(0);
 
   const isComponentMounted = useRef<boolean>(true);
   const conversationHistoryRef = useRef<AIMessage[]>([]);
 
-  // ─── Speak AI Response via TTS ──────────────────────────────────────────────
+  // ─── Speak AI Response via TTS (Synchronized Spoken & UI Transcript) ──────
   const speakAIResponse = useCallback((text: string, onDone?: () => void) => {
     if (!isComponentMounted.current) return;
     setVoiceState('speaking');
@@ -76,21 +270,22 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang, p
       }
     });
 
-    // Speak initial AI greeting prompt directly in user's interaction window
-    const patientName = patientProfile?.name || 'Ravi Kumar';
-    const greeting = t.aiSpeakingPrompt
-      .replace(/Mr\. Ravi|ரவி ஐயா|रवि जी|రవి గారు/gi, patientName)
-      .replace(/"/g, '');
-    setAiMessage(`"${greeting}"`);
+    // Registered patient name and upcoming medicine from patient database ONLY
+    const registeredName = patientProfile?.name?.trim() || '';
+    const upcomingMed = medicines.find(m => m.status === 'upcoming') || medicines[0];
+    const greeting = buildVoiceScript('GREETING', registeredName, lang, upcomingMed?.name);
+
+    // Exact synchronization between spoken text and UI transcript
+    setAiMessage(greeting);
 
     const greetTimer = setTimeout(() => {
       speakAIResponse(greeting, () => {
-        // After greeting finishes, automatically open microphone to listen!
+        // After greeting finishes, automatically open microphone to listen
         if (isComponentMounted.current) {
           startListening();
         }
       });
-    }, 120);
+    }, 150);
 
     return () => {
       isComponentMounted.current = false;
@@ -132,14 +327,12 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang, p
       onError: (err: string) => {
         if (!isComponentMounted.current) return;
         setVoiceState('idle');
-        // If benign no-speech or network/offline transition, keep UI clean
         if (!err.includes('No speech') && !err.includes('network') && !err.includes('aborted')) {
           setErrorMessage(err);
         }
       },
       onEnd: () => {
         if (!isComponentMounted.current) return;
-        // If transcript was captured but wasn't marked final, process it
         setTranscriptInterim(current => {
           if (current.trim()) {
             handleUserVoiceInput(current.trim());
@@ -152,7 +345,7 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang, p
     });
   }, [lang]);
 
-  // ─── Process User Voice Input (MNN Pipeline) ──────────────────────────────
+  // ─── Process User Voice Input (Human-Like Intent Orchestration) ────────────
   const handleUserVoiceInput = async (spokenText: string) => {
     if (!spokenText.trim() || !isComponentMounted.current) return;
 
@@ -160,137 +353,100 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang, p
     setTranscriptInterim('');
     setVoiceState('processing');
 
-    const lower = spokenText.toLowerCase();
+    const registeredName = patientProfile?.name?.trim() || '';
+    const intent = classifyVoiceIntent(spokenText);
 
-    // Check if user confirmed taking medicine (multilingual support: en, ta, hi, te, ur, ml, kn)
-    const isTakenIntent = (
-      lower.includes('took') ||
-      lower.includes('already taken') ||
-      lower.includes('had my') ||
-      lower.includes('finished') ||
-      lower.includes('done') ||
-      lower === 'yes' ||
-      lower.includes('yes i did') ||
-      lower.includes('mark taken') ||
-      lower.includes('எடுத்து') ||
-      lower.includes('சாப்பிட்') ||
-      lower.includes('ஆமாம்') ||
-      lower.includes('ஆம்') ||
-      lower.includes('மாத்திரை') ||
-      lower.includes('ले ली') ||
-      lower.includes('खा ली') ||
-      lower.includes('हाँ') ||
-      lower.includes('दवा') ||
-      lower.includes('తీసుకున్నా') ||
-      lower.includes('వేసుకున్నా') ||
-      lower.includes('అవును') ||
-      lower.includes('لے لی') ||
-      lower.includes('جی ہاں') ||
-      lower.includes('കഴിച്ചു') ||
-      lower.includes('ഉവ്വ്') ||
-      lower.includes('ತಗೊಂಡೆ') ||
-      lower.includes('ಹೌದು')
-    );
-
-    // Check if user requested reminder snooze (multilingual support)
-    const isSnoozeIntent = (
-      lower.includes('remind') ||
-      lower.includes('15 min') ||
-      lower.includes('later') ||
-      lower.includes('snooze') ||
-      lower.includes('not yet') ||
-      lower.includes('not now') ||
-      lower.includes('பிறகு') ||
-      lower.includes('நினைவூட்டு') ||
-      lower.includes('இல்லை') ||
-      lower.includes('அப்புறம்') ||
-      lower.includes('बाद में') ||
-      lower.includes('याद') ||
-      lower.includes('नहीं') ||
-      lower.includes('తర్వాత') ||
-      lower.includes('గుర్తు') ||
-      lower.includes('వద్దు') ||
-      lower.includes('بعد میں') ||
-      lower.includes('یاد') ||
-      lower.includes('نہیں') ||
-      lower.includes('പിന്നെ') ||
-      lower.includes('ഓർമ്മി') ||
-      lower.includes('ಆಮೇಲೆ') ||
-      lower.includes('ನೆನ')
-    );
-
-    if (isTakenIntent) {
+    // 1. Explicit Confirmation: TAKEN
+    if (intent === 'TAKEN') {
+      setClarificationAttempts(0);
       handleMarkMedicineTaken();
+      const ackMsg = buildVoiceScript('TAKEN_ACK', registeredName, lang);
+      setAiMessage(ackMsg);
+      speakAIResponse(ackMsg, () => {
+        if (isComponentMounted.current) {
+          setCallState('responded');
+        }
+      });
+      return;
     }
 
-    try {
-      // Send to local MNN AI backend (/api/ai/voice) with user-selected language
-      const medicinesContext = medicines.map(m => ({
-        name: m.name,
-        time: m.time,
-        dose: m.dose,
-        food: m.food,
-        status: m.status,
-      }));
+    // 2. Delay / Snooze
+    if (intent === 'DELAYED' || intent === 'NOT_TAKEN') {
+      setClarificationAttempts(0);
+      const ackMsg = buildVoiceScript('DELAY_ACK', registeredName, lang);
+      setAiMessage(ackMsg);
+      speakAIResponse(ackMsg);
+      return;
+    }
 
-      const patientName = patientProfile?.name || 'Ravi Kumar';
-      const result = await sendVoiceMessageToLocalAI(
-        spokenText,
-        conversationHistoryRef.current,
-        medicinesContext,
-        patientName,
-        lang
-      );
+    // 3. Skip
+    if (intent === 'SKIPPED') {
+      setClarificationAttempts(0);
+      const ackMsg = buildVoiceScript('SKIP_ACK', registeredName, lang);
+      setAiMessage(ackMsg);
+      speakAIResponse(ackMsg);
+      return;
+    }
 
-      if (!isComponentMounted.current) return;
+    // 4. Clinical Query or General Health Question
+    if (intent === 'CLINICAL_QUERY') {
+      setClarificationAttempts(0);
+      try {
+        const medicinesContext = medicines.map(m => ({
+          name: m.name,
+          time: m.time,
+          dose: m.dose,
+          food: m.food,
+          status: m.status,
+        }));
 
-      if (result.success && result.response) {
-        setAiAvailable(true);
-        setAiMessage(result.response);
-
-        // Save to shared conversational memory
-        appendTurnToSharedHistory(spokenText, result.response);
-        conversationHistoryRef.current.push(
-          { role: 'user', content: spokenText },
-          { role: 'assistant', content: result.response }
+        const result = await sendVoiceMessageToLocalAI(
+          spokenText,
+          conversationHistoryRef.current,
+          medicinesContext,
+          registeredName,
+          lang
         );
 
-        // Speak the MNN / Clinical response
-        speakAIResponse(result.response, () => {
-          // Continuous multi-turn conversation: automatically listen for follow-up
-          if (isComponentMounted.current && callState === 'connected' && !isTakenIntent && !isSnoozeIntent) {
-            startListening();
-          }
-        });
-      } else {
-        // Empathetic Clinical Voice Fallback
-        const fallbackMsg = lang === 'ta'
-          ? `${patientName}, உங்கள் அறிகுறிகளைப் புரிந்து கொள்கிறேன். பரிந்துரைக்கப்பட்ட மருந்துகளை உட்கொண்டு ஓய்வெடுக்கவும். அறிகுறிகள் நீடித்தால் மருத்துவரை அணுகவும்.`
-          : lang === 'hi'
-          ? `${patientName}, मैं आपकी बात समझ गया। कृपया अपनी निर्धारित दवाएं समय पर लें और आराम करें। लक्षण बने रहने पर डॉक्टर से परामर्श लें।`
-          : lang === 'te'
-          ? `${patientName}, మీ పరిస్థితి అర్థమైంది. సూచించిన మందులను సమయానికి తీసుకుని విశ్రాంతి తీసుకోండి. సమస్య కొనసాగితే వైద్యుడిని సంప్రదించండి.`
-          : lang === 'ml'
-          ? `${patientName}, നിർദ്ദേശിച്ച മരുന്നുകൾ കൃത്യമായി കഴിച്ച് വിശ്രമിക്കുക. ബുദ്ധിമുട്ട് തുടരുകയാണെങ്കിൽ ഡോക്ടറെ കാണുക.`
-          : lang === 'kn'
-          ? `${patientName}, ದಯವಿಟ್ಟು ಸೂಚಿಸಿದ ಔಷಧಿಗಳನ್ನು ಸರಿಯಾಗಿ ತೆಗೆದುಕೊಂಡು ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ. ಸಮಸ್ಯೆ ಮುಂದುವರಿದರೆ ವೈದ್ಯರನ್ನು ಭೇಟಿ ಮಾಡಿ.`
-          : `${patientName}, I understand your symptoms. Please take your prescribed medicines as directed and rest. If symptoms persist or worsen, please consult your doctor.`;
+        if (!isComponentMounted.current) return;
 
-        setAiMessage(fallbackMsg);
-        setAiAvailable(true);
-        speakAIResponse(fallbackMsg, () => {
-          if (isComponentMounted.current && callState === 'connected') {
-            startListening();
-          }
-        });
+        if (result.success && result.response) {
+          setAiAvailable(true);
+          setAiMessage(result.response);
+
+          appendTurnToSharedHistory(spokenText, result.response);
+          conversationHistoryRef.current.push(
+            { role: 'user', content: spokenText },
+            { role: 'assistant', content: result.response }
+          );
+
+          speakAIResponse(result.response, () => {
+            if (isComponentMounted.current && callState === 'connected') {
+              startListening();
+            }
+          });
+          return;
+        }
+      } catch (err) {
+        console.warn('[PhoneCallSimulation] Local AI voice query error:', err);
       }
-    } catch {
-      if (!isComponentMounted.current) return;
-      const patientName = patientProfile?.name || 'Ravi Kumar';
-      const fallbackMsg = `${patientName}, please take your prescribed medications with plain water and rest. Please consult your physician if your symptoms persist.`;
-      setAiMessage(fallbackMsg);
-      setAiAvailable(true);
-      speakAIResponse(fallbackMsg);
+    }
+
+    // 5. Unclear Intent - Failure Handling (Rule 18: Maximum 2 clarification attempts)
+    if (clarificationAttempts < 2) {
+      setClarificationAttempts(prev => prev + 1);
+      const clarifyPrompt = buildVoiceScript('CLARIFY', registeredName, lang);
+      setAiMessage(clarifyPrompt);
+      speakAIResponse(clarifyPrompt, () => {
+        if (isComponentMounted.current && callState === 'connected') {
+          startListening();
+        }
+      });
+    } else {
+      // Reached maximum 2 clarification attempts: status = UNCLEAR, do not mark TAKEN
+      const maxClarifyPrompt = buildVoiceScript('MAX_CLARIFY', registeredName, lang);
+      setAiMessage(maxClarifyPrompt);
+      speakAIResponse(maxClarifyPrompt);
     }
   };
 
@@ -314,8 +470,10 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang, p
     setCallState('connected');
     ttsProvider.unlock();
     soundManager.resumeAudioContext();
-    const greeting = t.aiSpeakingPrompt.replace(/"/g, '');
-    setAiMessage(t.aiSpeakingPrompt);
+    const registeredName = patientProfile?.name?.trim() || '';
+    const upcomingMed = medicines.find(m => m.status === 'upcoming') || medicines[0];
+    const greeting = buildVoiceScript('GREETING', registeredName, lang, upcomingMed?.name);
+    setAiMessage(greeting);
     speakAIResponse(greeting, () => {
       if (isComponentMounted.current) {
         startListening();
