@@ -710,6 +710,13 @@ def execute_scheduled_reminder(reminder_id: str):
         patient_id=reminder.get("patient_id")
     )
 
+    # Safe Hook: Schedule separate 5-minute confirmation check after alert has informed patient
+    try:
+        from confirmation_service import schedule_confirmation_task
+        schedule_confirmation_task(reminder_id=reminder_id, delay_minutes=5)
+    except Exception as conf_err:
+        logger.warning(f"[Confirmation Hook] Error scheduling 5min check for {reminder_id}: {conf_err}")
+
 
 def schedule_call_job(
     phone: str,

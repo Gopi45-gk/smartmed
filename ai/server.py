@@ -29,7 +29,7 @@ if os.path.exists(_venv_python) and sys.executable != os.path.realpath(_venv_pyt
     except ImportError:
         os.execv(_venv_python, [_venv_python] + sys.argv)
 
-from fastapi import FastAPI, HTTPException, Response, UploadFile, File, Request
+from fastapi import FastAPI, HTTPException, Response, UploadFile, File, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import uvicorn
@@ -1569,11 +1569,112 @@ async def get_twilio_twiml_endpoint(
             preferred_language=preferred_language,
             reminder_id=reminder_id
         )
+
+        # Safe Hook: Schedule separate 5-minute confirmation check after alert has informed patient
+        if reminder_id:
+            try:
+                from confirmation_service import schedule_confirmation_task
+                schedule_confirmation_task(reminder_id=reminder_id, delay_minutes=5)
+            except Exception as conf_err:
+                logger.warning(f"[Confirmation Hook] Error: {conf_err}")
+
     except Exception as e:
         logger.error(f"Error generating interactive TwiML: {e}", exc_info=True)
         from twilio_service import generate_twiml
         xml_content = generate_twiml(medicine, dosage, patient_name, preferred_language)
     return Response(content=xml_content, media_type="application/xml")
+
+
+# ─── 5-Minute Medication Confirmation Workflow Endpoints ──────────────────────
+
+@app.get("/api/call/confirmation/twiml")
+@app.post("/api/call/confirmation/twiml")
+async def get_confirmation_twiml_endpoint(
+    confirmation_id: str = Query(...),
+    attempt: int = Query(1)
+):
+    """
+    Twilio TwiML endpoint for the 5-minute confirmation call.
+    Asks patient in their selected language: "Did you take your medicine?"
+    """
+    try:
+        from confirmation_service import generate_confirmation_twiml
+        xml_content = generate_confirmation_twiml(confirmation_id, attempt=attempt)
+    except Exception as e:
+        logger.error(f"Error generating confirmation TwiML: {e}", exc_info=True)
+        xml_content = """<?xml version="1.0" encoding="UTF-8"?><Response><Say>Medication confirmation check.</Say><Hangup/></Response>"""
+    return Response(content=xml_content, media_type="application/xml")
+
+
+@app.post("/api/call/confirmation/response")
+@app.get("/api/call/confirmation/response")
+async def handle_confirmation_response_endpoint(request: Request):
+    """
+    Twilio Speech webhook callback for the confirmation call:
+    - Recognizes TAKEN -> marks medicationStatus = TAKEN, takenAt, confirmationMethod = TWILIO_VOICE.
+    - Recognizes NOT_TAKEN -> asks "When should we remind you again?"
+    - UNCLEAR -> clarifies or exits.
+    """
+    form_data = {}
+    if request.method == "POST":
+        try:
+            form_data = await request.form()
+        except Exception:
+            form_data = {}
+
+    speech_result = str(form_data.get("SpeechResult") or request.query_params.get("SpeechResult", ""))
+    confirmation_id = str(request.query_params.get("confirmation_id") or form_data.get("confirmation_id", ""))
+    try:
+        attempt = int(request.query_params.get("attempt", 1))
+    except ValueError:
+        attempt = 1
+
+    from confirmation_service import process_confirmation_speech_response
+    xml_content = process_confirmation_speech_response(confirmation_id, speech_result, attempt=attempt)
+    return Response(content=xml_content, media_type="application/xml")
+
+
+@app.post("/api/call/confirmation/reschedule")
+@app.get("/api/call/confirmation/reschedule")
+async def handle_confirmation_reschedule_endpoint(request: Request):
+    """
+    Twilio Speech webhook callback when patient answers "When should we remind you again?".
+    Parses delay (10, 30 mins) and schedules follow-up confirmation call.
+    """
+    form_data = {}
+    if request.method == "POST":
+        try:
+            form_data = await request.form()
+        except Exception:
+            form_data = {}
+
+    speech_result = str(form_data.get("SpeechResult") or request.query_params.get("SpeechResult", ""))
+    confirmation_id = str(request.query_params.get("confirmation_id") or form_data.get("confirmation_id", ""))
+
+    from confirmation_service import process_confirmation_reschedule
+    xml_content = process_confirmation_reschedule(confirmation_id, speech_result)
+    return Response(content=xml_content, media_type="application/xml")
+
+
+@app.get("/api/call/confirmations")
+async def get_confirmations_endpoint():
+    """Returns all 5-minute confirmation records."""
+    from confirmation_service import load_confirmations
+    return {"success": True, "confirmations": list(load_confirmations().values())}
+
+
+@app.post("/api/call/confirmation/trigger_now")
+async def trigger_confirmation_now_endpoint(req: Dict[str, Any]):
+    """
+    Manually triggers an immediate confirmation call (useful for testing and verification).
+    """
+    reminder_id = req.get("reminder_id")
+    delay_minutes = int(req.get("delay_minutes", 0))
+    from confirmation_service import schedule_confirmation_task, execute_confirmation_call
+    res = schedule_confirmation_task(reminder_id=reminder_id, delay_minutes=delay_minutes, force=True)
+    if delay_minutes == 0 and res.get("confirmation_id"):
+        execute_confirmation_call(res["confirmation_id"])
+    return res
 
 
 @app.post("/api/call/response")
