@@ -361,6 +361,154 @@ CHAT_KB = {
             "شدید علامات کے لیے براہ کرم ڈاکٹر سے رجوع کریں۔"
         ),
     },
+    "eye_pain": {
+        "en": (
+            "• For eye pain or strain, rest your eyes in a dim room and avoid screen exposure.\n"
+            "• Do not rub your eyes, and seek immediate care if you experience sudden vision changes.\n"
+            "Please consult a doctor for severe symptoms."
+        ),
+        "ta": (
+            "• கண் வலிக்கு கண்களைத் தேய்க்காமல், வெளிச்சம் குறைவான இடத்தில் கண்களுக்கு ஓய்வு கொடுங்கள்.\n"
+            "• திரை பார்ப்பதைத் தவிர்த்து, பார்வை மங்கினால் உடனே மருத்துவரை அணுகவும்.\n"
+            "கடுமையான அறிகுறிகளுக்கு தயவுசெய்து மருத்துவரை அணுகவும்."
+        ),
+        "hi": (
+            "• आँखों में दर्द या जलन के लिए आँखों को न मलें और स्क्रीन से दूर रहकर आराम दें।\n"
+            "• यदि दृष्टि में बदलाव हो या दर्द बढ़े तो तुरंत डॉक्टर से परामर्श लें।\n"
+            "गंभीर लक्षणों के लिए कृपया डॉक्टर से परामर्श लें।"
+        ),
+        "te": (
+            "• కంటి నొప్పికి కళ్ళను రుద్దకండి మరియు స్క్రీన్‌లకు దూరంగా తగినంత విశ్రాంతి తీసుకోండి.\n"
+            "• చూపులో మార్పులు లేదా మసకబారడం ఉంటే వెంటనే వైద్యుడిని సంప్రదించండి.\n"
+            "తీవ్రమైన లక్షణాల కోసం దయచేసి వైద్యుడిని సంప్రదించండి."
+        ),
+        "ml": (
+            "• കണ്ണ് വേദനയ്ക്ക് കണ്ണുകൾ തിരുമ്മാതെ വിശ്രമം നൽകുക, വെളിച്ചവും സ്ക്രീനും ഒഴിവാക്കുക.\n"
+            "• കാഴ്ചയ്ക്ക് മങ്ങലുണ്ടെങ്കിൽ ഉടൻ ഒരു ഡോക്ടറെ കാണുക.\n"
+            "ഗുരുതരമായ ലക്ഷണങ്ങൾക്ക് ദയവായി ഒരു ഡോക്ടറെ കാണുക."
+        ),
+        "kn": (
+            "• ಕಣ್ಣು ನೋವಿಗೆ ಕಣ್ಣುಗಳನ್ನು ಉಜ್ಜಬೇಡಿ ಮತ್ತು ಪರದೆಗಳಿಂದ ದೂರವಿರಿ, ಕಣ್ಣುಗಳಿಗೆ ವಿಶ್ರಾಂತಿ ನೀಡಿ.\n"
+            "• ದೃಷ್ಟಿಯಲ್ಲಿ ಯಾವುದೇ ಬದಲಾವಣೆಯಾದರೆ ತಕ್ಷಣವೇ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.\n"
+            "ತೀವ್ರವಾದ ರೋಗಲಕ್ಷಣಗಳಿಗಾಗಿ ದಯವಿಟ್ಟು ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ."
+        ),
+        "ur": (
+            "• آنکھوں کے درد کے لیے آنکھوں کو نہ ملیں اور اسکرین کے استعمال سے پرہیز کریں۔\n"
+            "• نظر میں تبدیلی کی صورت میں فوری ڈاکٹر سے رجوع کریں۔\n"
+            "شدید علامات کے لیے براہ کرم ڈاکٹر سے رجوع کریں۔"
+        ),
+    },
+    "dizziness": {
+        "en": (
+            "• If you feel dizzy, sit or lie down immediately to avoid falling and drink plenty of water.\n"
+            "• Avoid sudden movements or standing up quickly, and consult your doctor if dizziness persists.\n"
+            "Please consult a doctor for severe symptoms."
+        ),
+        "ta": (
+            "• தலைசுற்றல் ஏற்படும் போது உடனே பாதுகாப்பாக அமர்ந்து அல்லது படுத்து ஓய்வெடுங்கள், கீழே விழுவதைத் தவிர்க்கவும்.\n"
+            "• போதிய தண்ணீர் அருந்தி திடீரென எழுந்து நிற்பதைத் தவிர்க்கவும்.\n"
+            "கடுமையான அறிகுறிகளுக்கு தயவுசெய்து மருத்துவரை அணுகவும்."
+        ),
+        "hi": (
+            "• चक्कर आने पर गिरने से बचने के लिए तुरंत सुरक्षित स्थान पर बैठ या लेट जाएं।\n"
+            "• पर्याप्त पानी पिएं और अचानक उठने-बैठने से बचें। चक्कर बने रहने पर डॉक्टर को दिखाएं।\n"
+            "गंभीर लक्षणों के लिए कृपया डॉक्टर से परामर्श लें।"
+        ),
+        "te": (
+            "• తలతిరుగుతున్నప్పుడు కింద పడకుండా వెంటనే సురక్షితంగా కూర్చోండి లేదా పడుకోండి.\n"
+            "• తగినంత నీరు త్రాగండి మరియు ఆకస్మికంగా లేచి నిలబడకండి.\n"
+            "తీవ్రమైన లక్షణాల కోసం దయచేసి వైద్యుడిని సంప్రదించండి."
+        ),
+        "ml": (
+            "• തലകറക്കം അനുഭവപ്പെടുമ്പോൾ വീഴാതിരിക്കാൻ ഉടൻ സുരക്ഷിതമായി ഇരിക്കുകയോ കിടക്കുകയോ ചെയ്യുക.\n"
+            "• ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും പെട്ടെന്ന് എഴുന്നേൽക്കുന്നത് ഒഴിവാക്കുകയും ചെയ്യുക.\n"
+            "ഗുരുതരമായ ലക്ഷണങ്ങൾക്ക് ദയവായി ഒരു ഡോക്ടറെ കാണുക."
+        ),
+        "kn": (
+            "• ತಲೆಸುತ್ತು ಬಂದಾಗ ಬೀಳದಂತೆ ತಕ್ಷಣ ಕುಳಿತುಕೊಳ್ಳಿ ಅಥವಾ ಮಲಗಿ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ.\n"
+            "• ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ ಮತ್ತು ಇದ್ದಕ್ಕಿದ್ದಂತೆ ಎದ್ದು ನಿಲ್ಲುವುದನ್ನು ತಪ್ಪಿಸಿ.\n"
+            "ತೀವ್ರವಾದ ರೋಗಲಕ್ಷಣಗಳಿಗಾಗಿ ದಯವಿಟ್ಟು ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ."
+        ),
+        "ur": (
+            "• چکر آنے کی صورت میں فوری طور پر بیٹھ یا لیٹ جائیں تاکہ گرنے سے بچا جا سکے۔\n"
+            "• پانی پئیں اور اچانک کھڑے ہونے سے گریز کریں۔\n"
+            "شدید علامات کے لیے براہ کرم ڈاکٹر سے رجوع کریں۔"
+        ),
+    },
+    "hypertension_info": {
+        "en": (
+            "• Hypertension refers to consistently high blood pressure in your blood vessels.\n"
+            "• It can be effectively managed with prescribed medications, reduced sodium intake, and regular exercise.\n"
+            "Please consult a doctor for severe symptoms."
+        ),
+        "ta": (
+            "• உயர் இரத்த அழுத்தம் என்பது இரத்த நாளங்களில் அழுத்தம் தொடர்ந்து அதிகமாக இருப்பதாகும்.\n"
+            "• சரியான உணவு, உப்பு குறைப்பு மற்றும் மருத்துவர் பரிந்துரைத்த மருந்துகள் மூலம் இதைக் கட்டுப்படுத்தலாம்.\n"
+            "கடுமையான அறிகுறிகளுக்கு தயவுசெய்து மருத்துவரை அணுகவும்."
+        ),
+        "hi": (
+            "• उच्च रक्तचाप (हाइपरटेंशन) का अर्थ है धमनियों में रक्त का दबाव सामान्य से अधिक बना रहना।\n"
+            "• कम नमक वाला आहार, नियमित व्यायाम और अपनी निर्धारित दवाओं से इसे नियंत्रित रखा जाता है।\n"
+            "गंभीर लक्षणों के लिए कृपया डॉक्टर से परामर्श लें।"
+        ),
+        "te": (
+            "• హైపర్‌టెన్షన్ అంటే రక్తనాళాల్లో రక్తపోటు సాధారణ స్థాయి కంటే నిరంతరం ఎక్కువగా ఉండటం.\n"
+            "• ఉప్పు తగ్గించడం, వ్యాయామం మరియు సూచించిన మందులను క్రమం తప్పకుండా వేసుకోవడం ద్వారా దీన్ని అదుపులో ఉంచవచ్చు.\n"
+            "తీవ్రమైన లక్షణాల కోసం దయచేసి వైద్యుడిని సంప్రదించండి."
+        ),
+        "ml": (
+            "• ഉയർന്ന രക്തസമ്മർദ്ദം (ഹൈപ്പർടെൻഷൻ) എന്നാൽ ധമനികളിൽ രക്തസമ്മർദ്ദം സാധാരണയേക്കാൾ കൂടുതലായി തുടരുന്നതാണ്.\n"
+            "• ഉപ്പ് കുറയ്ക്കലും കൃത്യമായ വ്യായാമവും നിർദ്ദേശിച്ച മരുന്നുകളും ഇതിനെ നിയന്ത്രിക്കാൻ സഹായിക്കുന്നു.\n"
+            "ഗുരുതരമായ ലക്ഷണങ്ങൾക്ക് ദയവായി ഒരു ഡോക്ടറെ കാണുക."
+        ),
+        "kn": (
+            "• ಅಧಿಕ ರಕ್ತದೊತ್ತಡ (ಹೈಪರ್‌ಟೆನ್ಷನ್) ಎಂದರೆ ರಕ್ತನಾಳಗಳಲ್ಲಿ ರಕ್ತದ ಒತ್ತಡ ನಿರಂತರವಾಗಿ ಹೆಚ್ಚಿರುವುದು.\n"
+            "• ಕಡಿಮೆ ಉಪ್ಪಿನ ಆಹಾರ, ವ್ಯಾಯಾಮ ಮತ್ತು ನಿಯಮಿತ ಔಷಧಿಗಳಿಂದ ಇದನ್ನು ನಿಯಂತ್ರಣದಲ್ಲಿಡಬಹುದು.\n"
+            "ತೀವ್ರವಾದ ರೋಗಲಕ್ಷಣಗಳಿಗಾಗಿ ದಯವಿಟ್ಟು ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ."
+        ),
+        "ur": (
+            "• ہائی بلڈ پریشر سے مراد خون کی نالیوں میں مستقل دباؤ کا بڑھ جانا ہے۔\n"
+            "• نمک کی کمی، ورزش اور باقاعدہ ادویات سے اسے قابو میں رکھا جا سکتا ہے۔\n"
+            "شدید علامات کے لیے براہ کرم ڈاکٹر سے رجوع کریں۔"
+        ),
+    },
+    "sleepiness_side_effect": {
+        "en": (
+            "• Certain medications can cause mild drowsiness or sleepiness as your body adjusts.\n"
+            "• Avoid driving or operating machinery if you feel drowsy, and consult your doctor if it interferes with your day.\n"
+            "Please consult a doctor for severe symptoms."
+        ),
+        "ta": (
+            "• சில மருந்துகள் உடலுக்குப் பழகும் வரை லேசான தூக்கக் கலக்கம் அல்லது சோர்வை ஏற்படுத்தலாம்.\n"
+            "• தூக்கமாக இருக்கும்போது வாகனம் ஓட்டுவதைத் தவிர்க்கவும்; இது தொடர்ந்தால் மருத்துவரிடம் ஆலோசிக்கவும்.\n"
+            "கடுமையான அறிகுறிகளுக்கு தயவுசெய்து மருத்துவரை அணுகவும்."
+        ),
+        "hi": (
+            "• कुछ दवाएं शरीर के अभ्यस्त होने तक हल्का आलस्य या नींद ला सकती हैं।\n"
+            "• सुस्ती महसूस होने पर वाहन चलाने से बचें और समस्या जारी रहने पर डॉक्टर से परामर्श लें।\n"
+            "गंभीर लक्षणों के लिए कृपया डॉक्टर से परामर्श लें।"
+        ),
+        "te": (
+            "• కొన్ని మందుల వల్ల శరీరం అలవాటు పడేవరకు తేలికపాటి నిద్రమత్తు లేదా అలసట రావచ్చు.\n"
+            "• నిద్రమత్తుగా అనిపిస్తే వాహనాలు నడపకండి మరియు సమస్య కొనసాగితే వైద్యుడిని సంప్రదించండి.\n"
+            "తీవ్రమైన లక్షణాల కోసం దయచేసి వైద్యుడిని సంప్రదించండి."
+        ),
+        "ml": (
+            "• ചില മരുന്നുകൾ തുടക്കത്തിൽ ചെറിയ മയക്കമോ ഉറക്കമോ ഉണ്ടാക്കിയേക്കാം.\n"
+            "• ഉറക്കം തോന്നുമ്പോൾ ഡ്രൈവിംഗ് ഒഴിവാക്കുക, പ്രശ്നം തുടരുകയാണെങ്കിൽ ഡോക്ടറെ അറിയിക്കുക.\n"
+            "ഗുരുതരമായ ലക്ഷണങ്ങൾക്ക് ദയവായി ഒരു ഡോക്ടറെ കാണുക."
+        ),
+        "kn": (
+            "• ಕೆಲವು ಔಷಧಿಗಳು ಆರಂಭದಲ್ಲಿ ಸ್ವಲ್ಪ ನಿದ್ರಾಮಂಪರು ಅಥವಾ ಆಲಸ್ಯವನ್ನು ಉಂಟುಮಾಡಬಹುದು.\n"
+            "• ನಿದ್ರೆ ಬಂದಂತೆ ಎನಿಸಿದರೆ ವಾಹನ ಚಾಲನೆ ಮಾಡಬೇಡಿ ಮತ್ತು ತೊಂದರೆ ಮುಂದುವರಿದರೆ ವೈದ್ಯರಿಗೆ ತಿಳಿಸಿ.\n"
+            "ತೀವ್ರವಾದ ರೋಗಲಕ್ಷಣಗಳಿಗಾಗಿ ದಯವಿಟ್ಟು ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ."
+        ),
+        "ur": (
+            "• کچھ ادویات کے استعمال سے وقتی طور پر نیند یا غنودگی طاری ہو سکتی ہے۔\n"
+            "• غنودگی کی حالت میں ڈرائیونگ سے گریز کریں اور ڈاکٹر کو مطلع کریں۔\n"
+            "شدید علامات کے لیے براہ کرم ڈاکٹر سے رجوع کریں۔"
+        ),
+    },
     "general": {
         "en": (
             "• I have noted your health query. Please maintain proper hydration, rest, and adhere to prescribed medication schedules.\n"
@@ -408,53 +556,94 @@ def resolve_clinical_chat(message: str, fallback_lang: str = "en") -> str:
     q = message.lower().strip()
     lang = detect_language(message, fallback_lang)
 
-    # 1. Emergency
+    # 1. Emergency (chest pain, shortness of breath, heart attack)
     if any(k in q for k in [
         "chest pain", "heart attack", "can't breathe", "cannot breathe", "stroke", "bleeding heavily",
-        "நெஞ்சு வலி", "மூச்சு", "सीने में दर्द", "सांस", "ఛాతీ నొప్పి", "శ్వాస", "سینے میں درد", "سانس", "നെഞ്ചുവേദന", "എದೆ ನೋವು"
+        "நெஞ்சு வலி", "மூச்சு", "सीने में दर्द", "सांस", "ఛాతీ నొప్పి", "శ్వాస", "سینے میں درد", "سانس", "നെഞ്ചുവേദന",
+        "ಎದೆ ನೋವು", "ಎದೆನೋವು", "ಉಸಿರಾಟ"
     ]):
         return CHAT_KB["emergency"].get(lang, CHAT_KB["emergency"]["en"])
 
-    # 2. Coffee / Drinks with BP
+    # 2. Eye pain / strain
+    if any(k in q for k in [
+        "eye pain", "eye strain", "eyes hurt", "eye irritation", "eyes", "eye",
+        "கண் வலி", "கண்கள்", "கண்", "आँख", "आंख", "కంటి నొప్పి", "కన్ను", "కണ്ണുവേദന", "കണ്ണ്", "ಕಣ್ಣು ನೋವು", "ಕಣ್ಣು"
+    ]):
+        return CHAT_KB["eye_pain"].get(lang, CHAT_KB["eye_pain"]["en"])
+
+    # 3. Dizziness / feeling dizzy (check before slight_pain/headache)
+    if any(k in q for k in [
+        "dizzy", "dizziness", "lightheaded", "spinning",
+        "தலைசுற்றல்", "தலை சுற்றல்", "மயக்கம்",
+        "चक्कर", "चक्कर आना",
+        "తలతిరుగు", "తలతిరుగుతోంది", "తలతిరగడం",
+        "തലകറക്കം",
+        "ತಲೆಸುತ್ತು", "ತಲೆ ಸುತ್ತು"
+    ]):
+        return CHAT_KB["dizziness"].get(lang, CHAT_KB["dizziness"]["en"])
+
+    # 4. Sleepiness / Drowsiness side effect
+    if any(k in q for k in [
+        "sleepiness", "sleepy", "drowsy", "drowsiness", "tiredness",
+        "தூக்கம்", "தூக்கக் கலக்கம்", "தூக்க கலக்கம்",
+        "नींद", "आलस्य", "सुस्ती",
+        "నిద్ర", "నిద్రమత్తు", "మత్తు",
+        "മയക്കം", "ഉറക്കം",
+        "ನಿದ್ರೆ", "ಮಂಪರು"
+    ]):
+        return CHAT_KB["sleepiness_side_effect"].get(lang, CHAT_KB["sleepiness_side_effect"]["en"])
+
+    # 5. Hypertension Explanation / Meaning
+    if any(k in q for k in [
+        "what is hypertension", "what is high blood pressure", "high blood pressure mean", "hypertension mean", "explain hypertension", "hypertension",
+        "உயர் இரத்த அழுத்தம்", "உயர் ரத்த அழுத்தம்", "இரத்த அழுத்தம்",
+        "उच्च रक्तचाप", "हाइपरटेंशन", "हाई ब्लड प्रेशर",
+        "అధిక రక్తపోటు", "హైపర్‌టెన్షన్", "రక్తపోటు",
+        "ഉയർന്ന രക്തസമ്മർദ്ദം", "ഹൈപ്പർടെൻഷൻ", "രക്തസമ്മർദ്ദം",
+        "ಅಧಿಕ ರಕ್ತದೊತ್ತಡ", "ಹೈಪರ್‌ಟೆನ್ಷನ್", "ರಕ್ತದೊತ್ತಡ"
+    ]):
+        return CHAT_KB["hypertension_info"].get(lang, CHAT_KB["hypertension_info"]["en"])
+
+    # 6. Coffee / Drinks with BP
     if any(k in q for k in ["coffee", "with coffee", "tea", "காபி", "कॉफी", "కాఫీ", "കാപ്പി", "ಕಾಫಿ"]):
         return CHAT_KB["bp_coffee"].get(lang, CHAT_KB["bp_coffee"]["en"])
 
-    # 3. Missed dose
+    # 7. Missed dose
     if any(k in q for k in [
-        "missed", "forgot", "skip", "miss", "மறந்து", "भूल गया", "भूल गई", "మర్చిపోయా", "മറന്നു", "ಮರೆತು"
+        "missed", "forgot", "skip", "miss", "மறந்து", "भूल गया", "भूल गई", "మర్చిపోయా", "మర్చిపో", "മറന്നു", "ಮರೆತು"
     ]):
         return CHAT_KB["missed_dose"].get(lang, CHAT_KB["missed_dose"]["en"])
 
-    # 4. Headache / Head pain
+    # 8. Headache / Head pain
     if any(k in q for k in [
         "head pain", "headache", "head ache", "migraine", "head throbbing",
         "தலைவலி", "தலை வலி", "सिरदर्द", "सिर दर्द", "తలనొప్పి", "తల నొప్పి", "തലവേദന", "ತಲೆನೋವು", "سر درد"
     ]):
         return CHAT_KB["headache"].get(lang, CHAT_KB["headache"]["en"])
 
-    # 5. Mild pain / Slighted pain / Body ache
+    # 9. Mild pain / Slighted pain / Body ache
     if any(k in q for k in [
         "slighted pain", "slight pain", "body pain", "body ache", "muscle pain", "back pain", "leg pain", "mild pain",
         "வலி", "உடல் வலி", "दर्द", "बदन दर्द", "నొప్పి", "వంటి నొప్పి", "വേദന", "ശരീരവേദന", "ನೋವು", "ಮೈಕೈ ನೋವು", "جسم میں درد"
     ]):
         return CHAT_KB["slight_pain"].get(lang, CHAT_KB["slight_pain"]["en"])
 
-    # 6. Fever
+    # 10. Fever
     if any(k in q for k in [
-        "fever", "temperature", "chills", "high temp", "காய்ச்சல்", "बुखार", "జ్వరం", "പനി", "ಜ್ವರ", "بخار"
+        "fever", "temperature", "chills", "high temp", "காய்ச்சல்", "बुखार", "జ్వరం", "పని", "ಜ್ವರ", "بخار"
     ]):
         return CHAT_KB["fever"].get(lang, CHAT_KB["fever"]["en"])
 
-    # 7. Cold / Cough
+    # 11. Cold / Cough
     if any(k in q for k in [
         "cold", "cough", "sore throat", "sneezing", "flu", "சளி", "இருமல்", "सर्दी", "खांसी", "జలుబు", "దగ్గు", "ജലദോഷം", "ചുമ", "ಶೀತ", "ಕೆಮ್ಮು", "نزلہ", "کھانسی"
     ]):
         return CHAT_KB["cold_cough"].get(lang, CHAT_KB["cold_cough"]["en"])
 
-    # 8. Stomach / Acidity
+    # 12. Stomach / Acidity
     if any(k in q for k in [
         "stomach", "acidity", "gas", "indigestion", "vomiting", "nausea",
-        "வயிறு", "வயிற்று வலி", "पेट दर्द", "कడుపు నొప్పి", "വയറുവേദന", "ಹೊಟ್ಟೆ ನೋವು", "پیٹ کا درد"
+        "வயிறு", "வயிற்று வலி", "पेट दर्द", "కడుపు నొప్పి", "വയറുവേദന", "ಹೊಟ್ಟೆ ನೋವು", "پیٹ کا درد"
     ]):
         return CHAT_KB["stomach_pain"].get(lang, CHAT_KB["stomach_pain"]["en"])
 
@@ -464,67 +653,230 @@ def resolve_clinical_chat(message: str, fallback_lang: str = "en") -> str:
 
 def resolve_clinical_voice(
     message: str,
-    patient_name: str = "Mr. Ravi",
+    patient_name: str = "",
     language: str = "en",
 ) -> str:
     """Resolve a clinical voice query in 1-2 spoken sentences for natural TTS."""
     q = message.lower().strip()
     lang = detect_language(message, language)
-    p_name = patient_name or "Patient"
+    p_name = (patient_name or "").strip()
+    prefix = f"{p_name}, " if p_name else ""
 
-    # Emergency
-    if any(k in q for k in ["chest pain", "heart attack", "can't breathe", "நெஞ்சு வலி", "சீने में दर्द", "ఛాతీ నొప్పి", "നെഞ്ചുവേദന", "ಎದೆ ನೋವು"]):
+    # 1. Emergency
+    if any(k in q for k in [
+        "chest pain", "heart attack", "can't breathe", "cannot breathe",
+        "நெஞ்சு வலி", "சீने में दर्द", "सीने में दर्द", "ఛాతీ నొప్పి", "നെഞ്ചുവേദന",
+        "ಎದೆ ನೋವು", "ಎದೆನೋವು", "ಉಸಿರಾಟ"
+    ]):
         if lang == "ta":
-            return f"{p_name}, நெஞ்சு வலி அவசர சிகிச்சை தேவைப்படும் அறிகுறி. தயவுசெய்து உடனடியாக அவசர மருத்துவ சேவையைத் தொடர்பு கொள்ளவும்."
+            return f"{prefix}நெஞ்சு வலி அவசர சிகிச்சை தேவைப்படும் அறிகுறி. தயவுசெய்து உடனடியாக அவசர மருத்துவ சேவையைத் தொடர்பு கொள்ளவும்."
         elif lang == "hi":
-            return f"{p_name}, सीने में दर्द आपातकालीन लक्षण है। कृपया तुरंत नजदीकी अस्पताल की आपातकालीन सेवा से संपर्क करें।"
+            return f"{prefix}सीने में दर्द आपातकालीन लक्षण है। कृपया तुरंत नजदीकी अस्पताल की आपातकालीन सेवा से संपर्क करें।"
         elif lang == "te":
-            return f"{p_name}, ఛాతీ నొప్పి అత్యవసర పరిస్థితి. దయచేసి వెంటనే సమీప ఆసుపత్రికి వెళ్లండి."
+            return f"{prefix}ఛాతీ నొప్పి అత్యవసర పరిస్థితి. దయచేసి వెంటనే సమీప ఆసుపత్రికి వెళ్లండి."
         elif lang == "kn":
-            return f"{p_name}, ಎದೆ ನೋವು ತುರ್ತು ವೈದ್ಯಕೀಯ ಚಿಕಿತ್ಸೆ ಅಗತ್ಯವಿರುವ ಲಕ್ಷಣ. ದಯವಿಟ್ಟು ತಕ್ಷಣವೇ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ."
+            return f"{prefix}ಎದೆ ನೋವು ತುರ್ತು ವೈದ್ಯಕೀಯ ಚಿಕಿತ್ಸೆ ಅಗತ್ಯವಿರುವ ಲಕ್ಷಣ. ದಯವಿಟ್ಟು ತಕ್ಷಣವೇ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ."
         elif lang == "ml":
-            return f"{p_name}, നെഞ്ചുവേദന അടിയന്തിര വൈദ്യസഹായം ആവശ്യമുള്ള ലക്ഷണമാണ്. ഉടൻ ആശുപത്രിയിൽ ചികിത്സ തേടുക."
-        return f"{p_name}, chest pain requires immediate emergency medical care. Please call emergency services right away."
+            return f"{prefix}നെഞ്ചുവേദന അടിയന്തിര വൈദ്യസഹായം ആവശ്യമുള്ള ലക്ഷണമാണ്. ഉടൻ ആശുപത്രിയിൽ ചികിത്സ തേടുക."
+        return f"{prefix}chest pain requires immediate emergency medical care. Please call emergency services right away."
 
-    # Slight pain / Body pain
-    if any(k in q for k in ["slighted pain", "slight pain", "body pain", "body ache", "pain", "வலி", "दर्द", "నొప్పి", "വേദന", "ನೋವು"]):
+    # 2. Eye pain / strain (before slight pain)
+    if any(k in q for k in [
+        "eye pain", "eye strain", "eyes hurt", "eye irritation", "eyes", "eye",
+        "கண் வலி", "கண்கள்", "கண்", "आँख", "आंख", "కంటి నొప్పి", "కన్ను", "കണ്ണുവേദന", "കണ്ണ്", "ಕಣ್ಣು ನೋವು", "ಕಣ್ಣು"
+    ]):
         if lang == "ta":
-            return f"{p_name}, லேசான வலிக்கு ஓய்வெடுத்து போதுமான தண்ணீர் குடியுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை எடுத்துக்கொள்ளுங்கள்."
+            return f"{prefix}கண் வலிக்கு கண்களைத் தேய்க்காமல் ஓய்வெடுங்கள். பார்வை மங்கினால் உடனே மருத்துவரை அணுகவும்."
         elif lang == "hi":
-            return f"{p_name}, हल्के दर्द के लिए आराम करें और पर्याप्त पानी पिएं। अपनी निर्धारित दवाएं समय पर लें।"
+            return f"{prefix}आँखों में दर्द के लिए आँखों को आराम दें और उन्हें न मलें। दृष्टि में बदलाव हो तो डॉक्टर को दिखाएं।"
         elif lang == "te":
-            return f"{p_name}, తేలికపాటి నొప్పికి విశ్రాంతి తీసుకోండి మరియు నీరు త్రాగండి. సూచించిన మందులను వేసుకోండి."
+            return f"{prefix}కంటి నొప్పికి కళ్ళను రుద్దకుండా విశ్రాంతి ఇవ్వండి. చూపులో మార్పు ఉంటే వెంటనే వైద్యుడిని సంప్రదించండి."
         elif lang == "kn":
-            return f"{p_name}, ಸೌಮ್ಯವಾದ ನೋವಿಗೆ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ."
+            return f"{prefix}ಕಣ್ಣು ನೋವಿಗೆ ಕಣ್ಣುಗಳನ್ನು ಉಜ್ಜದೆ ವಿಶ್ರಾಂತಿ ನೀಡಿ. ದೃಷ್ಟಿಯಲ್ಲಿ ವ್ಯತ್ಯಾಸವಾದರೆ ತಕ್ಷಣ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ."
         elif lang == "ml":
-            return f"{p_name}, നേരിയ വേദനയ്ക്ക് വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക."
-        return f"{p_name}, for mild pain, please rest and drink plenty of water. Take your prescribed medicines as directed."
+            return f"{prefix}കണ്ണുവേദനയ്ക്ക് കണ്ണുകൾ തിരുമ്മാതെ വിശ്രമിക്കുക. കാഴ്ചയിൽ മങ്ങലുണ്ടെങ്കിൽ ഉടൻ ഡോക്ടറെ കാണുക."
+        return f"{prefix}for eye pain, rest your eyes and avoid rubbing them. Seek medical attention if you notice vision changes."
 
-    # Head pain / Headache
-    if any(k in q for k in ["head pain", "headache", "தலைவலி", "सिरदर्द", "తలనొప్పి", "തലവേദന", "ತಲೆನೋವು"]):
+    # 3. Dizziness (before slight pain and headache)
+    if any(k in q for k in [
+        "dizzy", "dizziness", "lightheaded", "spinning",
+        "தலைசுற்றல்", "தலை சுற்றல்", "மயக்கம்",
+        "चक्कर", "चक्कर आना",
+        "తలతిరుగు", "తలతిరుగుతోంది", "తలతిరగడం",
+        "തലകറക്കം",
+        "ತಲೆಸುತ್ತು", "ತಲೆ ಸುತ್ತು"
+    ]):
         if lang == "ta":
-            return f"{p_name}, தலைவலிக்கு அமைதியான அறையில் ஓய்வெடுத்து தண்ணீர் குடியுங்கள். வலி நீடித்தால் மருத்துவரை அணுகவும்."
+            return f"{prefix}தலைசுற்றல் இருக்கும்போது உடனே அமர்ந்து தண்ணீர் குடியுங்கள். திடீரென எழுந்து நிற்பதைத் தவிர்க்கவும்."
         elif lang == "hi":
-            return f"{p_name}, सिरदर्द के लिए शांत कमरे में आराम करें और पानी पिएं। यदि सिरदर्द बना रहे तो डॉक्टर को दिखाएं।"
+            return f"{prefix}चक्कर आने पर तुरंत बैठ जाएं और पानी पिएं। अचानक उठने-बैठने से बचें।"
         elif lang == "te":
-            return f"{p_name}, తలనొప్పికి నిశ్శబ్దంగా విశ్రాంతి తీసుకోండి మరియు తగినంత నీరు త్రాగండి."
+            return f"{prefix}తలతిరుగుతున్నప్పుడు వెంటనే కూర్చోండి మరియు మంచి నీరు త్రాగండి. ఆకస్మికంగా లేచి నిలబడకండి."
         elif lang == "kn":
-            return f"{p_name}, ತಲೆನೋವಿಗೆ ಶಾಂತವಾದ ಕೋಣೆಯಲ್ಲಿ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ."
+            return f"{prefix}ತಲೆಸುತ್ತು ಬಂದಾಗ ತಕ್ಷಣ ಕುಳಿತುಕೊಳ್ಳಿ ಮತ್ತು ನೀರು ಕುಡಿಯಿರಿ. ಇದ್ದಕ್ಕಿದ್ದಂತೆ ಎದ್ದು ನಿಲ್ಲಬೇಡಿ."
         elif lang == "ml":
-            return f"{p_name}, തലവേദനയ്ക്ക് ശാന്തമായ മുറിയിൽ വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക."
-        return f"{p_name}, for a headache, please rest in a quiet room and stay well hydrated with water."
+            return f"{prefix}തലകറക്കം ഉള്ളപ്പോൾ ഉടൻ സുരക്ഷിതമായി ഇരുന്ന് വെള്ളം കുടിക്കുക. പെട്ടെന്ന് എഴുന്നേൽക്കുന്നത് ഒഴിവാക്കുക."
+        return f"{prefix}if you feel dizzy, please sit or lie down immediately and drink plenty of water."
+
+    # 4. Sleepiness / Drowsiness side effect
+    if any(k in q for k in [
+        "sleepiness", "sleepy", "drowsy", "drowsiness", "tiredness",
+        "தூக்கம்", "தூக்கக் கலக்கம்", "தூக்க கலக்கம்",
+        "नींद", "आलस्य", "सुस्ती",
+        "నిద్ర", "నిద్రమత్తు", "మత్తు",
+        "മയക്കം", "ഉറക്കം",
+        "ನಿದ್ರೆ", "ಮಂಪರು"
+    ]):
+        if lang == "ta":
+            return f"{prefix}ஆம், சில மருந்துகள் லேசான தூக்கக் கலக்கத்தை ஏற்படுத்தலாம். தூக்கமாக இருக்கும்போது வாகனம் ஓட்டுவதைத் தவிருங்கள்."
+        elif lang == "hi":
+            return f"{prefix}हाँ, कुछ दवाओं से हल्की नींद या सुस्ती आ सकती है। सुस्ती महसूस होने पर वाहन न चलाएं।"
+        elif lang == "te":
+            return f"{prefix}అవును, కొన్ని మందుల వల్ల తేలికపాటి నిద్రమత్తు రావచ్చు. నిద్రమత్తుగా ఉన్నప్పుడు డ్రైవింగ్ చేయకండి."
+        elif lang == "kn":
+            return f"{prefix}ಹೌದು, ಕೆಲವು ಔಷಧಿಗಳಿಂದ ಸ್ವಲ್ಪ ನಿದ್ರೆ ಅಥವಾ ಮಂಪರು ಬರಬಹುದು. ಮಂಪರು ಇದ್ದಾಗ ವಾಹನ ಚಾಲನೆ ಮಾಡಬೇಡಿ."
+        elif lang == "ml":
+            return f"{prefix}അതെ, ചില മരുന്നുകൾ നേരിയ ഉറക്കമോ മയക്കമോ ഉണ്ടാക്കാം. മയക്കമുള്ളപ്പോൾ വാഹനങ്ങൾ ഓടിക്കരുത്."
+        return f"{prefix}yes, some medications can cause mild sleepiness. Avoid driving if you feel drowsy."
+
+    # 5. Hypertension explanation
+    if any(k in q for k in [
+        "what is hypertension", "what is high blood pressure", "high blood pressure mean", "hypertension mean",
+        "உயர் இரத்த அழுத்தம்", "உயர் ரத்த அழுத்தம்", "இரத்த அழுத்தம் என்றால்",
+        "हाइपरटेंशन", "हाई ब्लड प्रेशर",
+        "హైపర్‌టెన్షన్", "రక్తపోటు",
+        "ഹൈപ്പർടെൻഷൻ", "രക്തസമ്മർദ്ദം",
+        "ಹೈಪರ್‌ಟೆನ್ಷನ್", "ರಕ್ತದೊತ್ತಡ"
+    ]):
+        if lang == "ta":
+            return f"{prefix}உயர் இரத்த அழுத்தம் என்பது இரத்த நாளங்களில் அழுத்தம் அதிகமாக இருப்பதாகும். மருத்துவர் அளித்த மருந்துகள் இதை சீராக வைக்கும்."
+        elif lang == "hi":
+            return f"{prefix}हाइपरटेंशन का मतलब हाई ब्लड प्रेशर है। नियमित दवा और संतुलित आहार से इसे नियंत्रित रखा जाता है।"
+        elif lang == "te":
+            return f"{prefix}హైపర్‌టెన్షన్ అంటే అధిక రక్తపోటు. మీ డాక్టర్ ఇచ్చిన మందులను సమయానికి వేసుకుంటే ఇది అదుపులో ఉంటుంది."
+        elif lang == "kn":
+            return f"{prefix}ಹೈಪರ್‌ಟೆನ್ಷನ್ ಎಂದರೆ ಅಧಿಕ ರಕ್ತದೊತ್ತಡ. ನಿಗದಿತ ಮಾತ್ರೆಗಳನ್ನು ಸಮಯಕ್ಕೆ ತೆಗೆದುಕೊಳ್ಳುವುದರಿಂದ ಇದನ್ನು ನಿಯಂತ್ರಣದಲ್ಲಿಡಬಹುದು."
+        elif lang == "ml":
+            return f"{prefix}ഉയർന്ന രക്തസമ്മർദ്ദം എന്നാൽ ബിപി കൂടുതലായിരിക്കുന്നതാണ്. കൃത്യമായ മരുന്ന് കഴിക്കുന്നത് ഇത് നിയന്ത്രിക്കാൻ സഹായിക്കും."
+        return f"{prefix}hypertension means high blood pressure. Taking your prescribed medication and reducing salt keeps it controlled."
+
+    # 6. Coffee with BP
+    if any(k in q for k in ["coffee", "with coffee", "tea", "காபி", "कॉफी", "కాఫీ", "കാപ്പി", "ಕಾಫಿ"]):
+        if lang == "ta":
+            return f"{prefix}இரத்த அழுத்த மாத்திரைகளை காபியுடன் எடுக்காமல் சுத்தமான தண்ணீருடன் உட்கொள்ளவும்."
+        elif lang == "hi":
+            return f"{prefix}ब्लड प्रेशर की दवा कॉफी के साथ न लें, हमेशा सादे पानी के साथ ही लें।"
+        elif lang == "te":
+            return f"{prefix}రక్తపోటు మందులను కాఫీతో కాకుండా మంచి నీటితో మాత్రమే తీసుకోండి."
+        elif lang == "kn":
+            return f"{prefix}ರಕ್ತದೊತ್ತಡದ ಮಾತ್ರೆಗಳನ್ನು ಕಾಫಿಯೊಂದಿಗೆ ತೆಗೆದುಕೊಳ್ಳಬೇಡಿ, ನೀರಿನೊಂದಿಗೆ ಮಾತ್ರ ತೆಗೆದುಕೊಳ್ಳಿ."
+        elif lang == "ml":
+            return f"{prefix}രക്തസമ്മർദ്ദത്തിനുള്ള മരുന്നുകൾ കാപ്പിയോടൊപ്പം കഴിക്കരുത്, വെള്ളത്തോടൊപ്പം മാത്രം കഴിക്കുക."
+        return f"{prefix}please take your blood pressure medication with plain water, not with coffee."
+
+    # 7. Missed dose
+    if any(k in q for k in [
+        "missed", "forgot", "skip", "miss", "மறந்து", "भूल गया", "भूल गई", "మర్చిపోయా", "మర్చిపో", "మറന്നു", "ಮರೆತು"
+    ]):
+        if lang == "ta":
+            return f"{prefix}மருந்தை எடுக்க மறந்துவிட்டால் நினைவுக்கு வந்தவுடன் உட்கொள்ளவும். அடுத்த வேளைக்கு அருகிலிருந்தால் இரட்டை மாத்திரை எடுக்க வேண்டாம்."
+        elif lang == "hi":
+            return f"{prefix}यदि कोई खुराक छूट जाए तो याद आते ही ले लें। अगली खुराक का समय पास हो तो दो गोलियां एक साथ कभी न लें।"
+        elif lang == "te":
+            return f"{prefix}డోస్ మర్చిపోతే గుర్తుకు రాగానే తీసుకోండి. తదుపరి సమయం దగ్గరగా ఉంటే రెండు డోస్‌లు కలిపి తీసుకోవద్దు."
+        elif lang == "kn":
+            return f"{prefix}ಔಷಧಿ ತೆಗೆದುಕೊಳ್ಳಲು ಮರೆತರೆ ನೆನಪಾದ ತಕ್ಷಣ ತೆಗೆದುಕೊಳ್ಳಿ. ಮುಂದಿನ ಸಮಯ ಹತ್ತಿರವಿದ್ದರೆ ಎರಡು ಮಾತ್ರೆ ಒಟ್ಟಿಗೆ ತೆಗೆದುಕೊಳ್ಳಬೇಡಿ."
+        elif lang == "ml":
+            return f"{prefix}മരുന്ന് കഴിക്കാൻ മറന്നുപോയാൽ ഓർമ്മ വരുമ്പോൾ ഉടൻ കഴിക്കുക. അടുത്ത സമയത്തോട് അടുത്താണെങ്കിൽ ഇരട്ട ഡോസ് ഒരിക്കലും കഴിക്കരുത്."
+        return f"{prefix}if you miss a dose, take it as soon as you remember. If it is close to your next dose, never take a double dose."
+
+    # 8. Slight pain / Body pain
+    if any(k in q for k in [
+        "slighted pain", "slight pain", "body pain", "body ache", "pain",
+        "வலி", "உடல் வலி", "दर्द", "बदन दर्द", "నొప్పి", "వేదన", "ನೋವು"
+    ]):
+        if lang == "ta":
+            return f"{prefix}லேசான வலிக்கு ஓய்வெடுத்து போதுமான தண்ணீர் குடியுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை எடுத்துக்கொள்ளுங்கள்."
+        elif lang == "hi":
+            return f"{prefix}हल्के दर्द के लिए आराम करें और पर्याप्त पानी पिएं। अपनी निर्धारित दवाएं समय पर लें।"
+        elif lang == "te":
+            return f"{prefix}తేలికపాటి నొప్పికి విశ్రాంతి తీసుకోండి మరియు నీరు త్రాగండి. సూచించిన మందులను వేసుకోండి."
+        elif lang == "kn":
+            return f"{prefix}ಸೌಮ್ಯವಾದ ನೋವಿಗೆ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ."
+        elif lang == "ml":
+            return f"{prefix}നേരിയ വേദനയ്ക്ക് വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക."
+        return f"{prefix}for mild pain, please rest and drink plenty of water. Take your prescribed medicines as directed."
+
+    # 9. Head pain / Headache
+    if any(k in q for k in [
+        "head pain", "headache", "head ache", "migraine",
+        "தலைவலி", "सिरदर्द", "తలనొప్పి", "തലവേദന", "ತಲೆನೋವು"
+    ]):
+        if lang == "ta":
+            return f"{prefix}தலைவலிக்கு அமைதியான அறையில் ஓய்வெடுத்து தண்ணீர் குடியுங்கள். வலி நீடித்தால் மருத்துவரை அணுகவும்."
+        elif lang == "hi":
+            return f"{prefix}सिरदर्द के लिए शांत कमरे में आराम करें और पानी पिएं। यदि सिरदर्द बना रहे तो डॉक्टर को दिखाएं।"
+        elif lang == "te":
+            return f"{prefix}తలనొప్పికి నిశ్శబ్దంగా విశ్రాంతి తీసుకోండి మరియు తగినంత నీరు త్రాగండి."
+        elif lang == "kn":
+            return f"{prefix}ತಲೆನೋವಿಗೆ ಶಾಂತವಾದ ಕೋಣೆಯಲ್ಲಿ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ."
+        elif lang == "ml":
+            return f"{prefix}തലവേദനയ്ക്ക് ശാന്തമായ മുറിയിൽ വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക."
+        return f"{prefix}for a headache, please rest in a quiet room and stay well hydrated with water."
+
+    # 10. Fever
+    if any(k in q for k in ["fever", "temperature", "காய்ச்சல்", "बुखार", "జ్వరం", "പനി", "ಜ್ವರ"]):
+        if lang == "ta":
+            return f"{prefix}காய்ச்சலின் போது உடலின் வெப்பநிலையைக் கண்காணித்து போதுமான தண்ணீர் மற்றும் திரவ உணவுகளை அருந்துங்கள்."
+        elif lang == "hi":
+            return f"{prefix}बुखार में नियमित रूप से तापमान मापें, खूब पानी पिएं और पूर्ण आराम करें।"
+        elif lang == "te":
+            return f"{prefix}జ్వరం వచ్చినప్పుడు శరీర ఉష్ణోగ్రతను తరచుగా తనిఖీ చేయండి మరియు తగినంత విశ్రాంతి తీసుకోండి."
+        elif lang == "kn":
+            return f"{prefix}ಜ್ವರವಿದ್ದಾಗ ತಾಪಮಾನವನ್ನು ಪರೀಕ್ಷಿಸಿ, ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ ಮತ್ತು ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ."
+        elif lang == "ml":
+            return f"{prefix}പനിയുള്ളപ്പോൾ ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും നല്ല വിശ്രമം എടുക്കുകയും ചെയ്യുക."
+        return f"{prefix}for fever, please rest, stay well hydrated, and monitor your temperature regularly."
+
+    # 11. Cold / Cough
+    if any(k in q for k in ["cold", "cough", "சளி", "இருமல்", "सर्दी", "खांसी", "జలుబు", "దగ్గు", "ജലദോഷം", "ചുമ", "ಶೀತ", "ಕೆಮ್ಮು"]):
+        if lang == "ta":
+            return f"{prefix}சளி மற்றும் இருமலுக்கு ஆவி பிடித்து வெதுவெதுப்பான நீர் அருந்தி ஓய்வெடுக்கவும்."
+        elif lang == "hi":
+            return f"{prefix}सर्दी और खांसी के लिए भाप लें और गुनगुना पानी पिएं।"
+        elif lang == "te":
+            return f"{prefix}జలుబు మరియు దగ్గుకు ఆవిరి పట్టండి మరియు వేడి నీరు త్రాగండి."
+        elif lang == "kn":
+            return f"{prefix}ಶೀತ ಮತ್ತು ಕೆಮ್ಮಿಗೆ ಹಬೆ ತೆಗೆದುಕೊಳ್ಳಿ ಮತ್ತು ಬೆಚ್ಚಗಿನ ನೀರನ್ನು ಕುಡಿಯಿರಿ."
+        elif lang == "ml":
+            return f"{prefix}ജലദോഷത്തിനും ചുമയ്ക്കും ആവി പിടിക്കുന്നതും ചൂടുവെള്ളം കുടിക്കുന്നതും നല്ലതാണ്."
+        return f"{prefix}for cold and cough, steam inhalation and warm fluids provide relief. Rest well."
+
+    # 12. Stomach pain / Acidity
+    if any(k in q for k in ["stomach", "acidity", "gas", "வயிறு", "வயிற்று வலி", "पेट दर्द", "కడుపు నొప్పి", "വയറുവೇദന", "ಹೊಟ್ಟೆ ನೋವು"]):
+        if lang == "ta":
+            return f"{prefix}வயிற்று வலிக்கு காரம் மற்றும் எண்ணெய் உணவுகளைத் தவிர்த்து வெதுவெதுப்பான நீர் அருந்துங்கள்."
+        elif lang == "hi":
+            return f"{prefix}पेट दर्द के लिए हल्का भोजन लें और मसालेदार या तला-भुना खाना न खाएं।"
+        elif lang == "te":
+            return f"{prefix}కడుపు నొప్పికి కారం, నూనె పదార్థాలను నివారించండి మరియు తేలికపాటి ఆహారం తీసుకోండి."
+        elif lang == "kn":
+            return f"{prefix}ಹೊಟ್ಟೆ ನೋವಿಗೆ ಮಸಾಲೆಯುಕ್ತ ಆಹಾರ ತಪ್ಪಿಸಿ ಮತ್ತು ತಿಳಿಯಾದ ಆಹಾರ ಸೇವಿಸಿ."
+        elif lang == "ml":
+            return f"{prefix}വയറുവೇദനയ്ക്ക് എരിவும் എണ്ണയുമുള്ള ഭക്ഷണങ്ങൾ ഒഴിവാക്കി ലഘುഭക്ഷണം കഴിക്കുക."
+        return f"{prefix}for stomach discomfort, eat light plain meals and avoid spicy or oily foods."
 
     # General voice fallback
     if lang == "ta":
-        return f"{p_name}, உங்கள் உடல்நலத்தை கவனித்துக் கொள்ளுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை சரியான நேரத்தில் உட்கொள்ளுங்கள்."
+        return f"{prefix}உங்கள் உடல்நலத்தை கவனித்துக் கொள்ளுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை சரியான நேரத்தில் உட்கொள்ளுங்கள்."
     elif lang == "hi":
-        return f"{p_name}, अपना ख्याल रखें और अपनी सभी निर्धारित दवाएं समय पर लेते रहें।"
+        return f"{prefix}अपना ख्याल रखें और अपनी सभी निर्धारित दवाएं समय पर लेते रहें।"
     elif lang == "te":
-        return f"{p_name}, మీ ఆరోగ్యాన్ని జాగ్రత్తగా చూసుకోండి మరియు మందులను సమయానికి తీసుకోండి."
+        return f"{prefix}మీ ఆరోగ్యాన్ని జాగ్రత్తగా చూసుకోండి మరియు మందులను సమయానికి తీసుకోండి."
     elif lang == "ml":
-        return f"{p_name}, ആരോഗ്യം ശ്രദ്ധിക്കുക, നിർദ്ദേശിച്ച മരുന്നുകൾ കൃത്യമായി കഴിക്കുക."
+        return f"{prefix}ആരോഗ്യം ശ്രദ്ധിക്കുക, നിർദ്ദേശിച്ച മരുന്നുകൾ കൃത്യമായി കഴിക്കുക."
     elif lang == "kn":
-        return f"{p_name}, ನಿಮ್ಮ ಆರೋಗ್ಯವನ್ನು ಚೆನ್ನಾಗಿ ನೋಡಿಕೊಳ್ಳಿ ಮತ್ತು ಔಷಧಿಗಳನ್ನು ಸಮಯಕ್ಕೆ ತೆಗೆದುಕೊಳ್ಳಿ."
+        return f"{prefix}ನಿಮ್ಮ ಆರೋಗ್ಯವನ್ನು ಚೆನ್ನಾಗಿ ನೋಡಿಕೊಳ್ಳಿ ಮತ್ತು ಔಷಧಿಗಳನ್ನು ಸಮಯಕ್ಕೆ ತೆಗೆದುಕೊಳ್ಳಿ."
     elif lang == "ur":
-        return f"{p_name}، اپنی صحت کا خیال رکھیں اور اپنی دوائیں وقت پر لیں۔"
-    return f"{p_name}, I understand. Please take your prescribed medications with plain water and rest. Consult your doctor if symptoms continue."
+        return f"{prefix}اپنی صحت کا خیال رکھیں اور اپنی دوائیں وقت پر لیں۔"
+    return f"{prefix}I understand. Please take your prescribed medications with plain water and rest. Consult your doctor if symptoms continue."

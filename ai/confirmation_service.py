@@ -376,7 +376,7 @@ def generate_confirmation_twiml(confirmation_id: str, attempt: int = 1) -> str:
     question_text = cfg["question"]
     no_speech_text = cfg["no_speech"]
 
-    action_url = f"{BASE_WEBHOOK_URL}/api/call/confirmation/response?confirmation_id={quote(confirmation_id)}&lang={quote(lang_key)}&attempt={attempt}"
+    action_url = f"{BASE_WEBHOOK_URL}/api/call/confirmation/response?confirmation_id={quote(confirmation_id)}&lang={quote(lang_key)}&attempt={attempt}".replace("&", "&amp;")
 
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -470,7 +470,7 @@ def process_confirmation_speech_response(
 
         # Ask: "When should we remind you again?"
         ask_text = cfg["not_taken_ask"]
-        reschedule_url = f"{BASE_WEBHOOK_URL}/api/call/confirmation/reschedule?confirmation_id={quote(confirmation_id)}&lang={quote(lang_key)}"
+        reschedule_url = f"{BASE_WEBHOOK_URL}/api/call/confirmation/reschedule?confirmation_id={quote(confirmation_id)}&lang={quote(lang_key)}".replace("&", "&amp;")
 
         return f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -484,7 +484,7 @@ def process_confirmation_speech_response(
     else:  # UNCLEAR
         if attempt < 2:
             clarify_text = cfg["clarify"]
-            action_url = f"{BASE_WEBHOOK_URL}/api/call/confirmation/response?confirmation_id={quote(confirmation_id)}&lang={quote(lang_key)}&attempt={attempt + 1}"
+            action_url = f"{BASE_WEBHOOK_URL}/api/call/confirmation/response?confirmation_id={quote(confirmation_id)}&lang={quote(lang_key)}&attempt={attempt + 1}".replace("&", "&amp;")
             return f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Gather input="speech" action="{action_url}" method="POST" language="{locale}" timeout="5" speechTimeout="auto">

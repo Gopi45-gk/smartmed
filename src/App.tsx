@@ -14,6 +14,8 @@ import { CaregiverScreen } from './components/CaregiverScreen';
 import { ChatScreen } from './components/ChatScreen';
 import { ReportsScreen } from './components/ReportsScreen';
 import { ProfileScreen } from './components/ProfileScreen';
+import { DiabetesRiskModal } from './components/DiabetesRiskModal';
+import { GlucoseAndLabPortal } from './features/GlucoseAndLabPortal';
 import { BottomNav } from './components/BottomNav';
 import { soundManager } from './utils/audio';
 import { ttsProvider } from './utils/speech';
@@ -118,11 +120,28 @@ function MainApp() {
           />
         );
       case 'caregiver':
-        return <CaregiverScreen t={t} />;
+        return <CaregiverScreen t={t} onOpenGlucosePortal={() => setScreen('glucose_portal')} />;
       case 'chat':
-        return <ChatScreen medicines={medicines} t={t} lang={lang} />;
+        return <ChatScreen medicines={medicines} t={t} lang={lang} patientProfile={patientProfile} />;
       case 'reports':
         return <ReportsScreen medicines={medicines} t={t} />;
+      case 'diabetes_risk':
+        return (
+          <DiabetesRiskModal 
+            close={() => setScreen('home')} 
+            patientProfile={patientProfile}
+            t={t} 
+          />
+        );
+      case 'glucose_portal':
+        return (
+          <GlucoseAndLabPortal 
+            close={() => setScreen('home')} 
+            patientProfile={patientProfile}
+            t={t}
+            lang={lang}
+          />
+        );
       case 'profile':
         return (
           <ProfileScreen 
@@ -147,8 +166,8 @@ function MainApp() {
     }
   };
 
-  const isFullscreenModal = screen === 'phone_call' || screen === 'add_prescription';
-  const showBottomNav = !['splash', 'language', 'login', 'phone_call', 'add_prescription'].includes(screen);
+  const isFullscreenModal = screen === 'phone_call' || screen === 'add_prescription' || screen === 'diabetes_risk' || screen === 'glucose_portal';
+  const showBottomNav = !['splash', 'language', 'login', 'phone_call', 'add_prescription', 'diabetes_risk', 'glucose_portal'].includes(screen);
 
   return (
     <div 

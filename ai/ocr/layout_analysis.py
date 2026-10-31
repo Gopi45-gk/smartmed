@@ -104,7 +104,7 @@ class DocumentLayoutAnalyzer:
 
         # Symptoms / Clinical Notes
         self.re_symptoms = re.compile(
-            r"\b(c/o|c\\o|c\/o|lo|complaints?\s*of|history\s*of|h/o|symptoms?|fever|cough|vomiting|nausea|headache|pain|loose\s*(?:motion|stools?)|diarrhea|dysentery|weakness|fatigue|dizziness|giddiness|restlessness|gnodnes|yodines|setleesney|heblesnes|breathlessness|burning\s*micturition)\b",
+            r"\b(c/o|c\\o|c\/o|clo|c[l\|/]o|lo|complaints?\s*of|history\s*of|h/o|symptoms?|fever|cough|vomiting|nausea|headache|pain|loose\s*(?:motion|stools?)|diarrhea|dysentery|weakness|fatigue|dizziness|giddiness|restlessness|reablersnesss|gnodnes|yodines|setleesney|heblesnes|breathlessness|burning\s*micturition)\b",
             re.IGNORECASE,
         )
 
@@ -116,7 +116,7 @@ class DocumentLayoutAnalyzer:
 
         # Vitals
         self.re_vitals = re.compile(
-            r"\b(bp|pulse|pr|spo2|temp|temperature|wt|weight|height|ht|bmi|respiratory\s*rate|rr)\s*[:\-\s]*([0-9\/\.]+(?:\s*(?:bpm|mmhg|\/min|f|c))?|afebril|afebrile|normal)\b",
+            r"\b(bp|pulse|pr|spo2|temp|temperature|wt|weight|height|ht|bmi|respiratory\s*rate|rr|o[/\\\|l]e|ole)\s*[:\-\s]*([0-9\/\.]+(?:\s*(?:bpm|mmhg|\/min|f|c))?|afebril|afebrile|normal|[0-9\/\.\-]+)\b",
             re.IGNORECASE,
         )
 
@@ -127,24 +127,30 @@ class DocumentLayoutAnalyzer:
         )
 
         # Advice & Diet
-        # Note: (?:ors|drs)\d* handles OCR-merged tokens like DRS28ochets, DRS280chets
         self.re_advice = re.compile(
-            r"(?:\b(?:advice|adv|advise|oral\s+rehydration|sachets?|ochets?|[0-9]+\s*sachets?|[0-9]+\s*ochets?|fluid|flui[dl]|intake|insake|tntake|drink\s+(?:plenty|lots|more)\s+(?:of\s+)?(?:water|fluids?)|soft\s+diet|bland\s+diet|liquid\s+diet|rest|bed\s+rest|avoid\s+(?:spicy|oily|outside\s+food)|steam\s+inhalation|warm\s+water|salt\s+water\s+gargle)\b|(?:^|(?<=\s))(?:ors|drs)\d*\s*(?:sachets?|ochets?)?)",
+            r"\b(advice|adv|advise|fluid\s+intake|adequate\s+fluid|drink\s+(?:plenty|lots|more)\s+(?:of\s+)?(?:water|fluids?)|soft\s+diet|bland\s+diet|liquid\s+diet|rest|bed\s+rest|avoid\s+(?:spicy|oily|outside\s+food)|steam\s+inhalation|warm\s+water|salt\s+water\s+gargle)\b",
             re.IGNORECASE,
         )
 
         # Follow-up
         self.re_follow_up = re.compile(
-            r"\b(review|follow\s*up|sos|review\s+(?:after|in)|visit|see\s+(?:again|after)|next\s+visit)\b",
+            r"\b(review|follow\s*up|review\s+(?:after|in)|visit|see\s+(?:again|after)|next\s+visit)\b",
             re.IGNORECASE,
         )
 
         # Medication Indicators
         self.re_med_prefix = re.compile(
-            r"\b(rx|rx[:\s]|tab\.?|tablet|cap\.?|capsule|syp\.?|syrup|inj\.?|injection|oint\.?|ointment|drops?|gel|cream|susp\.?|suspension)\b",
+            r"\b(rx|rx[:\s]|tab\.?|tablet|tablets|cap\.?|capsule|capsules|syp\.?|syrup|inj\.?|injection|oint\.?|ointment|drops?|gel|cream|susp\.?|suspension|medicines?|medications?|meds?|sachets?|ochets?)\b",
             re.IGNORECASE,
         )
-        self.re_frequency = re.compile(r"\b([012]-[012]-[012](-[012])?|od|bd|tds|qid|sos|hs|qid|qd|bid|tid)\b", re.IGNORECASE)
+        self.re_frequency = re.compile(
+            r"\b([012]-[012]-[012](-[012])?|od|bd|tds|qid|sos|hs|qd|bid|tid|stat|qds|once\s+daily|twice\s+daily|thrice\s+daily|morning\s+and\s+night)\b",
+            re.IGNORECASE,
+        )
+        self.re_dosage_pattern = re.compile(
+            r"\b\d+(?:\.\d+)?\s*(?:tablets?|tabs?|capsules?|caps?|ml|puffs?|drops?|sachets?|ochets?|rachets?|tsp|ampoules?)\b",
+            re.IGNORECASE,
+        )
         self.re_strength = re.compile(r"\b\d+(?:\.\d+)?\s*(?:mg|g|mcg|ml|iu|k|%)\b", re.IGNORECASE)
 
     def classify_line(self, line_text: str, line_index: int, total_lines: int) -> ClassifiedLine:
@@ -156,6 +162,14 @@ class DocumentLayoutAnalyzer:
         extracted: Dict[str, Any] = {}
 
         # 1. Patient Information Check (HIGHEST PRIORITY for preventing non-medicine extraction)
+        # Check demographic name pattern first: e.g. "Vivek, S. (19lm)" or "Name: Vivek"
+        dem_name_m = re.search(r"\b([A-Z][a-z]{2,20}(?:,\s*[A-Z0-9]\.?)?)\s*\(\s*(\d{1,3})\s*(?:[\/\|lI1\s]+)\s*([MFmf])\s*\)", text)
+        if dem_name_m:
+            extracted["patient_name"] = re.split(r"[,0-9]", dem_name_m.group(1))[0].strip()
+            extracted["age"] = dem_name_m.group(2)
+            extracted["gender"] = "Male" if dem_name_m.group(3).upper() == "M" else "Female"
+            return ClassifiedLine(text, RegionCategory.PATIENT_INFO, 0.98, extracted_fields=extracted)
+
         name_match = self.re_name_prefix.search(text)
         if not name_match:
             name_match = self.re_patient_name.search(text)
@@ -167,15 +181,17 @@ class DocumentLayoutAnalyzer:
             clean_name = re.sub(r"^[\s\.\:\-_/]+|[\s\.\:\-_/]+$", "", clean_name).strip()
             if clean_name.lower().endswith("..."):
                 clean_name = clean_name[:-3].strip()
-            if clean_name.lower().startswith("viuek"):
-                clean_name = "Vivek" + clean_name[5:]
-            extracted["patient_name"] = clean_name
-            # Also extract age & gender if present on same line (e.g. "( 19 / M )")
-            dem_m = re.search(r"\(\s*(\d{1,3})\s*[\/\|]\s*([MFmf])\s*\)", text)
+            if len(clean_name) >= 2:
+                if clean_name.lower().startswith("viuek"):
+                    clean_name = "Vivek" + clean_name[5:]
+                extracted["patient_name"] = clean_name
+            # Also extract age & gender if present on same line (e.g. "( 19 / M )" or "(19lm)")
+            dem_m = re.search(r"\(\s*(\d{1,3})\s*(?:[\/\|lI1\s]+)\s*([MFmf])\s*\)", text)
             if dem_m:
                 extracted["age"] = dem_m.group(1)
                 extracted["gender"] = "Male" if dem_m.group(2).upper() == "M" else "Female"
-            return ClassifiedLine(text, RegionCategory.PATIENT_INFO, 0.98, extracted_fields=extracted)
+            if extracted.get("patient_name") or extracted.get("age"):
+                return ClassifiedLine(text, RegionCategory.PATIENT_INFO, 0.98, extracted_fields=extracted)
 
         # Check for UHID / IP number
         if re.search(r"\b(?:uhid|ip(?:\s*no)?)\b", text, re.IGNORECASE):
@@ -202,45 +218,47 @@ class DocumentLayoutAnalyzer:
         if self.re_iv_fluids.search(text):
             return ClassifiedLine(text, RegionCategory.IV_FLUID, 0.94)
 
-        # 4. Advice / Fluid Recommendations: "Drink ORS in 1L water", "Fluid advice"
-        if self.re_advice.search(text) and not (self.re_med_prefix.search(text) and self.re_strength.search(text)):
+        # 4. Medication Check (HIGHEST CLINICAL PRIORITY over advice/follow-up):
+        # Must have explicit medical indicators: Form prefix, strength, frequency, dosage, or verified medicine name
+        has_form = bool(self.re_med_prefix.search(text))
+        has_strength = bool(self.re_strength.search(text))
+        has_frequency = bool(self.re_frequency.search(text))
+        has_dosage = bool(self.re_dosage_pattern.search(text))
+        has_known_med = bool(re.search(r"\b(ors|paracetamol|metformin|amoxicillin|pantoprazole|azithromycin|ciprofloxacin|cetirizine|dextrose|rl|ns|d5|dns)\b", text, re.IGNORECASE))
+
+        if has_known_med or has_form or has_strength or has_dosage or (has_frequency and not re.search(r"\b(review|follow|visit)\b", text, re.IGNORECASE)):
+            return ClassifiedLine(text, RegionCategory.MEDICATION, 0.94)
+
+        # 5. Advice / Fluid Recommendations: "Drink plenty of water", "Adequate fluid intake"
+        if self.re_advice.search(text):
             return ClassifiedLine(text, RegionCategory.ADVICE, 0.92)
 
-        # 5. Follow-up Check
-        if self.re_follow_up.search(text) and not self.re_strength.search(text):
+        # 6. Follow-up Check
+        if self.re_follow_up.search(text):
             return ClassifiedLine(text, RegionCategory.FOLLOW_UP, 0.90)
 
-        # 6. Diagnosis Check: "Dx: Acute Gastroenteritis"
-        if self.re_diagnosis.search(text) and not self.re_strength.search(text):
+        # 7. Diagnosis Check: "Dx: Acute Gastroenteritis"
+        if self.re_diagnosis.search(text):
             return ClassifiedLine(text, RegionCategory.DIAGNOSIS, 0.92)
 
-        # 7. Symptoms / Clinical Notes: "C/O fever x 3 days", "Vomiting"
-        if self.re_symptoms.search(text) and not self.re_strength.search(text):
+        # 8. Symptoms / Clinical Notes: "C/O fever x 3 days", "Vomiting"
+        if self.re_symptoms.search(text):
             return ClassifiedLine(text, RegionCategory.CLINICAL_NOTES, 0.90)
 
-        # 8. Date Check
+        # 9. Date Check
         if self.re_date.search(text) and len(text.split()) <= 4:
             date_m = self.re_date.search(text)
             if date_m:
                 extracted["date"] = date_m.group(1)
             return ClassifiedLine(text, RegionCategory.DATE, 0.95, extracted_fields=extracted)
 
-        # 9. Hospital / Clinic Banner (usually at top of page)
+        # 10. Hospital / Clinic Banner (usually at top of page)
         if line_index < 3 and self.re_clinic.search(text):
             return ClassifiedLine(text, RegionCategory.CLINIC_HEADER, 0.94)
 
-        # 10. Doctor Info
+        # 11. Doctor Info
         if (line_index < 4 or line_index >= total_lines - 3) and self.re_doctor.search(text):
             return ClassifiedLine(text, RegionCategory.DOCTOR_INFO, 0.92)
-
-        # 11. Medication Check:
-        # Must have explicit medical indicators: Form prefix (Tab/Cap/Syp/Inj) OR strength OR frequency
-        has_form = bool(self.re_med_prefix.search(text))
-        has_strength = bool(self.re_strength.search(text))
-        has_frequency = bool(self.re_frequency.search(text))
-
-        if has_form or (has_strength and has_frequency) or has_strength:
-            return ClassifiedLine(text, RegionCategory.MEDICATION, 0.92)
 
         # Default classification
         return ClassifiedLine(text, RegionCategory.OTHER, 0.50)
@@ -274,6 +292,8 @@ class DocumentLayoutAnalyzer:
                     patient_info["age"] = c_line.extracted_fields["age"]
                 if c_line.extracted_fields.get("gender"):
                     patient_info["gender"] = c_line.extracted_fields["gender"]
+                if c_line.extracted_fields.get("patient_id"):
+                    patient_info["id"] = c_line.extracted_fields["patient_id"]
 
             elif cat == RegionCategory.DATE:
                 if c_line.extracted_fields.get("date"):

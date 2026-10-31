@@ -60,7 +60,9 @@ export const translations: Record<Language, TranslationStrings> = {
     bloodGroup: "O+ Positive",
     twilioAlertCall: "Twilio Alert Call",
     callingState: "Calling…",
-    scheduledLabel: "Scheduled"
+    scheduledLabel: "Scheduled",
+    glucoseAndLabTitle: "Glucose & Lab Reports",
+    glucoseAndLabSub: "Log sugar, scan lab reports & check diabetes risk"
   },
   ta: {
     appName: "ஸ்மார்ட்மெட்",
@@ -121,7 +123,9 @@ export const translations: Record<Language, TranslationStrings> = {
     bloodGroup: "O+ பாசிட்டிவ்",
     twilioAlertCall: "Twilio அழைப்பு எச்சரிக்கை",
     callingState: "அழைக்கிறது…",
-    scheduledLabel: "திட்டமிடப்பட்டது"
+    scheduledLabel: "திட்டமிடப்பட்டது",
+    glucoseAndLabTitle: "சர்க்கரை அளவு & ஆய்வக அறிக்கைகள்",
+    glucoseAndLabSub: "சர்க்கரை அளவை பதிவு செய்யவும், ஆய்வக அறிக்கையை ஸ்கேன் செய்யவும்"
   },
   hi: {
     appName: "स्मार्टमेड",
@@ -182,7 +186,9 @@ export const translations: Record<Language, TranslationStrings> = {
     bloodGroup: "O+ पॉजिटिव",
     twilioAlertCall: "Twilio अलर्ट कॉल",
     callingState: "कॉल हो रहा है…",
-    scheduledLabel: "निर्धारित समय"
+    scheduledLabel: "निर्धारित समय",
+    glucoseAndLabTitle: "ग्लूकोज और लैब रिपोर्ट",
+    glucoseAndLabSub: "शुगर रिकॉर्ड करें, लैब रिपोर्ट स्कैन करें और जोखिम जांचें"
   },
   ur: {
     appName: "اسمارٹ میڈ",
@@ -243,7 +249,9 @@ export const translations: Record<Language, TranslationStrings> = {
     bloodGroup: "O+ مثبت",
     twilioAlertCall: "Twilio الرٹ کال",
     callingState: "کال کی جا رہی ہے…",
-    scheduledLabel: "مقررہ وقت"
+    scheduledLabel: "مقررہ وقت",
+    glucoseAndLabTitle: "شوگر اور لیب رپورٹس",
+    glucoseAndLabSub: "شوگر درج کریں، لیب رپورٹ اسکین کریں اور خطرہ چیک کریں"
   },
   te: {
     appName: "SmartMed",
@@ -304,7 +312,9 @@ export const translations: Record<Language, TranslationStrings> = {
     bloodGroup: "O+ పాజిటివ్",
     twilioAlertCall: "Twilio అలర్ట్ కాల్",
     callingState: "కాల్ చేస్తోంది…",
-    scheduledLabel: "షెడ్యూల్ చేయబడింది"
+    scheduledLabel: "షెడ్యూల్ చేయబడింది",
+    glucoseAndLabTitle: "గ్లూకోజ్ & ల్యాబ్ నివేదికలు",
+    glucoseAndLabSub: "షుగర్ నమోదు చేయండి, ల్యాబ్ రిపోర్టును స్కాన్ చేయండి"
   },
   ml: {
     appName: "SmartMed",
@@ -365,7 +375,9 @@ export const translations: Record<Language, TranslationStrings> = {
     bloodGroup: "O+ പോസിറ്റീവ്",
     twilioAlertCall: "Twilio കോൾ അലേർട്ട്",
     callingState: "വിളിക്കുന്നു…",
-    scheduledLabel: "ഷെഡ്യൂൾ ചെയ്തത്"
+    scheduledLabel: "ഷെഡ്യൂൾ ചെയ്തത്",
+    glucoseAndLabTitle: "ഗ്ലൂക്കോസും ലാബ് റിപ്പോർട്ടുകളും",
+    glucoseAndLabSub: "ഷുഗർ രേഖപ്പെടുത്തുക, ലാബ് റിപ്പോർട്ട് സ്കാൻ ചെയ്യുക"
   },
   kn: {
     appName: "SmartMed",
@@ -426,6 +438,8 @@ export const translations: Record<Language, TranslationStrings> = {
     bloodGroup: "O+ ಪಾಸಿಟಿವ್",
     twilioAlertCall: "Twilio ಕರೆ ಎಚ್ಚರಿಕೆ",
     callingState: "ಕರೆ ಮಾಡಲಾಗುತ್ತಿದೆ…",
-    scheduledLabel: "ನಿಗದಿತ ಸಮಯ"
+    scheduledLabel: "ನಿಗದಿತ ಸಮಯ",
+    glucoseAndLabTitle: "ಗ್ಲೂಕೋಸ್ ಮತ್ತು ಲ್ಯಾಬ್ ವರದಿಗಳು",
+    glucoseAndLabSub: "ಸಕ್ಕರೆ ಮಟ್ಟ ದಾಖಲಿಸಿ, ಲ್ಯಾಬ್ ವರದಿ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ"
   }
 };

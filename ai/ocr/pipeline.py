@@ -11,6 +11,7 @@ Orchestrates:
 8. Structured Clinical Field Separation (Patient, Notes, Diagnosis, Vitals, Meds, IV, Advice)
 """
 
+import os
 import base64
 import logging
 from typing import List, Dict, Any, Union, Optional
@@ -93,8 +94,11 @@ class PrescriptionOCRPipeline:
             if "base64," in source:
                 header, encoded = source.split("base64,", 1)
                 return base64.b64decode(encoded)
-            # Check for pure base64 without prefix
-            if len(source) > 200 and not source.startswith("/") and not source.startswith("."):
+            # Check if it's a file path that exists on disk
+            if os.path.exists(source) and os.path.isfile(source):
+                return source
+            # If not an existing file and long string, try base64 decode
+            if len(source) > 100:
                 try:
                     return base64.b64decode(source)
                 except Exception:
@@ -186,32 +190,41 @@ class PrescriptionOCRPipeline:
             # Patient Info, Advice, and Notes are strictly segregated from medications
             structured = self.extractor.extract_structured_prescription(regions)
 
-            medications = structured["medications"]
-            patient_info = structured["patient"]
-            clinical_notes = structured["clinical_notes"]
-            diagnosis = structured["diagnosis"]
-            vitals = structured["vitals"]
-            iv_fluids = structured["iv_fluids"]
-            advice = structured["advice"]
-            follow_up = structured["follow_up"]
-            overall_confidence = structured["overall_confidence"]
-            requires_review = structured["requires_review"]
-            full_text = structured["full_text"]
+            medications = structured.get("medications", [])
+            patient_info = structured.get("patient", {"name": None, "id": None})
+            clinical_notes = structured.get("clinical_notes", [])
+            diagnosis = structured.get("diagnosis", [])
+            vitals = structured.get("vitals", [])
+            iv_fluids = structured.get("iv_fluids", [])
+            advice = structured.get("advice", [])
+            follow_up = structured.get("follow_up", [])
+            overall_confidence = structured.get("overall_confidence", 0.0)
+            requires_review = structured.get("requires_review", False)
+            full_text = structured.get("full_text", "")
 
-            # Backward-compatible medicines format with strict zero-hallucination fields
-            # Unknown / missing values MUST remain None (never fabricated defaults)
+            # Backward-compatible medicines format with rich aliases
             medicines_output = []
             for m in medications:
+                sched_time = m.get("scheduled_time") or m.get("scheduledTime")
+                sched_times = m.get("scheduled_times") or m.get("scheduledTimes") or ([sched_time] if sched_time else [])
+                food_ins = m.get("food_instruction") or m.get("foodInstruction") or m.get("instructions")
+                dose_val = m.get("dosage") or m.get("dose") or m.get("strength")
                 medicines_output.append({
                     "name": m.get("name"),
+                    "medicineName": m.get("name"),
                     "strength": m.get("strength"),
-                    "dosage": m.get("dosage"),
+                    "dosage": dose_val,
+                    "dose": dose_val,
                     "frequency": m.get("frequency"),
-                    "scheduled_time": m.get("scheduled_time"),
-                    "food_instruction": m.get("food_instruction"),
-                    "instructions": m.get("instructions"),
+                    "scheduled_time": sched_time,
+                    "scheduledTime": sched_time,
+                    "scheduled_times": sched_times,
+                    "scheduledTimes": sched_times,
+                    "food_instruction": food_ins,
+                    "foodInstruction": food_ins,
+                    "instructions": food_ins,
                     "confidence": m.get("confidence", 0.5),
-                    "requires_review": m.get("requires_review", True),
+                    "requires_review": m.get("requires_review", False),
                     "type": m.get("type", "tablet"),
                     "evidence": m.get("evidence", []),
                 })

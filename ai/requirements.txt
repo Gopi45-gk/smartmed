@@ -18,3 +18,7 @@ rapidfuzz>=3.0.0
 huggingface-hub>=0.23.0
 twilio>=9.0.0
 APScheduler>=3.10.4
+torch>=2.2.0
+torchvision>=0.17.0
+transformers>=4.40.0
+sentencepiece>=0.2.0

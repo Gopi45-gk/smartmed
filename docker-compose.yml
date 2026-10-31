@@ -29,14 +29,30 @@ services:
       - TWILIO_API_KEY=${TWILIO_API_KEY:-}
       - TWILIO_API_SECRET=${TWILIO_API_SECRET:-}
       - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER:-}
+      - TWILIO_WEBHOOK_BASE_URL=${TWILIO_WEBHOOK_BASE_URL:-https://smart-med.duckdns.org}
+      - FLAGS_use_mkldnn=0
+      - PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT=0
+      - PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True
       - CORS_ORIGINS=${CORS_ORIGINS:-*}
     volumes:
+      - ./ai/server.py:/app/server.py
+      - ./ai/clinical_triage.py:/app/clinical_triage.py
+      - ./ai/twilio_service.py:/app/twilio_service.py
+      - ./ai/confirmation_service.py:/app/confirmation_service.py
+      - ./ai/diabetes_prediction.py:/app/diabetes_prediction.py
+      - ./ai/diabetes_model_weights.json:/app/diabetes_model_weights.json
+      - ./ai/lab_scan.py:/app/lab_scan.py
+      - ./ai/lab_parser.py:/app/lab_parser.py
+      - ./ai/glucose.py:/app/glucose.py
+      - ./ai/glucose_alerts.py:/app/glucose_alerts.py
+      - ./ai/rag:/app/rag
       - ./ai/mnn/model:/app/mnn/model
       - ./ai/tts:/app/tts
       - ./ai/data:/app/data
-      - ./ai/ocr/models:/app/ocr/models
+      - ./ai/ocr:/app/ocr
       - hf_cache:/root/.cache/huggingface
       - paddle_cache:/root/.paddleocr
+      - paddlex_cache:/root/.paddlex
     ports:
       - "8100:8100"
     networks:
@@ -62,3 +78,4 @@ networks:
 volumes:
   hf_cache:
   paddle_cache:
+  paddlex_cache:

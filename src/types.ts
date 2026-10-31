@@ -11,6 +11,8 @@ export type ScreenType =
   | 'caregiver' 
   | 'chat' 
   | 'reports' 
+  | 'diabetes_risk'
+  | 'glucose_portal'
   | 'profile';
 
 export type TabType = 'home' | 'medicines' | 'caregiver' | 'chat' | 'reports' | 'profile';
@@ -127,6 +129,8 @@ export interface TranslationStrings {
   twilioAlertCall?: string;
   callingState?: string;
   scheduledLabel?: string;
+  glucoseAndLabTitle?: string;
+  glucoseAndLabSub?: string;
 }
 
 export type ReminderStatus = 'PENDING' | 'CALLING' | 'COMPLETED' | 'DELAYED' | 'SKIPPED' | 'UNCERTAIN' | 'FAILED';

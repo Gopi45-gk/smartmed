@@ -38,4 +38,9 @@ android/local.properties
 LITERATURE/
 ai/data/reminders.json
 ai/data/adherence.json
+ai/data/confirmations.json
+ai/data/glucose.db
+*.db
+matlab/predicting-diabetes-mellitus/
+matlab/test_inspect.m
 

@@ -89,4 +89,19 @@ fuser -k 8100/tcp
 
 # Stop frontend
 fuser -k 3000/tcp
-```
+`
+BACKEND=
+
+# Start both Frontend & Backend in the background
+docker compose up -d
+
+# Rebuild and start (after making code edits)
+docker compose up -d --build
+
+# View real-time logs
+docker compose logs -f
+
+# Stop containers
+docker compose down
+
+

@@ -164,9 +164,11 @@ class MedicineValidator:
         """
         self._load_database()
         name_clean = raw_name.strip()
+        # Clean leading punctuation, bullets, hyphens, and numbers: e.g. "- ORS", "1. Paracetamol"
+        name_clean = re.sub(r"^[\s\-\*\•\.\d\)\(/]+", "", name_clean).strip()
         name_lower = name_clean.lower()
 
-        if not name_lower or len(name_lower) < 3:
+        if not name_lower or (len(name_lower) < 3 and name_lower not in ("rl", "ns")):
             return None, 0.0
 
         # Check blacklist (patient names, medical metadata, vitals)
@@ -178,10 +180,16 @@ class MedicineValidator:
         if name_lower in self._name_lookup:
             return self._name_lookup[name_lower].title(), 1.0
 
-        # 2. Check multi-word leading token
-        first_token = name_lower.split()[0]
-        if first_token in self._name_lookup and len(first_token) >= 4:
-            return self._name_lookup[first_token].title(), 0.95
+        # 2. Check multi-word leading token or individual tokens for known clinical medicines
+        word_tokens = [t.strip(".,;:()") for t in name_lower.split() if t.strip(".,;:()")]
+        if word_tokens:
+            first_token = word_tokens[0]
+            if first_token in self._name_lookup and (len(first_token) >= 3 or first_token in ("rl", "ns")):
+                return self._name_lookup[first_token].title(), 0.95
+
+            for tok in word_tokens:
+                if tok in self._name_lookup and (len(tok) >= 3 or tok in ("rl", "ns")):
+                    return self._name_lookup[tok].title(), 0.94
 
         # 3. Generate OCR handwriting confusion variants
         candidates = self.generate_candidates(name_lower)

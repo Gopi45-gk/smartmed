@@ -43,6 +43,7 @@ except Exception as e:
 import httpx
 import time
 from rag.pipeline import rag_pipeline
+from rag.eml_knowledge import search_medicines, get_eml_context
 
 from mnn.config import config
 from mnn.inference import inference_engine
@@ -50,7 +51,7 @@ from mnn.model_manager import model_manager
 from tts.manager import tts_manager
 import base64
 from stt.manager import stt_manager
-from clinical_triage import resolve_clinical_chat, resolve_clinical_voice
+from clinical_triage import resolve_clinical_chat, resolve_clinical_voice, detect_language
 
 # Configure logging
 logging.basicConfig(
@@ -129,6 +130,8 @@ class ChatRequest(BaseModel):
     mode: Optional[str] = Field("auto", description="Inference mode: 'auto', 'offline', or 'online'")
     preferred_language: Optional[str] = Field("en", description="User preferred language (ta, en, hi, te, kn, ml)")
     language: Optional[str] = Field(None, description="Alias for preferred_language")
+    medicinesContext: Optional[List[Dict[str, Any]]] = Field(None, description="Patient's scheduled medications")
+    patientName: Optional[str] = Field(None, description="Patient registered name")
 
 
 class ChatResponse(BaseModel):
@@ -423,108 +426,7 @@ async def chat_nim(request: ChatRequest):
         )
 
 
-@app.post("/api/ai/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest):
-    """
-    Hybrid AI Router Endpoint (Offline-First with Online Fallback).
-    
-    - OFFLINE MODE: Routes directly to local on-device MNN / WebLLM pipeline.
-    - ONLINE MODE: Routes complex medical queries to AWS NVIDIA NIM with live WHO/FDA lookups.
-    - AUTO MODE: Uses NVIDIA NIM if available/online, seamlessly falling back to local MNN.
-    """
-    message = request.message.strip()
-
-    if not message:
-        raise HTTPException(status_code=400, detail="Message cannot be empty")
-
-    if len(message) > 4096:
-        raise HTTPException(status_code=400, detail="Message too long (max 4096 chars)")
-
-    pref_lang = request.preferred_language or request.language or "en"
-    intent = detect_intent(message)
-    logger.info(f"Chat request: {message[:80]}{'...' if len(message) > 80 else ''} (Intent: {intent}, Mode: {request.mode}, Lang: {pref_lang})")
-
-    # Fetch verified pharmacological RAG context (EML, OpenFDA, ICD-11)
-    rag_context = ""
-    try:
-        rag_context = rag_pipeline.get_rag_context(message)
-    except Exception as r_err:
-        logger.debug(f"RAG lookup error: {r_err}")
-
-    # Determine whether to attempt online NVIDIA NIM inference
-    should_try_online = (
-        request.mode == "online"
-        or (request.mode == "auto" and bool(config.ai_api_key))
-        or (request.mode == "auto" and not config.model_exists())
-    ) and bool(config.ai_api_key)
-
-    if should_try_online:
-        logger.info("Routing query to AWS-hosted NVIDIA NIM router with live pharmacological data...")
-        nim_result = await query_nvidia_nim(
-            message=message,
-            conversation_history=request.history,
-            rag_context=rag_context,
-            preferred_language=pref_lang,
-        )
-        if nim_result.get("success"):
-            return ChatResponse(
-                success=True,
-                response=nim_result.get("response"),
-                intent=intent,
-                model=nim_result.get("model", config.ai_model_chat),
-                offline=False,
-                rag_grounded=nim_result.get("rag_grounded", False),
-                timing=nim_result.get("timing"),
-            )
-        logger.warning(f"Online NVIDIA NIM inference failed: {nim_result.get('error')}. Falling back to local offline MNN...")
-
-    # Offline local inference using on-device MNN runtime with clinical engine fallback
-    async with _inference_lock:
-        try:
-            result = await asyncio.to_thread(
-                inference_engine.generate,
-                message=message,
-                conversation_history=request.history,
-                preferred_language=pref_lang,
-            )
-
-            if not result.get("success") or not result.get("response"):
-                clinical_text = resolve_clinical_chat(message, fallback_lang=pref_lang)
-                return ChatResponse(
-                    success=True,
-                    response=clinical_text,
-                    intent=intent,
-                    model="smartmed-clinical-engine",
-                    offline=True,
-                    rag_grounded=bool(rag_context),
-                    timing="0.01s",
-                )
-
-            return ChatResponse(
-                success=True,
-                response=result.get("response"),
-                intent=intent,
-                model=result.get("model", config.model_name),
-                offline=True,
-                rag_grounded=result.get("rag_grounded", False),
-                timing=result.get("timing"),
-            )
-
-        except Exception as e:
-            logger.error(f"Chat endpoint error: {e}", exc_info=True)
-            clinical_text = resolve_clinical_chat(message, fallback_lang=pref_lang)
-            return ChatResponse(
-                success=True,
-                response=clinical_text,
-                intent=intent,
-                model="smartmed-clinical-engine",
-                offline=True,
-                rag_grounded=False,
-                timing="0.01s",
-            )
-
-
-# ─── Clinical Voice Knowledge Base & Query Resolver ─────────────────────────
+# ─── Clinical Knowledge Base & Query Resolver ─────────────────────────
 
 COMMON_DRUG_DATABASE: Dict[str, Dict[str, str]] = {
     "metformin": {
@@ -562,6 +464,30 @@ COMMON_DRUG_DATABASE: Dict[str, Dict[str, str]] = {
         "side_effects": "Common side effects include dizziness or fatigue as blood pressure adjusts.",
         "food": "Losartan can be taken with or without food once daily.",
         "missed": "Take as soon as you remember, but never take two doses on the same day.",
+    },
+    "telmisartan": {
+        "use": "Telmisartan is an angiotensin II receptor blocker prescribed to manage high blood pressure and protect against heart disease.",
+        "side_effects": "Common side effects include mild dizziness, fatigue, or back discomfort as your body adjusts to lower blood pressure.",
+        "food": "Telmisartan is taken once daily at the same time each day with a glass of water, with or without food.",
+        "missed": "If you miss a dose, take it as soon as you remember, unless it is close to your next scheduled dose. Never take a double dose.",
+    },
+    "pantoprazole": {
+        "use": "Pantoprazole is a proton pump inhibitor that reduces stomach acid to treat acidity, heartburn, and ulcers.",
+        "side_effects": "Common side effects include mild headache or diarrhea. It is generally well tolerated.",
+        "food": "Pantoprazole should be taken in the morning, 30 to 60 minutes before breakfast with plain water.",
+        "missed": "Take your missed dose before your next meal, but do not double up.",
+    },
+    "cetirizine": {
+        "use": "Cetirizine is an antihistamine used to relieve allergy symptoms such as sneezing, runny nose, and itching.",
+        "side_effects": "Common side effects include mild drowsiness or dry mouth. Avoid driving if feeling sleepy.",
+        "food": "Cetirizine can be taken with or without food, preferably in the evening.",
+        "missed": "Take it when you remember if symptoms persist, but do not take two tablets at once.",
+    },
+    "ibuprofen": {
+        "use": "Ibuprofen is a nonsteroidal anti-inflammatory drug used to reduce pain, swelling, and fever.",
+        "side_effects": "It can irritate the stomach lining. Take it with meals or milk, never on an empty stomach.",
+        "food": "Always take Ibuprofen with or immediately after food to protect your stomach.",
+        "missed": "Take it when needed for pain, spaced at least 6 to 8 hours apart.",
     }
 }
 
@@ -628,6 +554,7 @@ def resolve_voice_query(
 
     # 2. Confirmation of Taking Medicine
     taken_kw = [
+        "i took my medicine", "took my medicine", "took medicine", "i took",
         "yes, i took it", "i took it", "already taken", "taken", "had my tablet",
         "had my medicine", "finished my medicine", "i have taken", "took my bp",
         "took my pill", "yes i did", "already did", "yes took it", "mark taken",
@@ -891,15 +818,15 @@ def resolve_voice_query(
 
     # 8. Missed Dose Inquiry
     missed_kw = [
-        "missed my dose", "missed a dose", "missed my tablet", "missed tablet",
+        "missed my medicine", "missed medicine", "missed my dose", "missed a dose", "missed my tablet", "missed tablet",
         "forgot to take", "forgot my pill", "forgot my medicine", "skipped a dose",
-        "missed dose", "forgot my dose",
+        "missed dose", "forgot my dose", "missed", "miss", "forgot", "skip",
         "மறந்துவிட்டேன்", "மறந்து",
         "भूल गया", "भूल गई",
-        "మర్చిపోయాను",
+        "మర్చిపోయాను", "మర్చిపో", "మర్చిపోయా",
         "بھول گیا",
-        "മറന്നുപോയി",
-        "ಮರೆತುಹೋಯಿತು"
+        "മറന്നുപോയി", "മറന്നു",
+        "ಮರೆತುಹೋಯಿತು", "ಮರೆತು"
     ]
     if any(k in q for k in missed_kw):
         if lang == "ta":
@@ -975,110 +902,340 @@ def resolve_voice_query(
     return None, "GENERAL_HEALTH"
 
 
+# ─── Central Medical Query Pipeline (Unified Chat + Voice Reasoning) ────────
+
+async def answer_medical_query(
+    message: str,
+    patient_name: str = "",
+    medicines: Optional[List[Dict[str, Any]]] = None,
+    language: str = "en",
+    mode: str = "chat",  # "chat" or "voice"
+    history: Optional[List[Dict[str, str]]] = None,
+    inference_mode: str = "auto",
+) -> Dict[str, Any]:
+    """
+    Central Unified Medical Reasoning Pipeline for SmartMed AI.
+    Used identically by ChatScreen and PhoneCallSimulation (Voice Bot).
+    """
+    start_time = time.time()
+    q = message.lower().strip()
+    meds = medicines or []
+    lang = detect_language(message, fallback=language)
+    p_name = (patient_name or "").strip()
+
+    # 1. Emergency Detection (Immediate Urgent Triage)
+    emergency_kw = [
+        "chest pain", "heart attack", "can't breathe", "cannot breathe",
+        "trouble breathing", "stroke", "bleeding heavily", "fainted",
+        "collapsed", "choking", "seizure", "unconscious", "heart racing",
+        "நெஞ்சு வலி", "மூச்சு", "सीने में दर्द", "सांस", "ఛాతీ నొప్పి", "శ్వాస",
+        "سینے میں درد", "سانس", "നെഞ്ചുവേദന", "ശ്വാസം", "ಎದೆ ನೋವು", "ಉಸಿರಾಟ"
+    ]
+    if any(k in q for k in emergency_kw):
+        if mode == "voice":
+            resp = clean_voice_output(resolve_clinical_voice(message, patient_name=p_name, language=lang))
+        else:
+            resp = resolve_clinical_chat(message, fallback_lang=lang)
+        return {
+            "success": True,
+            "response": resp,
+            "intent": "EMERGENCY_WARNING",
+            "model": "smartmed-clinical-engine",
+            "offline": True,
+            "rag_grounded": True,
+            "timing": "0.01s",
+        }
+
+    # 2. Medication Actions, Status & Schedule Inquiries
+    resolved_action, intent = resolve_voice_query(
+        message=message,
+        medicines=meds,
+        patient_name=p_name,
+        language=lang,
+    )
+    if resolved_action is not None:
+        if mode == "voice":
+            resp = clean_voice_output(resolved_action)
+        else:
+            resp = resolved_action
+        return {
+            "success": True,
+            "response": resp,
+            "intent": intent,
+            "model": "smartmed-clinical-engine",
+            "offline": True,
+            "rag_grounded": True,
+            "timing": "0.01s",
+        }
+
+    # 3. Grounded Clinical Symptoms & Triage Inquiries
+    symptom_kw = [
+        "eye pain", "eye strain", "eyes hurt", "eyes", "eye", "கண் வலி", "கண்கள்", "கண்", "आँख", "కన్ను", "കണ്ണുവേദന", "ಕಣ್ಣು",
+        "dizzy", "dizziness", "lightheaded", "தலைச்சுற்றல்", "தலை சுற்றல்", "மயக்கம்", "चक्कर", "తలతిరగడం", "తలతిరుగు", "తలతిరుగుతోంది", "తలతిరుగుతుంది", "തലകറക്കം", "ತಲೆಸುತ್ತು", "ತಲೆ ಸುತ್ತು",
+        "what is hypertension", "high blood pressure", "what is bp", "blood pressure mean", "உயர் இரத்த அழுத்தம்", "உயர் ரத்த அழுத்தம்", "ரத்த அழுத்தம்", "उच्च रक्तचाप", "రక్తపోటు", "രക്തസമ്മർദ്ദം", "ರಕ್ತದೊತ್ತಡ",
+        "sleepy", "sleepiness", "drowsy", "drowsiness", "தூக்கம்", "தூக்கக் கலக்கம்", "नींद", "निद्र", "உറക്കം", "ನಿದ್ರೆ",
+        "head pain", "headache", "head ache", "migraine", "தலைவலி", "सिरदर्द", "తలనొప్పి", "തലവേദന", "ತಲೆನೋವು",
+        "slighted pain", "slight pain", "body pain", "body ache", "வலி", "உடல் வலி", "दर्द", "बदन दर्द", "నొప్పి", "വേദന", "ನೋವು",
+        "fever", "temperature", "காய்ச்சல்", "बुखार", "జ్వరం", "പനി", "ಜ್ವರ",
+        "cold", "cough", "sore throat", "சளி", "இருமல்", "सर्दी", "खांसी", "జలుబు", "దగ్గు", "ജലദോഷം", "ചുമ", "ಶೀತ", "ಕೆಮ್ಮು",
+        "stomach", "acidity", "gas", "வயிறு", "வயிற்று வலி", "पेट दर्द", "కడుపు నొప్పి", "വയറുവേദന", "ಹೊಟ್ಟೆ ನೋವು"
+    ]
+    if any(k in q for k in symptom_kw):
+        if mode == "voice":
+            resp = clean_voice_output(resolve_clinical_voice(message, patient_name=p_name, language=lang))
+        else:
+            resp = resolve_clinical_chat(message, fallback_lang=lang)
+        return {
+            "success": True,
+            "response": resp,
+            "intent": "CLINICAL_TRIAGE",
+            "model": "smartmed-clinical-engine",
+            "offline": True,
+            "rag_grounded": True,
+            "timing": "0.01s",
+        }
+
+    # 4. Medication Specific Questions (WHO EML / Patient Prescription / Database)
+    med_inquiry_kw = ["what is", "why am i taking", "why take", "purpose", "what for", "is for", "side effect", "எதற்கு", "எதுக்கு", "காரணம்", "किसलिए", "ఎందుకు", "എന്തിന്", "ಯಾಕೆ"]
+    is_med_inquiry = any(k in q for k in med_inquiry_kw) or any(k in q for k in ["tablet", "medicine", "pill", "மாத்திரை", "மருந்து", "दवा", "మందు", "ഗുളിക", "ಔಷಧಿ"])
+    
+    matched_med_name = None
+    # Check patient's active prescriptions first
+    for m in meds:
+        m_name = m.get("name", "").lower()
+        if m_name and m_name in q:
+            matched_med_name = m.get("name")
+            break
+    # If no match in query, but patient has exactly 1 medication and asks about "this medicine" / "my tablet"
+    if not matched_med_name and len(meds) == 1 and is_med_inquiry:
+        matched_med_name = meds[0].get("name")
+
+    # If still no match, search in COMMON_DRUG_DATABASE
+    if not matched_med_name:
+        for d_name in COMMON_DRUG_DATABASE.keys():
+            if d_name in q:
+                matched_med_name = d_name.title()
+                break
+
+    # If drug found or matched in EML
+    if matched_med_name:
+        drug_key = matched_med_name.lower().strip()
+        db_info = COMMON_DRUG_DATABASE.get(drug_key)
+        eml_matches = search_medicines(matched_med_name, limit=1)
+        indication = ""
+        category = ""
+        if eml_matches:
+            indication = eml_matches[0].get("indication", "")
+            category = eml_matches[0].get("section", "")
+        elif db_info:
+            indication = db_info.get("use", "")
+
+        if indication or db_info:
+            if lang == "ta":
+                med_resp = f"{matched_med_name} மருந்து {indication or db_info.get('use', '')}. மருத்துவர் பரிந்துரைத்தபடி தவறாமல் உட்கொள்ளவும்."
+            elif lang == "hi":
+                med_resp = f"{matched_med_name} दवा {indication or db_info.get('use', '')} के लिए निर्धारित है। इसे डॉक्टर की सलाह अनुसार समय पर लें।"
+            elif lang == "te":
+                med_resp = f"{matched_med_name} మందు {indication or db_info.get('use', '')}. మీ వైద్యుడు సూచించిన విధంగా రోజూ వేసుకోండి."
+            elif lang == "kn":
+                med_resp = f"{matched_med_name} ಔಷಧಿಯು {indication or db_info.get('use', '')}. ವೈದ್ಯರು ಸೂಚಿಸಿದಂತೆ ನಿಯಮಿತವಾಗಿ ತೆಗೆದುಕೊಳ್ಳಿ."
+            elif lang == "ml":
+                med_resp = f"{matched_med_name} മരുന്ന് {indication or db_info.get('use', '')}. ഡോക്ടർ നിർദ്ദേശിച്ച രീതിയിൽ കൃത്യമായി കഴിക്കുക."
+            else:
+                med_resp = f"{matched_med_name} is prescribed for: {indication or db_info.get('use', '')}. Please take it exactly as directed by your doctor."
+
+            if mode == "voice":
+                clean_m = clean_voice_output(med_resp)
+                return {
+                    "success": True,
+                    "response": clean_m,
+                    "intent": "MEDICINE_INFO",
+                    "model": "smartmed-clinical-engine",
+                    "offline": True,
+                    "rag_grounded": True,
+                    "timing": "0.01s",
+                }
+            else:
+                return {
+                    "success": True,
+                    "response": f"• {med_resp}\nPlease consult your doctor or pharmacist for questions about your prescription.",
+                    "intent": "MEDICINE_INFO",
+                    "model": "smartmed-clinical-engine",
+                    "offline": True,
+                    "rag_grounded": True,
+                    "timing": "0.01s",
+                }
+
+    # 5. Fetch Medical RAG Context for open-ended questions
+    rag_context = ""
+    try:
+        rag_context = rag_pipeline.get_rag_context(message)
+    except Exception as r_err:
+        logger.debug(f"RAG context error: {r_err}")
+
+    # 6. Try Online NVIDIA NIM if requested or auto with API key
+    should_try_online = (
+        inference_mode == "online"
+        or (inference_mode == "auto" and bool(config.ai_api_key))
+        or (inference_mode == "auto" and not config.model_exists())
+    ) and bool(config.ai_api_key)
+
+    if should_try_online:
+        logger.info(f"Routing {mode} query to NVIDIA NIM with RAG context...")
+        nim_result = await query_nvidia_nim(
+            message=message,
+            conversation_history=history,
+            rag_context=rag_context,
+            preferred_language=lang,
+        )
+        if nim_result.get("success") and nim_result.get("response"):
+            nim_text = nim_result.get("response", "")
+            if mode == "voice":
+                nim_text = clean_voice_output(nim_text)
+            return {
+                "success": True,
+                "response": nim_text,
+                "intent": "GENERAL_HEALTH",
+                "model": nim_result.get("model", config.ai_model_chat),
+                "offline": False,
+                "rag_grounded": nim_result.get("rag_grounded", False),
+                "timing": nim_result.get("timing"),
+            }
+        logger.warning("Online NIM failed, continuing to local offline pipeline...")
+
+    # 7. Local Offline MNN Inference (Reused loaded model, no reload)
+    async with _inference_lock:
+        try:
+            if mode == "voice":
+                med_summary = ", ".join(
+                    f"{m.get('name', '')} {m.get('dose', '')}".strip()
+                    for m in meds if m.get("name")
+                )
+                lang_names = {
+                    "en": "English", "ta": "Tamil", "hi": "Hindi",
+                    "te": "Telugu", "ur": "Urdu", "ml": "Malayalam", "kn": "Kannada"
+                }
+                target_lang_name = lang_names.get(lang, "English")
+                voice_sys = (
+                    f"You are SmartMed AI, a warm medical assistant on a phone call with patient {p_name or 'the patient'}. "
+                    f"The patient's active prescriptions: {med_summary or 'None specified'}. "
+                    f"The patient's language is {target_lang_name}. You MUST reply entirely in {target_lang_name} script. "
+                    f"Reply directly in 1 to 2 spoken sentences with clear medical guidance. "
+                    f"Never use markdown formatting, asterisks, bullet points, or numbered lists."
+                )
+                result = await asyncio.to_thread(
+                    inference_engine.generate_voice,
+                    message=message,
+                    system_prompt=voice_sys,
+                    conversation_history=history,
+                )
+            else:
+                result = await asyncio.to_thread(
+                    inference_engine.generate,
+                    message=message,
+                    conversation_history=history,
+                    preferred_language=lang,
+                )
+
+            raw_resp = result.get("response", "")
+            clean_resp = clean_voice_output(raw_resp) if (mode == "voice" and raw_resp) else raw_resp
+
+            # Coherence & script validation check
+            is_valid = bool(result.get("success") and clean_resp and len(clean_resp.strip()) >= 5)
+            if is_valid and lang in ["ta", "hi", "te", "kn", "ml"]:
+                script_regexes = {
+                    "ta": r"[\u0B80-\u0BFF]",
+                    "hi": r"[\u0900-\u097F]",
+                    "te": r"[\u0C00-\u0C7F]",
+                    "kn": r"[\u0C80-\u0CFF]",
+                    "ml": r"[\u0D00-\u0D7F]",
+                }
+                rx = script_regexes.get(lang)
+                if rx and not re.search(rx, clean_resp):
+                    is_valid = False
+
+            if not is_valid:
+                logger.info(f"MNN response invalid or script mismatch for {lang}. Falling back to verified clinical knowledge.")
+                if mode == "voice":
+                    clean_resp = clean_voice_output(resolve_clinical_voice(message, patient_name=p_name, language=lang))
+                else:
+                    clean_resp = resolve_clinical_chat(message, fallback_lang=lang)
+
+            return {
+                "success": True,
+                "response": clean_resp,
+                "intent": "GENERAL_HEALTH",
+                "model": result.get("model", config.model_name) if is_valid else "smartmed-clinical-engine",
+                "offline": True,
+                "rag_grounded": bool(rag_context),
+                "timing": result.get("timing", f"{round(time.time() - start_time, 2)}s"),
+            }
+
+        except Exception as e:
+            logger.error(f"Inference error in answer_medical_query: {e}", exc_info=True)
+            if mode == "voice":
+                fb = clean_voice_output(resolve_clinical_voice(message, patient_name=p_name, language=lang))
+            else:
+                fb = resolve_clinical_chat(message, fallback_lang=lang)
+            return {
+                "success": True,
+                "response": fb,
+                "intent": "GENERAL_HEALTH",
+                "model": "smartmed-clinical-engine",
+                "offline": True,
+                "rag_grounded": False,
+                "timing": "0.01s",
+            }
+
+
+@app.post("/api/ai/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest):
+    """
+    Central unified chat endpoint for SmartMed AI assistant.
+    Uses the exact same medical reasoning pipeline as Voice.
+    """
+    message = request.message.strip()
+    if not message:
+        raise HTTPException(status_code=400, detail="Message cannot be empty")
+    if len(message) > 4096:
+        raise HTTPException(status_code=400, detail="Message too long (max 4096 chars)")
+
+    pref_lang = request.preferred_language or request.language or "en"
+    result = await answer_medical_query(
+        message=message,
+        patient_name=(request.patientName or "").strip(),
+        medicines=request.medicinesContext or [],
+        language=pref_lang,
+        mode="chat",
+        history=request.history,
+        inference_mode=request.mode or "auto",
+    )
+    return ChatResponse(**result)
+
+
 @app.post("/api/ai/voice", response_model=ChatResponse)
 async def voice_endpoint(request: VoiceChatRequest):
     """
-    Dedicated endpoint for the Call AI Voice Assistant.
-    Provides instant, verified clinical answers for medication queries,
-    with seamless local MNN LLM generation for open-ended queries.
+    Central unified voice endpoint for the Call AI Voice Assistant.
+    Uses the exact same medical reasoning pipeline as Chat.
     """
     message = request.message.strip()
-
     if not message:
         raise HTTPException(status_code=400, detail="Voice message cannot be empty")
+    if len(message) > 4096:
+        raise HTTPException(status_code=400, detail="Voice message too long (max 4096 chars)")
 
     logger.info(f"Voice call request: '{message[:80]}' (Patient: {request.patientName})")
-
-    # 1. Check instant clinical resolver
-    resolved_answer, intent = resolve_voice_query(
+    result = await answer_medical_query(
         message=message,
-        medicines=request.medicinesContext,
         patient_name=(request.patientName or "").strip(),
+        medicines=request.medicinesContext or [],
         language=request.language or "en",
+        mode="voice",
+        history=request.history,
+        inference_mode="auto",
     )
-
-    if resolved_answer is not None:
-        clean_text = clean_voice_output(resolved_answer)
-        logger.info(f"Voice query resolved deterministically (Intent: {intent}) in 0.00s")
-        return ChatResponse(
-            success=True,
-            response=clean_text,
-            intent=intent,
-            model=config.model_name,
-            offline=True,
-            rag_grounded=True,
-            timing="0.01s",
-        )
-
-    # 2. Delegate open-ended query to fast local MNN voice LLM
-    med_summary = ", ".join(
-        f"{m.get('name', '')} {m.get('dose', '')}".strip()
-        for m in (request.medicinesContext or []) if m.get("name")
-    )
-    lang_names = {
-        "en": "English",
-        "ta": "Tamil",
-        "hi": "Hindi",
-        "te": "Telugu",
-        "ur": "Urdu",
-        "ml": "Malayalam",
-        "kn": "Kannada",
-    }
-    lang_code = (request.language or "en").lower().split("-")[0].strip()
-    target_lang_name = lang_names.get(lang_code, "English")
-
-    voice_sys = (
-        f"You are SmartMed AI, a warm medical voice call assistant on a telephone call with patient {request.patientName}. "
-        f"The patient's active prescriptions are: {med_summary or 'None specified'}. "
-        f"The patient's chosen language is {target_lang_name}. You MUST reply entirely in {target_lang_name} using natural script. "
-        f"Reply directly in 1 to 2 spoken sentences with clear, compassionate medical guidance. "
-        f"Never use markdown formatting, asterisks, bullet points, or numbered lists."
-    )
-
-    async with _inference_lock:
-        try:
-            result = await asyncio.to_thread(
-                inference_engine.generate_voice,
-                message=message,
-                system_prompt=voice_sys,
-                conversation_history=request.history,
-            )
-
-            raw_resp = result.get("response", "")
-            clean_resp = clean_voice_output(raw_resp) if raw_resp else ""
-
-            if not result.get("success") or not clean_resp:
-                clean_resp = resolve_clinical_voice(
-                    message=message,
-                    patient_name=request.patientName or "Patient",
-                    language=request.language or "en",
-                )
-
-            return ChatResponse(
-                success=True,
-                response=clean_resp,
-                intent=intent,
-                model="smartmed-voice-engine",
-                offline=True,
-                rag_grounded=False,
-                timing=result.get("timing", "0.01s"),
-            )
-
-        except Exception as e:
-            logger.error(f"Voice endpoint error: {e}", exc_info=True)
-            clean_resp = resolve_clinical_voice(
-                message=message,
-                patient_name=request.patientName or "Patient",
-                language=request.language or "en",
-            )
-            return ChatResponse(
-                success=True,
-                response=clean_resp,
-                intent=intent,
-                model="smartmed-voice-engine",
-                offline=True,
-                timing="0.01s",
-            )
+    return ChatResponse(**result)
 
 
 
@@ -1216,8 +1373,8 @@ async def get_ocr_status():
 
 @app.post("/api/ocr/prescription")
 async def process_prescription(
+    request: Request,
     file: Optional[UploadFile] = File(None),
-    request: Optional[PrescriptionOCRRequest] = None,
 ):
     """
     High-Accuracy Prescription OCR endpoint.
@@ -1237,9 +1394,15 @@ async def process_prescription(
             content = await file.read()
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Failed to read uploaded file: {str(e)}")
-    elif request and request.image_base64:
-        content = request.image_base64
     else:
+        try:
+            body = await request.json()
+            if isinstance(body, dict) and body.get("image_base64"):
+                content = body["image_base64"]
+        except Exception:
+            pass
+
+    if not content:
         raise HTTPException(
             status_code=400,
             detail="No prescription image provided. Please upload a file or supply image_base64.",
@@ -1253,11 +1416,11 @@ async def process_prescription(
         logger.error(f"Prescription OCR processing error: {e}", exc_info=True)
         return {
             "success": False,
-            "text": "",
-            "confidence": 0.0,
-            "regions": [],
-            "medicines": [],
             "error": str(e),
+            "medicines": [],
+            "medications": [],
+            "confidence": 0.0,
+            "requires_pharmacist_review": True
         }
 
 
@@ -1777,6 +1940,80 @@ async def get_twilio_service_status():
     except Exception as e:
         return {"status": "error", "error": str(e)}
 
+
+
+# ─── Clinical Intelligence: MathWorks Predicting Diabetes Mellitus ───────────
+
+class DiabetesRiskRequest(BaseModel):
+    glucose: float = Field(110.0, description="Blood glucose level in mg/dL")
+    bmi: float = Field(25.5, description="Body Mass Index in kg/m²")
+    age: float = Field(50.0, description="Patient age in years")
+    systolic_bp: float = Field(120.0, description="Systolic blood pressure in mmHg")
+    diastolic_bp: float = Field(80.0, description="Diastolic blood pressure in mmHg")
+    heart_rate: float = Field(75.0, description="Heart rate in bpm")
+    creatinine: float = Field(1.0, description="Serum creatinine in mg/dL")
+    bun: float = Field(16.0, description="Blood urea nitrogen in mg/dL")
+    patient_name: str = Field("ICU Patient", description="Patient identifier or name")
+    use_matlab_engine: bool = Field(False, description="Run inference through native MATLAB engine")
+
+
+@app.get("/api/clinical/diabetes-status")
+async def get_diabetes_status():
+    """Returns MathWorks Predicting Diabetes Mellitus model status and engine availability."""
+    from diabetes_prediction import diabetes_predictor
+    return {
+        "status": "ok",
+        "service": "mathworks-predicting-diabetes-mellitus",
+        "model_loaded": diabetes_predictor.model_loaded,
+        "model_name": diabetes_predictor.weights_data.get("model_name") if diabetes_predictor.weights_data else "MathWorks Predicting Diabetes Mellitus Classifier",
+        "matlab_available": diabetes_predictor._is_matlab_available(),
+        "release": "MATLAB R2026b"
+    }
+
+
+@app.post("/api/clinical/diabetes-predict")
+async def predict_diabetes_risk(req: DiabetesRiskRequest):
+    """
+    Evaluates patient diabetes mellitus risk using the MathWorks machine learning model
+    and acute ICU glycemic triage guidelines.
+    """
+    try:
+        from diabetes_prediction import diabetes_predictor
+        result = diabetes_predictor.predict(
+            glucose=req.glucose,
+            bmi=req.bmi,
+            age=req.age,
+            systolic_bp=req.systolic_bp,
+            diastolic_bp=req.diastolic_bp,
+            heart_rate=req.heart_rate,
+            creatinine=req.creatinine,
+            bun=req.bun,
+            patient_name=req.patient_name,
+            use_matlab_engine=req.use_matlab_engine
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Diabetes prediction error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ─── Feature Flags & Additive Extensions: Lab Report Scan & Glucose Tracking ─
+ENABLE_GLUCOSE_FEATURES = os.getenv("ENABLE_GLUCOSE_FEATURES", "true").lower() in ("true", "1", "yes")
+
+if ENABLE_GLUCOSE_FEATURES:
+    try:
+        from lab_scan import router as lab_scan_router
+        app.include_router(lab_scan_router)
+        logger.info("✓ Additive feature registered: Lab Report Scan router (/api/clinical/lab-scan)")
+    except Exception as e:
+        logger.warning(f"Failed to register lab_scan router: {e}")
+
+    try:
+        from glucose import router as glucose_router
+        app.include_router(glucose_router)
+        logger.info("✓ Additive feature registered: Glucose Monitoring router (/api/glucose)")
+    except Exception as e:
+        logger.warning(f"Failed to register glucose router: {e}")
 
 
 # ─── Main ────────────────────────────────────────────────────────────────────

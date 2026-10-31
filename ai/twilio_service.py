@@ -40,7 +40,10 @@ try:
     from twilio.rest import Client
     if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN:
         _client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-        logger.info("✓ Twilio Client initialized successfully.")
+        logger.info("✓ Twilio Client initialized successfully with Primary Auth Token.")
+    elif TWILIO_API_KEY and TWILIO_API_SECRET and TWILIO_ACCOUNT_SID:
+        _client = Client(TWILIO_API_KEY, TWILIO_API_SECRET, account_sid=TWILIO_ACCOUNT_SID)
+        logger.info("✓ Twilio Client initialized successfully with API Key.")
     else:
         logger.warning("Twilio credentials missing.")
 except Exception as e:
@@ -76,6 +79,8 @@ def get_twilio_client():
             from twilio.rest import Client
             if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN:
                 _client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+            elif TWILIO_API_KEY and TWILIO_API_SECRET and TWILIO_ACCOUNT_SID:
+                _client = Client(TWILIO_API_KEY, TWILIO_API_SECRET, account_sid=TWILIO_ACCOUNT_SID)
         except Exception as e:
             logger.error(f"Error obtaining Twilio client: {e}")
     return _client
@@ -409,7 +414,7 @@ def classify_call_response(speech_text: str, language: str = "en") -> Tuple[str,
     # 4. TAKEN keywords
     taken_keywords = [
         "yes", "taken", "took", "had it", "already taken", "done", "consumed", "swallowed", "i have taken", "i took it", "finished", "yeah", "yep",
-        "எடுத்துக்கிட்டேன்", "போட்டுட்டேன்", "ஆமாம்", "எடுத்தாச்சு", "சாப்பிட்டாச்சு", "முடிஞ்சிது", "ஆம்", "ஆமா", "எடுத்துட்டேன்", "eduthuten", "aam", "potuten", "eduthachu",
+        "எடுத்துக்கிட்டேன்", "போட்டுட்டேன்", "ஆமாம்", "எடுத்தாச்சு", "சாப்பிட்டாச்சு", "சாப்பிட்டேன்", "முடிஞ்சிது", "ஆம்", "ஆமா", "எடுத்துட்டேன்", "eduthuten", "aam", "potuten", "eduthachu",
         "हाँ", "ले ली", "खा ली", "ले लिया", "खा लिया", "haan", "haa", "le li", "kha li", "le liya",
         "అవును", "వేసుకున్నాను", "తీసుకున్నాను", "avunu", "vesukunna", "teesukunna", "vesukunnanu",
         "ಹೌದು", "ತೆಗೆದುಕೊಂಡೆ", "ತಗೊಂಡೆ", "haudu", "thogonde", "aayithu", "thegedukonde",
@@ -465,7 +470,7 @@ def generate_interactive_twiml(
     spoken_prompt = f"{greeting} {notice} {question}"
 
     action_params = f"reminder_id={quote(reminder_id or '')}&medicine={quote(medicine)}&dosage={quote(dosage)}&lang={quote(lang_key)}&attempt={attempt}"
-    action_url = f"{BASE_WEBHOOK_URL}/api/call/response?{action_params}"
+    action_url = f"{BASE_WEBHOOK_URL}/api/call/response?{action_params}".replace("&", "&amp;")
 
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -551,7 +556,7 @@ def generate_ack_twiml(
         if attempt < 2:
             clarify_text = cfg["unclear_clarify"]
             action_params = f"reminder_id={quote(reminder_id or '')}&lang={quote(lang_key)}&attempt={attempt + 1}"
-            action_url = f"{BASE_WEBHOOK_URL}/api/call/response?{action_params}"
+            action_url = f"{BASE_WEBHOOK_URL}/api/call/response?{action_params}".replace("&", "&amp;")
             return f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Gather input="speech" action="{action_url}" method="POST" language="{locale}" timeout="5" speechTimeout="auto">

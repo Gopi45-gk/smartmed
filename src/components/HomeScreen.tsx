@@ -1,7 +1,7 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Medicine, ScreenType, TranslationStrings, PatientProfile, defaultPatientProfile } from '../types';
-import { Pill, PhoneCall, FileText, CheckCircle2, Clock, Sparkles, AlertCircle, ChevronRight, PhoneForwarded } from 'lucide-react';
+import { Pill, PhoneCall, FileText, CheckCircle2, Clock, Sparkles, AlertCircle, ChevronRight, PhoneForwarded, Activity } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
 import { ttsProvider } from '../utils/speech';
@@ -272,6 +272,62 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
           </span>
         </button>
       </div>
+
+      {/* Clinical Intelligence Feature: MathWorks Diabetes Predictor */}
+      <div 
+        onClick={() => navigate('diabetes_risk')}
+        className="mt-3.5 p-4 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white rounded-2xl shadow-sm border border-blue-900/60 flex items-center justify-between cursor-pointer active:scale-98 transition-all group"
+      >
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 bg-white/10 rounded-xl flex items-center justify-center text-blue-300 border border-white/10 group-hover:scale-105 transition-transform">
+            <Activity className="w-5 h-5 text-blue-300" />
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-xs text-white">Diabetes Mellitus Risk AI</span>
+              <span className="text-[9px] bg-blue-500/30 text-blue-200 px-1.5 py-0.5 rounded-full font-bold">MATLAB</span>
+            </div>
+            <p className="text-[11px] text-slate-300 mt-0.5">
+              MathWorks ICU machine learning model • Clinical triage
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-1 text-xs text-blue-300 font-semibold group-hover:translate-x-0.5 transition-transform">
+          <span>Assess</span>
+          <ChevronRight className="w-4 h-4" />
+        </div>
+      </div>
+
+      {/* Glucose Log & Lab Reports Entry Card (Guarded by Feature Flag) */}
+      {((import.meta as any).env?.VITE_ENABLE_GLUCOSE_FEATURES !== 'false') && (
+        <div 
+          onClick={() => navigate('glucose_portal')}
+          className="mt-3 p-4 bg-gradient-to-r from-blue-700 via-indigo-700 to-sky-700 text-white rounded-2xl shadow-sm border border-blue-600/70 flex items-center justify-between cursor-pointer active:scale-98 transition-all group"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 bg-white/15 rounded-xl flex items-center justify-center text-white border border-white/20 group-hover:scale-105 transition-transform">
+              <FileText className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-xs text-white">
+                  {t.glucoseAndLabTitle || 'Glucose & Lab Reports'}
+                </span>
+                <span className="text-[9px] bg-emerald-400/30 text-emerald-100 px-1.5 py-0.5 rounded-full font-bold">
+                  NEW
+                </span>
+              </div>
+              <p className="text-[11px] text-blue-100 mt-0.5">
+                {t.glucoseAndLabSub || 'Log sugar, scan lab reports & check diabetes risk'}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 text-xs text-blue-100 font-semibold group-hover:translate-x-0.5 transition-transform">
+            <span>Open</span>
+            <ChevronRight className="w-4 h-4" />
+          </div>
+        </div>
+      )}
 
       {/* Today's Medicines list */}
       <div className="mt-6">

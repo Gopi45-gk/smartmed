@@ -149,6 +149,8 @@ export interface ChatOptions {
   mode?: 'auto' | 'offline' | 'online';
   timeout?: number;
   language?: string;
+  patientName?: string;
+  medicinesContext?: any[];
 }
 
 // ─── Network State Checker ──────────────────────────────────────────────────
@@ -280,42 +282,60 @@ export function resolveClinicalTriageOffline(
   options?: { isVoice?: boolean; patientName?: string; language?: string }
 ): string {
   const isVoice = options?.isVoice ?? false;
-  const patientName = options?.patientName || 'Patient';
+  const pName = (options?.patientName || '').trim();
+  const prefix = pName ? `${pName}, ` : '';
   const lang = options?.language ? detectLanguageFromText('', options.language) : detectLanguageFromText(message, 'en');
   const q = message.toLowerCase().trim();
 
   // If Voice requested (1 to 2 spoken sentences)
   if (isVoice) {
     if (q.includes('chest pain') || q.includes('heart') || q.includes('breathe') || /நெஞ்சு|சீने|ఛాతీ|നെഞ്ചുവേദന|ಎದೆ ನೋವು/.test(q)) {
-      if (lang === 'ta') return `${patientName}, நெஞ்சு வலி அவசர சிகிச்சை தேவைப்படும் அறிகுறி. உடனே அவசர மருத்துவ சேவையைத் தொடர்பு கொள்ளவும்.`;
-      if (lang === 'hi') return `${patientName}, सीने में दर्द आपातकालीन लक्षण है। कृपया तुरंत नजदीकी अस्पताल जाएं।`;
-      if (lang === 'te') return `${patientName}, ఛాతీ నొప్పి అత్యవసర పరిస్థితి. వెంటనే వైద్య సహాయం తీసుకోండి.`;
-      if (lang === 'kn') return `${patientName}, ಎದೆ ನೋವು ತುರ್ತು ವೈದ್ಯಕೀಯ ಚಿಕಿತ್ಸೆ ಅಗತ್ಯವಿರುವ ಲಕ್ಷಣ. ದಯವಿಟ್ಟು ತಕ್ಷಣವೇ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
-      if (lang === 'ml') return `${patientName}, നെഞ്ചുവേദന അടിയന്തിര വൈദ്യസഹായം ആവശ്യമുള്ള ലക്ഷണമാണ്. ഉടൻ ആശുപത്രിയിൽ ചികിത്സ തേടുക.`;
-      return `${patientName}, chest pain requires immediate emergency medical care. Please call emergency services right away.`;
+      if (lang === 'ta') return `${prefix}நெஞ்சு வலி அவசர சிகிச்சை தேவைப்படும் அறிகுறி. உடனே அவசர மருத்துவ சேவையைத் தொடர்பு கொள்ளவும்.`;
+      if (lang === 'hi') return `${prefix}सीने में दर्द आपातकालीन लक्षण है। कृपया तुरंत नजदीकी अस्पताल जाएं।`;
+      if (lang === 'te') return `${prefix}ఛాతీ నొప్పి అత్యవసర పరిస్థితి. వెంటనే వైద్య సహాయం తీసుకోండి.`;
+      if (lang === 'kn') return `${prefix}ಎದೆ ನೋವು ತುರ್ತು ವೈದ್ಯಕೀಯ ಚಿಕಿತ್ಸೆ ಅಗತ್ಯವಿರುವ ಲಕ್ಷಣ. ದಯವಿಟ್ಟು ತಕ್ಷಣವೇ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
+      if (lang === 'ml') return `${prefix}നെഞ്ചുവേദന അടിയന്തിര വൈദ്യസഹായം ആവശ്യമുള്ള ലക്ഷണമാണ്. ഉടൻ ആശുപത്രിയിൽ ചികിത്സ തേടുക.`;
+      return `${prefix}chest pain requires immediate emergency medical care. Please call emergency services right away.`;
+    }
+    if (q.includes('eye') || /கண்|आँख|కంటి|കണ്ണുവേദന|ಕಣ್ಣು/.test(q)) {
+      if (lang === 'ta') return `${prefix}கண் வலிக்கு கண்களுக்கு நல்ல ஓய்வு கொடுத்து திரைகளைப் பார்ப்பதைத் தவிர்க்கவும். வலி நீடித்தால் கண் மருத்துவரை அணுகவும்.`;
+      if (lang === 'hi') return `${prefix}आँखों में दर्द के लिए आँखों को आराम दें और स्क्रीन से दूर रहें। यदि दर्द बना रहे तो डॉक्टर को दिखाएं।`;
+      if (lang === 'te') return `${prefix}కంటి నొప్పికి తగినంత విశ్రాంతి ఇవ్వండి మరియు స్క్రీన్ చూడటం తగ్గించండి.`;
+      return `${prefix}for eye pain or strain, please rest your eyes and avoid digital screens. Consult a doctor if pain continues.`;
+    }
+    if (q.includes('dizzy') || /தலைச்சுற்றல்|மயக்கம்|चक्कर|తలతిరగడం|തലകറക്കം|ತಲೆಸುತ್ತು/.test(q)) {
+      if (lang === 'ta') return `${prefix}தலைச்சுற்றல் ஏற்படும் போது உடனே அமர்ந்து ஓய்வெடுத்து தண்ணீர் குடியுங்கள். பிரச்சனை நீடித்தால் மருத்துவரை அணுகவும்.`;
+      if (lang === 'hi') return `${prefix}चक्कर आने पर तुरंत बैठ जाएं और पानी पिएं। समस्या बनी रहे तो डॉक्टर से संपर्क करें।`;
+      if (lang === 'te') return `${prefix}తలతిరుగుతున్నప్పుడు వెంటనే కూర్చోండి మరియు నీరు త్రాగండి.`;
+      return `${prefix}if you feel dizzy, please sit down immediately to prevent falls and drink plenty of water.`;
+    }
+    if (q.includes('hypertension') || q.includes('blood pressure') || /உயர் இரத்த அழுத்தம்|ரத்த அழுத்தம்|उच्च रक्तचाप|రక్తపోటు/.test(q)) {
+      if (lang === 'ta') return `${prefix}உயர் இரத்த அழுத்தம் என்பது இரத்த அழுத்தம் அதிகமாக இருக்கும் நிலை. மருத்துவர் கூறியபடி மாத்திரைகளைத் தவறாமல் உட்கொள்ளுங்கள்.`;
+      if (lang === 'hi') return `${prefix}उच्च रक्तचाप का अर्थ है धमनियों में रक्त का दबाव अधिक होना। अपनी दवाएं नियमित रूप से लें।`;
+      return `${prefix}hypertension means high blood pressure. Take your prescribed medication regularly to keep it well controlled.`;
     }
     if (q.includes('head') || q.includes('தலை') || q.includes('सिर') || q.includes('తల') || q.includes('തല') || q.includes('ತಲೆ')) {
-      if (lang === 'ta') return `${patientName}, தலைவலிக்கு அமைதியான அறையில் ஓய்வெடுத்து போதுமான தண்ணீர் குடியுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை எடுத்துக்கொள்ளுங்கள்.`;
-      if (lang === 'hi') return `${patientName}, सिरदर्द के लिए शांत कमरे में आराम करें और पानी पिएं। अपनी दवाएं समय पर लें।`;
-      if (lang === 'te') return `${patientName}, తలనొప్పికి ప్రశాంతంగా విశ్రాంతి తీసుకోండి మరియు తగినంత నీరు త్రాగండి.`;
-      if (lang === 'kn') return `${patientName}, ತಲೆನೋವಿಗೆ ಶಾಂತವಾದ ಕೋಣೆಯಲ್ಲಿ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ.`;
-      if (lang === 'ml') return `${patientName}, തലവേദനയ്ക്ക് ശാന്തമായ മുറിയിൽ വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക.`;
-      return `${patientName}, for a headache, please rest in a quiet room and drink plenty of water. Take your prescribed medicines as directed.`;
+      if (lang === 'ta') return `${prefix}தலைவலிக்கு அமைதியான அறையில் ஓய்வெடுத்து போதுமான தண்ணீர் குடியுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை எடுத்துக்கொள்ளுங்கள்.`;
+      if (lang === 'hi') return `${prefix}सिरदर्द के लिए शांत कमरे में आराम करें और पानी पिएं। अपनी दवाएं समय पर लें।`;
+      if (lang === 'te') return `${prefix}తలనొప్పికి ప్రశాంతంగా విశ్రాంతి తీసుకోండి మరియు తగినంత నీరు త్రాగండి.`;
+      if (lang === 'kn') return `${prefix}ತಲೆನೋವಿಗೆ ಶಾಂತವಾದ ಕೋಣೆಯಲ್ಲಿ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ.`;
+      if (lang === 'ml') return `${prefix}തലവേദനയ്ക്ക് ശാന്തമായ മുറിയിൽ വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക.`;
+      return `${prefix}for a headache, please rest in a quiet room and drink plenty of water. Take your prescribed medicines as directed.`;
     }
     if (q.includes('slight') || q.includes('pain') || q.includes('வலி') || q.includes('दर्द') || q.includes('నొప్పి') || q.includes('വേദന') || q.includes('ನೋವು')) {
-      if (lang === 'ta') return `${patientName}, லேசான வலிக்கு ஓய்வெடுத்து தண்ணீர் குடியுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை எடுத்துக்கொள்ளுங்கள்.`;
-      if (lang === 'hi') return `${patientName}, हल्के दर्द के लिए आराम करें और पर्याप्त पानी पिएं। अपनी निर्धारित दवाएं समय पर लें।`;
-      if (lang === 'te') return `${patientName}, తేలికపాటి నొప్పికి విశ్రాంతి తీసుకోండి మరియు తగినంత నీరు త్రాగండి.`;
-      if (lang === 'kn') return `${patientName}, ಸೌಮ್ಯವಾದ ನೋವಿಗೆ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ.`;
-      if (lang === 'ml') return `${patientName}, നേരിയ വേദനയ്ക്ക് വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക.`;
-      return `${patientName}, for mild pain, please rest and drink plenty of water. Take your prescribed medicines as directed.`;
+      if (lang === 'ta') return `${prefix}லேசான வலிக்கு ஓய்வெடுத்து தண்ணீர் குடியுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை எடுத்துக்கொள்ளுங்கள்.`;
+      if (lang === 'hi') return `${prefix}हल्के दर्द के लिए आराम करें और पर्याप्त पानी पिएं। अपनी निर्धारित दवाएं समय पर लें।`;
+      if (lang === 'te') return `${prefix}తేలికపాటి నొప్పికి విశ్రాంతి తీసుకోండి మరియు తగినంత నీరు త్రాగండి.`;
+      if (lang === 'kn') return `${prefix}ಸೌಮ್ಯವಾದ ನೋವಿಗೆ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ.`;
+      if (lang === 'ml') return `${prefix}നേരിയ വേദനയ്ക്ക് വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക.`;
+      return `${prefix}for mild pain, please rest and drink plenty of water. Take your prescribed medicines as directed.`;
     }
-    if (lang === 'ta') return `${patientName}, உங்கள் உடல்நலனை கவனித்துக் கொள்ளுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை சரியான நேரத்தில் உட்கொள்ளவும்.`;
-    if (lang === 'hi') return `${patientName}, अपनी सेहत का ख्याल रखें और अपनी दवाएं नियमित रूप से लेते रहें।`;
-    if (lang === 'te') return `${patientName}, మీ ఆరోగ్యాన్ని జాగ్రత్తగా చూసుకోండి మరియు మందులను సమయానికి తీసుకోండి.`;
-    if (lang === 'ml') return `${patientName}, ആരോഗ്യം ശ്രദ്ധിക്കുക, നിർദ്ദേശിച്ച മരുന്നുകൾ കൃത്യമായി കഴിക്കുക.`;
-    if (lang === 'kn') return `${patientName}, ನಿಮ್ಮ ಆರೋಗ್ಯವನ್ನು ಚೆನ್ನಾಗಿ ನೋಡಿಕೊಳ್ಳಿ ಮತ್ತು ಔಷಧಿಗಳನ್ನು ಸಮಯಕ್ಕೆ ತೆಗೆದುಕೊಳ್ಳಿ.`;
-    return `${patientName}, I understand your symptoms. Please take your prescribed medications with plain water and rest. Consult your doctor if symptoms continue.`;
+    if (lang === 'ta') return `${prefix}உங்கள் உடல்நலனை கவனித்துக் கொள்ளுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை சரியான நேரத்தில் உட்கொள்ளவும்.`;
+    if (lang === 'hi') return `${prefix}अपनी सेहत का ख्याल रखें और अपनी दवाएं नियमित रूप से लेते रहें।`;
+    if (lang === 'te') return `${prefix}మీ ఆరోగ్యాన్ని జాగ్రత్తగా చూసుకోండి మరియు మందులను సమయానికి తీసుకోండి.`;
+    if (lang === 'ml') return `${prefix}ആരോഗ്യം ശ്രദ്ധിക്കുക, നിർദ്ദേശിച്ച മരുന്നുകൾ കൃത്യമായി കഴിക്കുക.`;
+    if (lang === 'kn') return `${prefix}ನಿಮ್ಮ ಆರೋಗ್ಯವನ್ನು ಚೆನ್ನಾಗಿ ನೋಡಿಕೊಳ್ಳಿ ಮತ್ತು ಔಷಧಿಗಳನ್ನು ಸಮಯಕ್ಕೆ ತೆಗೆದುಕೊಳ್ಳಿ.`;
+    return `${prefix}I understand your symptoms. Please take your prescribed medications with plain water and rest. Consult your doctor if symptoms continue.`;
   }
 
   // If Chat requested (Master System Prompt 5 Rules)
@@ -326,6 +346,27 @@ export function resolveClinicalTriageOffline(
     if (lang === 'kn') return `⚠️ ತುರ್ತು ವೈದ್ಯಕೀಯ ಎಚ್ಚರಿಕೆ:\n• ಎದೆ ನೋವು ಮತ್ತು ಉಸಿರಾಟದ ತೊಂದರೆಗೆ ತಕ್ಷಣ ತುರ್ತು ಚಿಕಿತ್ಸೆ ಅಗತ್ಯವಿದೆ.\n• ದಯವಿಟ್ಟು ತಕ್ಷಣವೇ ಹತ್ತಿರದ ತುರ್ತು ಚಿಕಿತ್ಸಾ ಕೇಂದ್ರಕ್ಕೆ ಭೇಟಿ ನೀಡಿ.\nತೀವ್ರವಾದ ರೋಗಲಕ್ಷಣಗಳಿಗಾಗಿ ದಯವಿಟ್ಟು ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
     if (lang === 'ml') return `⚠️ അടിയന്തര വൈദ്യസഹായം:\n• നെഞ്ചുവേദനയും ശ്വാസതടസ്സവും അടിയന്തിര ചികിത്സ ആവശ്യമുള്ള ലക്ഷണങ്ങളാണ്.\n• ദയവായി ഉടൻ തന്നെ അടുത്തുള്ള ആശുപത്രിയിൽ എത്തുക.\nഗുരുതരമായ ലക്ഷണങ്ങൾക്ക് ദയവായി ഒരു ഡോക്ടറെ കാണുക.`;
     return `⚠️ IMMEDIATE MEDICAL ALERT:\n• Acute chest pain or difficulty breathing requires emergency medical care.\n• Please seek emergency hospital attention immediately.\nPlease consult a doctor for severe symptoms.`;
+  }
+
+  if (q.includes('eye') || /கண்|आँख|కంటి|കണ്ണുവേദന|ಕಣ್ಣು/.test(q)) {
+    if (lang === 'ta') return `• கண் வலிக்கு கண்களுக்கு நல்ல ஓய்வு கொடுத்து, கணினி மற்றும் மொபைல் திரைகளைப் பார்ப்பதைத் தவிர்க்கவும்.\n• கண்களை குளிர்ந்த நீரால் கழுவலாம். கண் பார்வை மங்குதல் அல்லது கடுமையான வலி இருந்தால் உடனே கண் மருத்துவரை அணுகவும்.\nகடுமையான அறிகுறிகளுக்கு தயவுசெய்து மருத்துவரை அணுகவும்.`;
+    if (lang === 'hi') return `• आँखों में दर्द या थकान के लिए आँखों को आराम दें और मोबाइल/स्क्रीन से दूर रहें।\n• यदि दृष्टि में धुंधलापन या अत्यधिक दर्द हो, तो तुरंत नेत्र विशेषज्ञ को दिखाएं।\nगंभीर लक्षणों के लिए कृपया डॉक्टर से परामर्श लें।`;
+    if (lang === 'te') return `• కంటి నొప్పికి తగినంత విశ్రాంతి ఇవ్వండి మరియు మొబైల్ లేదా స్క్రీన్ చూడటం తగ్గించండి.\n• కంటి చూపులో మార్పు లేదా తీవ్రమైన నొప్పి ఉంటే వెంటనే నేత్ర వైద్యుడిని సంప్రదించండి.\nతీవ్రమైన లక్షణాల కోసం దయచేసి వైద్యుడిని సంప్రదించండి.`;
+    return `• For eye pain or strain, rest your eyes, avoid digital screens, and use a cool, clean compress.\n• If you experience sudden vision changes, severe pain, or redness, see an eye specialist promptly.\nPlease consult a doctor for severe symptoms.`;
+  }
+
+  if (q.includes('dizzy') || /தலைச்சுற்றல்|மயக்கம்|चक्कर|తలతిరగడం|തലകറക്കം|ತಲೆಸುತ್ತು/.test(q)) {
+    if (lang === 'ta') return `• தலைச்சுற்றல் ஏற்படும் போது உடனே அமர்ந்து ஓய்வெடுங்கள், கீழே விழுவதைத் தவிர்க்கவும்.\n• போதுமான தண்ணீர் குடியுங்கள். தலைச்சுற்றலுடன் நெஞ்சு வலி அல்லது மூச்சுத்திணறல் இருந்தால் உடனடியாக அவசர மருத்துவரை அணுகவும்.\nகடுமையான அறிகுறிகளுக்கு தயவுசெய்து மருத்துவரை அணுகவும்.`;
+    if (lang === 'hi') return `• चक्कर आने पर तुरंत बैठ या लेट जाएं ताकि गिरने से बच सकें, और पानी पिएं।\n• धीरे-धीरे उठें। यदि चक्कर के साथ सीने में दर्द या कमजोरी हो तो तुरंत आपातकालीन सहायता लें।\nगंभीर लक्षणों के लिए कृपया डॉक्टर से परामर्श लें।`;
+    if (lang === 'te') return `• తలతిరుగుతున్నప్పుడు వెంటనే కూర్చోండి లేదా పడుకోండి మరియు నీరు త్రాగండి.\n• తలతిరగడంతో పాటు ఛాతీ నొప్పి ఉంటే వెంటనే అత్యవసర వైద్య సహాయం పొందండి.\nతీవ్రమైన లక్షణాల కోసం దయచేసి వైద్యుడిని సంప్రదించండి.`;
+    return `• If feeling dizzy, sit or lie down immediately to prevent falls and drink plenty of water.\n• Stand up slowly after sitting. If dizziness is accompanied by chest pain or weakness, seek emergency medical care.\nPlease consult a doctor for severe symptoms.`;
+  }
+
+  if (q.includes('hypertension') || q.includes('blood pressure') || /உயர் இரத்த அழுத்தம்|உயர் ரத்த அழுத்தம்|ரத்த அழுத்தம்|उच्च रक्तचाप|రక్తపోటు/.test(q)) {
+    if (lang === 'ta') return `• உயர் இரத்த அழுத்தம் என்பது இரத்தக் குழாய்களில் இரத்தத்தின் அழுத்தம் சீராக அதிகமாக இருக்கும் நிலை.\n• மருத்துவர் பரிந்துரைத்த மாத்திரைகளைத் தவறாமல் உட்கொள்வதும், உணவில் உப்பைக் குறைப்பதும் இரத்த அழுத்தத்தைக் கட்டுக்குள் வைக்கும்.\nகடுமையான அறிகுறிகளுக்கு தயவுசெய்து மருத்துவரை அணுகவும்.`;
+    if (lang === 'hi') return `• उच्च रक्तचाप (हाइपरटेंशन) का अर्थ है धमनियों में रक्त का दबाव लगातार सामान्य से अधिक रहना।\n• डॉक्टर द्वारा दी गई दवाएं समय पर लेने और नमक कम खाने से रक्तचाप नियंत्रित रहता है।\nगंभीर लक्षणों के लिए कृपया डॉक्टर से परामर्श लें।`;
+    if (lang === 'te') return `• అధిక రక్తపోటు (హైపర్‌టెన్షన్) అంటే రక్తనాళాలపై రక్త పీడనం నిరంతరం ఎక్కువగా ఉండే పరిస్థితి.\n• వైద్యులు సూచించిన మందులు వాడటం మరియు ఉప్పు తగ్గించడం ద్వారా ఆరోగ్యాన్ని కాపాడుకోవచ్చు.\nతీవ్రమైన లక్షణాల కోసం దయచేసి వైద్యుడిని సంప్రదించండి.`;
+    return `• Hypertension means high blood pressure, where blood pushes against artery walls with consistently elevated force.\n• Adhering to prescribed medicines, reducing dietary salt, and regular monitoring effectively protect your heart.\nPlease consult a doctor for severe symptoms.`;
   }
 
   if (q.includes('head') || q.includes('தலை') || q.includes('सिर') || q.includes('తల') || q.includes('തല') || q.includes('ತಲೆ')) {
@@ -430,6 +471,8 @@ export async function sendMessageToLocalAI(
           language: userLang,
           preferred_language: userLang,
           system_prompt: augmentedPrompt,
+          patientName: options?.patientName,
+          medicinesContext: options?.medicinesContext,
         }),
         signal: cloudController.signal,
       });
@@ -464,6 +507,8 @@ export async function sendMessageToLocalAI(
         language: userLang,
         preferred_language: userLang,
         system_prompt: augmentedPrompt,
+        patientName: options?.patientName,
+        medicinesContext: options?.medicinesContext,
       }),
       signal: localController.signal,
     });
@@ -481,7 +526,10 @@ export async function sendMessageToLocalAI(
   }
 
   // 3. OFFLINE CLINICAL ENGINE FALLBACK: Instant deterministic answer in patient's language
-  const fallbackClinical = resolveClinicalTriageOffline(message, { language: userLang });
+  const fallbackClinical = resolveClinicalTriageOffline(message, {
+    language: userLang,
+    patientName: options?.patientName,
+  });
   return {
     success: true,
     response: fallbackClinical,
@@ -889,4 +937,194 @@ export async function triggerTwilioCallNow(req: ScheduleCallRequest): Promise<Sc
     };
   }
 }
+
+// ─── MathWorks Predicting Diabetes Mellitus Client ──────────────────────────
+
+export interface DiabetesPredictRequest {
+  glucose: number;
+  bmi: number;
+  age: number;
+  systolic_bp?: number;
+  diastolic_bp?: number;
+  heart_rate?: number;
+  creatinine?: number;
+  bun?: number;
+  patient_name?: string;
+  use_matlab_engine?: boolean;
+}
+
+export interface FeatureImpact {
+  feature: string;
+  value: string;
+  baseline: string;
+  impact_percent: number;
+  severity: 'normal' | 'moderate' | 'high';
+}
+
+export interface DiabetesPredictResponse {
+  success: boolean;
+  patient_name: string;
+  risk_score: number;
+  risk_percent: number;
+  risk_level: string;
+  classification: number;
+  condition_flag: string;
+  badge_color: 'green' | 'amber' | 'red';
+  clinical_inputs: {
+    glucose: number;
+    bmi: number;
+    age: number;
+    systolic_bp: number;
+    diastolic_bp: number;
+    heart_rate: number;
+    creatinine: number;
+    bun: number;
+  };
+  recommendations: string[];
+  feature_impacts: FeatureImpact[];
+  model_metadata: {
+    model_name: string;
+    release: string;
+    repo: string;
+    accuracy: number;
+    sensitivity: number;
+    specificity: number;
+    engine: string;
+  };
+  error?: string;
+}
+
+export async function predictDiabetesRisk(
+  data: DiabetesPredictRequest
+): Promise<DiabetesPredictResponse> {
+  const base = getBaseApiUrl();
+  try {
+    const res = await fetch(`${base}/api/clinical/diabetes-predict`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      return await res.json();
+    }
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.detail || `Server error ${res.status}`);
+  } catch (err: any) {
+    console.warn('[Diabetes Risk API] Falling back to offline clinical calculation:', err);
+    // Offline client-side fallback calculation matching MATLAB logic
+    const glucose = data.glucose || 110;
+    const bmi = data.bmi || 25.5;
+    const age = data.age || 50;
+    const sysBP = data.systolic_bp || 120;
+
+    const gluc_score = Math.max(0, Math.min(1, (glucose - 90) / (200 - 90)));
+    const bmi_score = Math.max(0, Math.min(1, (bmi - 22) / (38 - 22)));
+    const age_score = Math.max(0, Math.min(1, (age - 35) / (75 - 35)));
+    const bp_score = Math.max(0, Math.min(1, (sysBP - 120) / (170 - 120)));
+
+    const clinicalRisk = (0.50 * gluc_score) + (0.22 * bmi_score) + (0.16 * age_score) + (0.12 * bp_score);
+    const probPercent = Math.round(clinicalRisk * 1000) / 10;
+    const isHigh = probPercent >= 65;
+    const isMod = probPercent >= 35;
+
+    return {
+      success: true,
+      patient_name: data.patient_name || 'Patient',
+      risk_score: Math.round(clinicalRisk * 1000) / 1000,
+      risk_percent: probPercent,
+      risk_level: isHigh ? 'High Risk - ICU Alert' : isMod ? 'Moderate Risk - Borderline Glycemia' : 'Low Risk - Normal Metabolic Profile',
+      classification: isHigh ? 1 : 0,
+      condition_flag: isHigh ? 'Probable Undiagnosed Diabetes Mellitus' : isMod ? 'Borderline Glycemia' : 'Normal Glycemic Profile',
+      badge_color: isHigh ? 'red' : isMod ? 'amber' : 'green',
+      clinical_inputs: {
+        glucose,
+        bmi,
+        age,
+        systolic_bp: sysBP,
+        diastolic_bp: data.diastolic_bp || 80,
+        heart_rate: data.heart_rate || 75,
+        creatinine: data.creatinine || 1.0,
+        bun: data.bun || 16.0,
+      },
+      recommendations: isHigh
+        ? [
+            'Initiate bedside capillary blood glucose monitoring every 2-4 hours.',
+            'Order laboratory HbA1c and serum ketone analysis.',
+            'Consult endocrinology or critical care team for insulin management.',
+            'Maintain target ICU glycemic range between 140 - 180 mg/dL.',
+          ]
+        : isMod
+        ? [
+            'Perform scheduled fasting glucose checks upon patient stabilization.',
+            'Monitor for stress-induced hyperglycemia and medication effects.',
+            'Re-evaluate metabolic panel and vital signs within 24 hours.',
+          ]
+        : [
+            'Continue standard vital monitoring protocol.',
+            'Maintain baseline nutrition and medication schedule.',
+          ],
+      feature_impacts: [
+        {
+          feature: 'Blood Glucose',
+          value: `${glucose} mg/dL`,
+          baseline: '70-99 mg/dL',
+          impact_percent: Math.round(gluc_score * 50 * 10) / 10,
+          severity: glucose >= 140 ? 'high' : glucose < 100 ? 'normal' : 'moderate',
+        },
+        {
+          feature: 'Body Mass Index (BMI)',
+          value: `${bmi} kg/m²`,
+          baseline: '18.5-24.9',
+          impact_percent: Math.round(bmi_score * 22 * 10) / 10,
+          severity: bmi >= 30 ? 'high' : bmi < 25 ? 'normal' : 'moderate',
+        },
+        {
+          feature: 'Age Factor',
+          value: `${age} yrs`,
+          baseline: '<45 yrs',
+          impact_percent: Math.round(age_score * 16 * 10) / 10,
+          severity: age >= 65 ? 'high' : age < 45 ? 'normal' : 'moderate',
+        },
+        {
+          feature: 'Blood Pressure',
+          value: `${sysBP}/${data.diastolic_bp || 80} mmHg`,
+          baseline: '<120/80',
+          impact_percent: Math.round(bp_score * 12 * 10) / 10,
+          severity: sysBP >= 140 ? 'high' : sysBP <= 120 ? 'normal' : 'moderate',
+        },
+      ],
+      model_metadata: {
+        model_name: 'MathWorks Predicting Diabetes Mellitus Classifier (Client Fallback)',
+        release: 'MATLAB R2026b',
+        repo: 'https://github.com/mathworks/predicting-diabetes-mellitus',
+        accuracy: 50.62,
+        sensitivity: 26.21,
+        specificity: 74.20,
+        engine: 'SmartMed Clinical Inference Engine',
+      },
+    };
+  }
+}
+
+export async function getDiabetesModelStatus(): Promise<any> {
+  const base = getBaseApiUrl();
+  try {
+    const res = await fetch(`${base}/api/clinical/diabetes-status`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn('[Diabetes Model Status] Server check failed:', err);
+  }
+  return {
+    status: 'offline',
+    service: 'mathworks-predicting-diabetes-mellitus',
+    model_loaded: false,
+    matlab_available: false,
+  };
+}
+
 

@@ -3,14 +3,15 @@ import type { FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Caregiver, TranslationStrings } from '../types';
 import { initialCaregivers } from '../data/initialData';
-import { Users, Phone, ShieldCheck, Plus, Check, BellRing, MessageSquareText, AlertTriangle } from 'lucide-react';
+import { Users, Phone, ShieldCheck, Plus, Check, BellRing, MessageSquareText, AlertTriangle, Activity, ChevronRight } from 'lucide-react';
 import { soundManager } from '../utils/audio';
 
 interface Props {
   t: TranslationStrings;
+  onOpenGlucosePortal?: () => void;
 }
 
-export function CaregiverScreen({ t }: Props) {
+export function CaregiverScreen({ t, onOpenGlucosePortal }: Props) {
   const [caregivers, setCaregivers] = useState<Caregiver[]>(initialCaregivers);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newName, setNewName] = useState('');
@@ -137,6 +138,35 @@ export function CaregiverScreen({ t }: Props) {
         <Plus className="w-4 h-4" />
         <span>{t.addCaregiver}</span>
       </button>
+
+      {/* Glucose & Lab Reports Caregiver Card (Feature Flag Guarded) */}
+      {((import.meta as any).env?.VITE_ENABLE_GLUCOSE_FEATURES !== 'false') && onOpenGlucosePortal && (
+        <div 
+          onClick={onOpenGlucosePortal}
+          className="mt-4 p-4 bg-gradient-to-r from-purple-900 to-indigo-950 text-white rounded-3xl shadow-sm border border-purple-800/80 flex items-center justify-between cursor-pointer active:scale-98 transition-all group"
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 bg-white/10 rounded-2xl flex items-center justify-center text-purple-200 border border-white/10 group-hover:scale-105 transition-transform">
+              <Activity className="w-5 h-5 text-purple-200" />
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <h3 className="font-bold text-xs text-white">Glucose Trends &amp; Clinical Alerts</h3>
+                <span className="text-[9px] bg-purple-500/30 text-purple-200 px-1.5 py-0.5 rounded-full font-bold">
+                  LIVE
+                </span>
+              </div>
+              <p className="text-[11px] text-purple-200 mt-0.5">
+                Monitor glycemic ranges, automated rules, and lab reports
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 text-xs text-purple-200 font-semibold group-hover:translate-x-0.5 transition-transform">
+            <span>View</span>
+            <ChevronRight className="w-4 h-4" />
+          </div>
+        </div>
+      )}
 
       {/* Safety Protocol Note */}
       <div className="mt-6 p-4 bg-amber-50/70 border border-amber-200/70 rounded-2xl flex items-start gap-3">

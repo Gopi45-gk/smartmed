@@ -24,7 +24,7 @@ RUN pip install --no-cache-dir uv
 
 # Copy and install python dependencies
 COPY requirements.txt .
-RUN uv pip install --system --no-cache -r requirements.txt
+RUN uv pip install --system --no-cache --index-strategy unsafe-best-match --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
 
 # Copy backend application source
 COPY . /app

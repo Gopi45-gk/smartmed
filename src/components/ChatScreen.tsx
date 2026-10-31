@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
-import { Medicine, ChatMessage, TranslationStrings, Language } from '../types';
+import { Medicine, ChatMessage, TranslationStrings, Language, PatientProfile } from '../types';
 import { initialChatMessages } from '../data/initialData';
 import { Send, Bot, User, Sparkles, Trash2, RefreshCw, ShieldAlert } from 'lucide-react';
 import { soundManager } from '../utils/audio';
@@ -18,9 +18,10 @@ interface Props {
   medicines: Medicine[];
   t: TranslationStrings;
   lang: Language;
+  patientProfile?: PatientProfile;
 }
 
-export function ChatScreen({ medicines, t, lang }: Props) {
+export function ChatScreen({ medicines, t, lang, patientProfile }: Props) {
   // Load persisted messages or fall back to initial welcome messages
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     const saved = loadConversationHistory();
@@ -107,11 +108,18 @@ export function ChatScreen({ medicines, t, lang }: Props) {
     // Send to hybrid AI engine with offline fallback
     try {
       const history = getConversationHistory();
-      const result = await sendMessageToLocalAI(text.trim(), history, { language: lang });
+      const result = await sendMessageToLocalAI(text.trim(), history, {
+        language: lang,
+        patientName: patientProfile?.name,
+        medicinesContext: medicines,
+      });
 
       const replyText = (result.success && result.response)
         ? result.response
-        : resolveClinicalTriageOffline(text.trim(), { language: lang });
+        : resolveClinicalTriageOffline(text.trim(), {
+            language: lang,
+            patientName: patientProfile?.name,
+          });
 
       const aiMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -123,7 +131,10 @@ export function ChatScreen({ medicines, t, lang }: Props) {
       soundManager.playSuccessChime();
       setIsTyping(false);
     } catch {
-      const fallbackText = resolveClinicalTriageOffline(text.trim(), { language: lang });
+      const fallbackText = resolveClinicalTriageOffline(text.trim(), {
+        language: lang,
+        patientName: patientProfile?.name,
+      });
       const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',

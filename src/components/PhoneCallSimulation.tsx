@@ -205,16 +205,33 @@ function classifyVoiceIntent(spokenText: string): MedicationIntent {
   ];
   if (skipKeywords.some(kw => lower.includes(kw))) return 'SKIPPED';
 
-  // Clinical / Informational Queries (delegated to local AI)
+  // Clinical / Informational Queries (delegated to unified medical pipeline)
   const queryKeywords = [
-    'what', 'why', 'how', 'when', 'side effect', 'food', 'water', 'doctor', 'fever', 'pain',
-    'என்ன', 'எப்படி', 'எப்போது', 'வலி', 'சாப்பாடு',
-    'क्या', 'कैसे', 'कब', 'दर्द',
-    'ఏమిటి', 'ఎలా', 'ఎప్పుడు',
-    'ಏನು', 'ಹೇಗೆ', 'ಯಾವಾಗ',
-    'എന്ത്', 'എങ്ങനെ', 'എപ്പോൾ'
+    'what', 'why', 'how', 'when', 'who', 'where', 'which', 'side effect', 'food', 'water', 'doctor',
+    'fever', 'pain', 'ache', 'dizzy', 'dizziness', 'sleep', 'sleepy', 'sleepiness', 'drowsy',
+    'tablet', 'medicine', 'pill', 'dose', 'dosage', 'chest', 'heart', 'breathe', 'breath',
+    'pressure', 'bp', 'hypertension', 'serious', 'symptom', 'headache', 'eye', 'cough', 'cold',
+    'miss', 'missed', 'forgot', 'safe', 'harm', 'can i', 'should i', 'is it', 'is this',
+    // Tamil
+    'என்ன', 'எப்படி', 'எப்போது', 'எதற்கு', 'வலி', 'சாப்பாடு', 'மருந்து', 'மாத்திரை',
+    'மயக்கம்', 'தலைசுற்றல்', 'தலைச்சுற்றல்', 'தூக்கம்', 'நெஞ்சு', 'கண்', 'தலைவலி',
+    'இரத்த அழுத்தம்', 'ரத்த அழுத்தம்', 'மறந்து', 'முடியுமா',
+    // Hindi
+    'क्या', 'कैसे', 'कब', 'क्यों', 'दर्द', 'खाना', 'दवा', 'गोली',
+    'चक्कर', 'नींद', 'सीने', 'आँख', 'सिरदर्द', 'रक्तचाप', 'भूल', 'सकता',
+    // Telugu
+    'ఏమిటి', 'ఎలా', 'ఎప్పుడు', 'ఎందుకు', 'నొప్పి', 'ఆహారం', 'మందు', 'మాత్ర',
+    'తలతిరగడం', 'నిద్ర', 'ఛాతీ', 'కంటి', 'తలనొప్పి', 'రక్తపోటు', 'మర్చి',
+    // Kannada
+    'ಏನು', 'ಹೇಗೆ', 'ಯಾವಾಗ', 'ಏಕೆ', 'ನೋವು', 'ಊಟ', 'ಔಷಧಿ', 'ಮಾತ್ರೆ',
+    'ತಲೆಸುತ್ತು', 'ನಿದ್ದೆ', 'ಎದೆ', 'ಕಣ್ಣು', 'ತಲೆನೋವು', 'ಮರೆತು',
+    // Malayalam
+    'എന്ത്', 'എങ്ങനെ', 'എപ്പോൾ', 'എന്തിന്', 'വേദന', 'ഭക്ഷണം', 'മരുന്ന്',
+    'തലകറക്കം', 'ഉറക്കം', 'നെഞ്ച്', 'കണ്ണ്', 'തലവേദന', 'മറന്നു'
   ];
-  if (queryKeywords.some(kw => lower.includes(kw))) return 'CLINICAL_QUERY';
+  if (queryKeywords.some(kw => lower.includes(kw)) || lower.includes('?') || tokens.length >= 3) {
+    return 'CLINICAL_QUERY';
+  }
 
   return 'UNCLEAR';
 }

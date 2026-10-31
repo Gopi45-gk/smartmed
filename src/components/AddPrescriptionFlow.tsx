@@ -50,7 +50,13 @@ export function AddPrescriptionFlow({ close, setMedicines, t }: Props) {
   const currentLang = (typeof localStorage !== 'undefined' ? localStorage.getItem('smartmed_preferred_language') : 'en') || 'en';
   const [step, setStep] = useState<'select' | 'scanning' | 'review'>('select');
   const [ocrStatusMessage, setOcrStatusMessage] = useState<string>('Ready to scan prescription');
-  const [patientInfo, setPatientInfo] = useState<{ name?: string | null; age?: string | null; gender?: string | null } | null>(null);
+  const [patientInfo, setPatientInfo] = useState<{ name?: string | null; age?: string | null; gender?: string | null } | null>(() => {
+    try {
+      const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('smartmed_patient_profile') : null;
+      if (stored) return JSON.parse(stored);
+    } catch {}
+    return null;
+  });
   const [clinicalAdvice, setClinicalAdvice] = useState<string[]>([]);
   const [medicationsList, setMedicationsList] = useState<ExtractedMedItem[]>([
     {
@@ -118,8 +124,21 @@ export function AddPrescriptionFlow({ close, setMedicines, t }: Props) {
         return;
       }
 
-      // Record patient info & clinical advice if present
-      if (res.patient?.name) {
+      // Record patient info: authenticated profile strictly takes precedence over OCR
+      let authPatient: { name?: string | null; age?: string | null; gender?: string | null; phone?: string | null } | null = null;
+      try {
+        const storedProfile = localStorage.getItem('smartmed_patient_profile');
+        if (storedProfile) {
+          const parsed = JSON.parse(storedProfile);
+          if (parsed && (parsed.name || parsed.phone)) {
+            authPatient = parsed;
+          }
+        }
+      } catch {}
+
+      if (authPatient?.name) {
+        setPatientInfo(authPatient);
+      } else if (res.patient?.name) {
         setPatientInfo(res.patient);
       } else {
         setPatientInfo(null);
@@ -134,44 +153,55 @@ export function AddPrescriptionFlow({ close, setMedicines, t }: Props) {
       }
 
       // Filter valid medicines (excluding empty / null / pure non-medicine words)
-      const validMeds = (res.medications || res.medicines || []).filter(
-        m => m.name && m.name.trim().length > 0 && !m.name.toLowerCase().includes('name vivek')
+      const rawMeds = (res.medications && res.medications.length > 0) ? res.medications : (res.medicines || []);
+      const validMeds = rawMeds.filter(
+        m => {
+          const medName = m.name || (m as any).medicineName;
+          return medName && medName.trim().length > 0 && !medName.toLowerCase().includes('name vivek');
+        }
       );
 
       console.log(`[OCR] Prescription detected: ${validMeds.length} medications`);
 
       if (validMeds.length > 0) {
         const formatted: ExtractedMedItem[] = validMeds.map((m, idx) => {
-          const displayName = m.name
-            ? (m.strength && m.strength !== 'Standard' && !m.name.toLowerCase().includes(m.strength.toLowerCase())
-                ? `${m.name} ${m.strength}`
-                : m.name)
+          const rawName = m.name || (m as any).medicineName || '';
+          const rawStrength = m.strength || '';
+          const displayName = rawName
+            ? (rawStrength && rawStrength !== 'Standard' && !rawName.toLowerCase().includes(rawStrength.toLowerCase())
+                ? `${rawName} ${rawStrength}`
+                : rawName)
             : '';
+
+          const medDose = m.dosage || (m as any).dose || rawStrength || '';
+          const medTime = m.scheduled_time || (m as any).scheduledTime || ((m as any).scheduledTimes?.[0]) || '';
+          const medFood = m.food_instruction || (m as any).foodInstruction || m.instructions || '';
+          const medFreq = m.frequency || 'Daily';
 
           // Validate critical fields: NEVER GUESS CRITICAL MEDICATION INFO
           const isUncertain = (
             !displayName ||
             displayName.trim().length < 2 ||
             displayName.toLowerCase().includes('needs verification') ||
-            !m.dosage ||
-            !m.scheduled_time ||
+            !medDose ||
+            !medTime ||
             (m.confidence !== undefined && m.confidence < 0.6) ||
             m.requires_review
           );
 
           console.log(
-            `[OCR] Medication extracted: ${displayName}, dosage=${m.dosage || 'N/A'}, ` +
-            `time=${m.scheduled_time || 'N/A'}, meal=${m.food_instruction || m.instructions || 'N/A'}, uncertain=${Boolean(isUncertain)}`
+            `[OCR] Medication extracted: ${displayName}, dosage=${medDose || 'N/A'}, ` +
+            `time=${medTime || 'N/A'}, meal=${medFood || 'N/A'}, uncertain=${Boolean(isUncertain)}`
           );
 
           return {
             id: Date.now() + idx,
             name: displayName,
-            strength: m.strength || '',
-            time: m.scheduled_time || '',
-            dose: m.dosage || '',
-            frequency: m.frequency || 'Daily',
-            food: m.food_instruction || m.instructions || '',
+            strength: rawStrength,
+            time: medTime,
+            dose: medDose,
+            frequency: medFreq,
+            food: medFood,
             type: (m.type as Medicine['type']) || 'tablet',
             confidence: m.confidence || 0.85,
             requires_review: Boolean(isUncertain),
