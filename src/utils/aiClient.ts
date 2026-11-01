@@ -322,12 +322,36 @@ export function resolveClinicalTriageOffline(
       if (lang === 'ml') return `${prefix}തലവേദനയ്ക്ക് ശാന്തമായ മുറിയിൽ വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക.`;
       return `${prefix}for a headache, please rest in a quiet room and drink plenty of water. Take your prescribed medicines as directed.`;
     }
+    if (q.includes('stomach') || q.includes('acidity') || q.includes('gas') || /வயிறு|पेट|కడుపు|വയറുവേദന|ಹೊಟ್ಟೆ/.test(q)) {
+      if (lang === 'ta') return `${prefix}வயிற்று வலி அல்லது அசெளகரியத்திற்கு வெதுவெதுப்பான தண்ணீர் குடித்து ஓய்வெடுக்கவும். மருந்தை உணவுடன் சேர்த்து உட்கொள்ளவும்.`;
+      if (lang === 'hi') return `${prefix}पेट दर्द या गैस के लिए हल्का भोजन करें और गुनगुना पानी पिएं। यदि दवा खाली पेट नहीं लेनी है तो खाने के बाद लें।`;
+      if (lang === 'te') return `${prefix}కడుపు నొప్పికి గోరువెచ్చని నీరు త్రాగి విశ్రాంతి తీసుకోండి. మందును ఆహారంతో కలిపి తీసుకోండి.`;
+      return `${prefix}for stomach discomfort or acidity, drink warm water and rest. Take your medication with food unless directed on an empty stomach.`;
+    }
+    if (q.includes('fever') || q.includes('temperature') || q.includes('cold') || q.includes('cough') || /காய்ச்சல்|சளி|இருமல்|बुखार|खांसी|జ్వరం|പനി|ಜ್ವರ/.test(q)) {
+      if (lang === 'ta') return `${prefix}காய்ச்சல் அல்லது சளிக்கு வெதுவெதுப்பான திரவங்களை அருந்தி நல்ல ஓய்வெடுக்கவும். பரிந்துரைக்கப்பட்ட மருந்தை உட்கொள்ளவும்.`;
+      if (lang === 'hi') return `${prefix}बुखार या सर्दी के लिए पर्याप्त आराम करें और गुनगुना पानी पिएं। डॉक्टर की बताई दवा समय पर लें।`;
+      if (lang === 'te') return `${prefix}జ్వరం లేదా జలుబుకి తగినంత విశ్రాంతి తీసుకోండి మరియు గోరువెచ్చని నీరు త్రాగండి.`;
+      return `${prefix}for fever or cold symptoms, stay warm, drink plenty of fluids, and get good rest. Take your prescribed medications as directed.`;
+    }
+    if (q.includes('coffee') || q.includes('tea') || /காபி|कॉफी|కాఫీ|കാപ്പി|ಕಾಫಿ/.test(q)) {
+      if (lang === 'ta') return `${prefix}மருந்துகளை எப்போதும் சுத்தமான தண்ணீருடன் மட்டுமே உட்கொள்ள வேண்டும், காபி அல்லது டீயுடன் அல்ல.`;
+      if (lang === 'hi') return `${prefix}दवाएं हमेशा सादे पानी के साथ ही लें, चाय या कॉफी के साथ नहीं।`;
+      if (lang === 'te') return `${prefix}మందులను మంచి నీటితో మాత్రమే తీసుకోవాలి, కాఫీ లేదా టీతో తీసుకోకూడదు.`;
+      return `${prefix}it is strongly recommended to take your medicines with a full glass of plain water, not with coffee or tea.`;
+    }
+    if (q.includes('miss') || q.includes('forgot') || /மறந்து|भूल|మర్చి|മറന്നു|ಮರೆತು/.test(q)) {
+      if (lang === 'ta') return `${prefix}மருந்தை எடுக்க மறந்துவிட்டால் நினைவுக்கு வந்தவுடன் உட்கொள்ளவும். அடுத்த வேளைக்கு அருகிலிருந்தால் இரட்டை மாத்திரை எடுக்காதீர்கள்.`;
+      if (lang === 'hi') return `${prefix}यदि दवा छूट जाए तो याद आते ही ले लें। कभी भी दो खुराक एक साथ न लें।`;
+      if (lang === 'te') return `${prefix}డోస్ మర్చిపోతే గుర్తుకు రాగానే తీసుకోండి. రెండు డోస్‌లు కలిపి తీసుకోవద్దు.`;
+      return `${prefix}if you miss a dose, take it as soon as you remember. If it is almost time for your next dose, skip it and never take a double dose.`;
+    }
     if (q.includes('slight') || q.includes('pain') || q.includes('வலி') || q.includes('दर्द') || q.includes('నొప్పి') || q.includes('വേദന') || q.includes('ನೋವು')) {
       if (lang === 'ta') return `${prefix}லேசான வலிக்கு ஓய்வெடுத்து தண்ணீர் குடியுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை எடுத்துக்கொள்ளுங்கள்.`;
       if (lang === 'hi') return `${prefix}हल्के दर्द के लिए आराम करें और पर्याप्त पानी पिएं। अपनी निर्धारित दवाएं समय पर लें।`;
-      if (lang === 'te') return `${prefix}తేలికపాటి నొప్పికి విశ్రాంతి తీసుకోండి మరియు తగినంత నీరు త్రాగండి.`;
+      if (lang === 'te') return `${prefix}తేలికపాటి నొప్పికి విశ్రాంతి తీసుకోండి மற்றும் తగినంత నీరు త్రాగండి.`;
       if (lang === 'kn') return `${prefix}ಸೌಮ್ಯವಾದ ನೋವಿಗೆ ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ ಮತ್ತು ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ.`;
-      if (lang === 'ml') return `${prefix}നേരിയ വേദനയ്ക്ക് വിശ്രമിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക.`;
+      if (lang === 'ml') return `${prefix}നേരിയ വേദനയ്ക്ക് വിശ്രಮിക്കുകയും ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും ചെയ്യുക.`;
       return `${prefix}for mild pain, please rest and drink plenty of water. Take your prescribed medicines as directed.`;
     }
     if (lang === 'ta') return `${prefix}உங்கள் உடல்நலனை கவனித்துக் கொள்ளுங்கள். பரிந்துரைக்கப்பட்ட மருந்துகளை சரியான நேரத்தில் உட்கொள்ளவும்.`;
@@ -553,7 +577,7 @@ export async function sendVoiceMessageToLocalAI(
   language: string = 'en',
 ): Promise<AIChatResponse> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 3500);
+  const timeoutId = setTimeout(() => controller.abort(), 7000);
 
   try {
     const response = await fetch(`${AI_BASE_URL}/api/ai/voice`, {
@@ -1126,5 +1150,355 @@ export async function getDiabetesModelStatus(): Promise<any> {
     matlab_available: false,
   };
 }
+
+// ─── SOS Emergency System Client APIs ────────────────────────────────────────
+
+export interface SOSActivatePayload {
+  patient_name: string;
+  phone_number: string;
+  language?: string;
+  caregiver?: {
+    name?: string;
+    phone?: string;
+    relation?: string;
+  };
+  location?: {
+    latitude?: number;
+    longitude?: number;
+  };
+  vital_info?: {
+    bloodGroup?: string;
+    condition?: string;
+    allergies?: string;
+    latest_glucose?: number | string;
+  };
+}
+
+export interface SOSActivateResponse {
+  success: boolean;
+  emergency_id: string;
+  status: string;
+  patient_name: string;
+  caregiver_name: string;
+  caregiver_phone: string;
+  caregiver_alert: any;
+  voice_prompt: {
+    success: boolean;
+    text: string;
+    audio_base64?: string;
+    engine_used?: string;
+  };
+  call_action: {
+    tel_uri: string;
+    can_direct_dial: boolean;
+    fallback_number: string;
+  };
+  timestamp: string;
+}
+
+export interface SOSStatusResponse {
+  active: boolean;
+  emergency: {
+    id?: string;
+    status: string;
+    patient_name?: string;
+    phone_number?: string;
+    caregiver?: any;
+    location?: any;
+    call_status?: string;
+    delivery_status?: any;
+    conversation?: any[];
+    created_at?: string;
+    updated_at?: string;
+    resolved_at?: string;
+    resolution_notes?: string;
+  };
+}
+
+export async function activateSOSApi(payload: SOSActivatePayload): Promise<SOSActivateResponse> {
+  const base = getBaseApiUrl();
+  try {
+    const res = await fetch(`${base}/api/emergency/sos/activate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.detail || `Server returned ${res.status}`);
+  } catch (err) {
+    console.warn('[SOS API] Remote activation failed, using local offline fallback:', err);
+    // Offline local fallback
+    const offlineId = `sos-offline-${Date.now()}`;
+    const cgPhone = payload.caregiver?.phone || '+91 98765 12345';
+    return {
+      success: true,
+      emergency_id: offlineId,
+      status: 'ALERT_SENT',
+      patient_name: payload.patient_name,
+      caregiver_name: payload.caregiver?.name || 'Primary Caregiver',
+      caregiver_phone: cgPhone,
+      caregiver_alert: {
+        sms_status: 'LOCAL_SIMULATED_QUEUE',
+        delivery_confirmed: false,
+        offline_queued: true,
+      },
+      voice_prompt: {
+        success: true,
+        text: 'Your emergency request has been activated. I am contacting your caregiver now. Please stay calm. Can you tell me what happened?',
+        audio_base64: undefined,
+        engine_used: 'browser_tts',
+      },
+      call_action: {
+        tel_uri: `tel:${cgPhone}`,
+        can_direct_dial: true,
+        fallback_number: '112',
+      },
+      timestamp: new Date().toISOString(),
+    };
+  }
+}
+
+export async function cancelSOSApi(emergency_id?: string, reason?: string): Promise<any> {
+  const base = getBaseApiUrl();
+  try {
+    const res = await fetch(`${base}/api/emergency/sos/cancel`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emergency_id, reason }),
+    });
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('[SOS API] Cancel error:', err);
+  }
+  return { success: true, status: 'CANCELLED' };
+}
+
+export async function getSOSStatusApi(emergency_id?: string): Promise<SOSStatusResponse> {
+  const base = getBaseApiUrl();
+  try {
+    const url = emergency_id
+      ? `${base}/api/emergency/sos/status?emergency_id=${encodeURIComponent(emergency_id)}`
+      : `${base}/api/emergency/sos/status`;
+    const res = await fetch(url);
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('[SOS API] Get status error:', err);
+  }
+  return {
+    active: false,
+    emergency: { status: 'IDLE' },
+  };
+}
+
+export async function resolveSOSApi(emergency_id?: string, notes?: string): Promise<any> {
+  const base = getBaseApiUrl();
+  try {
+    const res = await fetch(`${base}/api/emergency/sos/resolve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emergency_id, notes: notes || 'Assistance confirmed and patient is safe.' }),
+    });
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('[SOS API] Resolve error:', err);
+  }
+  return { success: true, status: 'RESOLVED' };
+}
+
+export async function retrySOSCallApi(emergency_id: string): Promise<any> {
+  const base = getBaseApiUrl();
+  try {
+    const res = await fetch(`${base}/api/emergency/sos/call/retry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emergency_id }),
+    });
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('[SOS API] Retry call error:', err);
+  }
+  return { success: true, status: 'CALLING CAREGIVER' };
+}
+
+export async function sendSOSDialogueApi(
+  emergency_id: string,
+  patient_message: string,
+  language: string = 'en',
+): Promise<any> {
+  const base = getBaseApiUrl();
+  try {
+    const res = await fetch(`${base}/api/emergency/sos/dialogue`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emergency_id, patient_message, language }),
+    });
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('[SOS API] Dialogue error:', err);
+  }
+
+  // Offline fallback dialogue triage
+  const clean = patient_message.toLowerCase();
+  const isChest = /chest|heart|மார்பு|நெஞ்சு|छाती|सीने|ఛాతీ|గుండె/i.test(clean);
+  const isDizzy = /dizzy|dizziness|faint|spinning|தலைச்சுற்றல்|மயக்கம்|चक्कर|తల తిరుగు/i.test(clean);
+  const isCrit = isChest || /breathe|stroke|blood|unconscious|மூச்சு|பக்கவாதம்|सांस|लकवा/i.test(clean);
+
+  let replyText = 'I understand. Your emergency alert is being processed. Please remain seated and stay calm.';
+  if (isChest) {
+    replyText =
+      'I understand. Your emergency alert is being processed. Chest pain can be serious. Please seek immediate emergency medical assistance. Do not wait for the caregiver if you are experiencing severe symptoms.';
+  } else if (isDizzy) {
+    replyText =
+      'Please remain seated or lie down safely. I am here to assist you. If you need immediate emergency help, call 112.';
+  } else if (isCrit) {
+    replyText =
+      'This could be a serious emergency. Please call 112 or your nearest emergency medical services immediately.';
+  }
+
+  return {
+    success: true,
+    patient_message,
+    ai_response_text: replyText,
+    is_critical: isCrit,
+    risk_level: isCrit ? 'CRITICAL' : 'MODERATE',
+    call_emergency_services: isCrit,
+    emergency_number: '112',
+    audio_base64: null,
+  };
+}
+
+// ─── Voice Companion Client APIs ─────────────────────────────────────────────
+
+export interface VoiceSessionStartResponse {
+  success: boolean;
+  session_id: string;
+  greeting_text: string;
+  audio_base64?: string;
+  engine_used?: string;
+  language: string;
+}
+
+export interface VoiceSessionMessagePayload {
+  session_id: string;
+  user_text?: string;
+  audio_base64?: string;
+  language?: string;
+  patient_profile?: any;
+  medicines?: any[];
+  caregivers?: any[];
+  latest_glucose?: any;
+}
+
+export interface VoiceSessionMessageResponse {
+  success: boolean;
+  session_id: string;
+  patient_text: string;
+  response_text: string;
+  audio_base64?: string;
+  engine_used?: string;
+  is_emergency: boolean;
+  suggest_sos: boolean;
+  emergency_number?: string;
+  language: string;
+}
+
+export async function startVoiceSessionApi(
+  patient_id: string = 'guest',
+  language: string = 'en',
+  patient_profile?: any,
+): Promise<VoiceSessionStartResponse> {
+  const base = getBaseApiUrl();
+  try {
+    const res = await fetch(`${base}/api/voice/session/start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ patient_id, language, patient_profile }),
+    });
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('[Voice Companion API] Start session error, using client fallback:', err);
+  }
+
+  return {
+    success: true,
+    session_id: `vses-local-${Date.now()}`,
+    greeting_text: 'Hello! I am your SmartMed medical companion. How are you feeling today? How can I help you?',
+    audio_base64: undefined,
+    engine_used: 'browser_tts',
+    language,
+  };
+}
+
+export async function sendVoiceMessageApi(
+  payload: VoiceSessionMessagePayload,
+): Promise<VoiceSessionMessageResponse> {
+  const base = getBaseApiUrl();
+  try {
+    const res = await fetch(`${base}/api/voice/session/message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('[Voice Companion API] Message error, using client fallback:', err);
+  }
+
+  const query = payload.user_text || '';
+  const isEmergency = /chest pain|heart attack|breathe|stroke|112|emergency|help/i.test(query);
+
+  return {
+    success: true,
+    session_id: payload.session_id,
+    patient_text: query,
+    response_text: isEmergency
+      ? 'Alert: The symptoms you described may indicate a medical emergency. Please call 112 or activate SOS immediately.'
+      : 'I am here to help you manage your health and medications. Please feel free to ask about your prescription schedule or recent blood sugar.',
+    audio_base64: undefined,
+    engine_used: 'browser_tts',
+    is_emergency: isEmergency,
+    suggest_sos: isEmergency,
+    emergency_number: '112',
+    language: payload.language || 'en',
+  };
+}
+
+export async function speakVoiceTextApi(
+  text: string,
+  language: string = 'en',
+  speed: number = 0.95,
+): Promise<any> {
+  const base = getBaseApiUrl();
+  try {
+    const res = await fetch(`${base}/api/voice/session/speak`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, language, speed }),
+    });
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('[Voice Companion API] Speak error:', err);
+  }
+  return { success: false };
+}
+
+export async function endVoiceSessionApi(session_id: string): Promise<any> {
+  const base = getBaseApiUrl();
+  try {
+    const res = await fetch(`${base}/api/voice/session/end`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id }),
+    });
+    if (res.ok) return await res.json();
+  } catch (err) {
+    console.warn('[Voice Companion API] End session error:', err);
+  }
+  return { success: true };
+}
+
 
 

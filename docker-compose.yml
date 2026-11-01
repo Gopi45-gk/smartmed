@@ -50,6 +50,8 @@ services:
       - ./ai/tts:/app/tts
       - ./ai/data:/app/data
       - ./ai/ocr:/app/ocr
+      - ./ai/modules:/app/modules
+      - ./ai/routers:/app/routers
       - hf_cache:/root/.cache/huggingface
       - paddle_cache:/root/.paddleocr
       - paddlex_cache:/root/.paddlex

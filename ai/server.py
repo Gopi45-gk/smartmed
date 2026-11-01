@@ -211,6 +211,18 @@ def detect_intent(text: str) -> str:
 
 # ─── Endpoints ───────────────────────────────────────────────────────────────
 
+@app.get("/")
+async def root():
+    """Root endpoint welcoming users and directing to API docs and Frontend."""
+    return {
+        "status": "online",
+        "service": "SmartMed AI Backend",
+        "docs": "/docs",
+        "health": "/api/ai/health",
+        "frontend_app": "http://localhost:3000"
+    }
+
+
 @app.get("/api/ai/health")
 async def health_check():
     """Simple health check endpoint."""
@@ -2016,6 +2028,22 @@ if ENABLE_GLUCOSE_FEATURES:
         logger.warning(f"Failed to register glucose router: {e}")
 
 
+# ─── Additive Modules: SOS Emergency Assistance & Interactive Voice Companion ─
+try:
+    from routers.sos_router import router as sos_router
+    app.include_router(sos_router)
+    logger.info("✓ Additive feature registered: SOS Emergency router (/api/emergency/sos)")
+except Exception as e:
+    logger.warning(f"Failed to register sos_router: {e}")
+
+try:
+    from routers.voice_assistant_router import router as voice_assistant_router
+    app.include_router(voice_assistant_router)
+    logger.info("✓ Additive feature registered: Voice Companion router (/api/voice/session)")
+except Exception as e:
+    logger.warning(f"Failed to register voice_assistant_router: {e}")
+
+
 # ─── Main ────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
@@ -2025,3 +2053,4 @@ if __name__ == "__main__":
         port=config.port,
         log_level="info",
     )
+

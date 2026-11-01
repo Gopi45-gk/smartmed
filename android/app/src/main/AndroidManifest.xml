@@ -27,6 +27,20 @@
     <!-- Push Notification permission on Android 13+ (API 33+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- ===================================================================== -->
+    <!-- PERMISSIONS: SOS Emergency Assistance & Interactive Voice Assistant    -->
+    <!-- ===================================================================== -->
+    <!-- Microphone audio recording for speech-to-text medical voice companion -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Emergency patient location capture with user consent for caregiver alert -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Network state and internet access for caregiver alert synchronization -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:label="SmartMed Native Call Reminder"

@@ -33,11 +33,9 @@ SmartMed is a multilingual, voice-first health and medication adherence companio
 - **Native Android Background Service**: Native Kotlin companion with `AlarmManager`, `Room` SQLite persistence, and `BootReceiver` for reliable alarm triggers even after phone restarts.
 - **Caregiver & Family Portal**: Live medication adherence tracking, missed dose alerts, and single-tap emergency SOS notifications.
 
-### 📊 MathWorks® ICU Diabetes Mellitus Prediction (MATLAB Edition)
-- **MathWorks Challenge Integration**: Machine learning classifier based on [mathworks/predicting-diabetes-mellitus](https://github.com/mathworks/predicting-diabetes-mellitus) predicting undiagnosed Diabetes Mellitus upon ICU admission.
-- **Native MATLAB Orchestrator**: Run the entire platform (Frontend, Backend, and ML models) directly from MATLAB via `RunSmartMed`.
-- **Interactive MATLAB Clinical Dashboard**: Standalone `SmartMedDiabetesGUI.m` with real-time risk gauge, patient presets, and clinical triage recommendations.
-- **Full Stack Parity**: Exposed via FastAPI (`/api/clinical/diabetes-predict`) and integrated directly on the SmartMed Web UI with animated risk scores and biomarker impact breakdowns.
+### 📊 ICU Diabetes Mellitus Prediction
+- **Clinical ML Model**: Machine learning classifier based on [mathworks/predicting-diabetes-mellitus](https://github.com/mathworks/predicting-diabetes-mellitus) predicting undiagnosed Diabetes Mellitus upon ICU admission.
+- **Full Stack Integration**: Exposed via FastAPI (`/api/clinical/diabetes-predict`) and integrated directly on the SmartMed Web UI with animated risk scores, clinical guidelines, and biomarker impact breakdowns.
 
 ### 🩸 Glucose Log + Trend Alerts & Lab Report Scanning
 - **Lab Report Scan → Risk Auto-fill**: Camera capture or PDF upload of clinical biochemistry panels; in-memory TrOCR extraction of fasting/random glucose, HbA1c, BP, BMI, and creatinine with OCR noise tolerance, unit conversion (`mmol/L` ↔ `mg/dL`), and one-tap auto-fill into the diabetes predictor upon confirmation.

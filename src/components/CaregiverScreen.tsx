@@ -3,16 +3,39 @@ import type { FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Caregiver, TranslationStrings } from '../types';
 import { initialCaregivers } from '../data/initialData';
-import { Users, Phone, ShieldCheck, Plus, Check, BellRing, MessageSquareText, AlertTriangle, Activity, ChevronRight } from 'lucide-react';
+import { Users, Phone, ShieldCheck, Plus, Check, BellRing, MessageSquareText } from 'lucide-react';
 import { soundManager } from '../utils/audio';
 
 interface Props {
   t: TranslationStrings;
   onOpenGlucosePortal?: () => void;
+  caregivers?: Caregiver[];
+  onUpdateCaregivers?: (caregivers: Caregiver[]) => void;
 }
 
-export function CaregiverScreen({ t, onOpenGlucosePortal }: Props) {
-  const [caregivers, setCaregivers] = useState<Caregiver[]>(initialCaregivers);
+export function CaregiverScreen({ t, onOpenGlucosePortal, caregivers: propCaregivers, onUpdateCaregivers }: Props) {
+  const [localCaregivers, setLocalCaregivers] = useState<Caregiver[]>(() => {
+    if (propCaregivers) return propCaregivers;
+    try {
+      const saved = localStorage.getItem('smartmed_caregivers');
+      return saved ? JSON.parse(saved) : initialCaregivers;
+    } catch {
+      return initialCaregivers;
+    }
+  });
+
+  const caregivers = propCaregivers || localCaregivers;
+  const setCaregivers = (updater: (prev: Caregiver[]) => Caregiver[]) => {
+    const updated = updater(caregivers);
+    setLocalCaregivers(updated);
+    try {
+      localStorage.setItem('smartmed_caregivers', JSON.stringify(updated));
+    } catch (e) {
+      console.warn('Failed to save caregivers:', e);
+    }
+    onUpdateCaregivers?.(updated);
+  };
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [newRelation, setNewRelation] = useState('Daughter');
@@ -138,46 +161,6 @@ export function CaregiverScreen({ t, onOpenGlucosePortal }: Props) {
         <Plus className="w-4 h-4" />
         <span>{t.addCaregiver}</span>
       </button>
-
-      {/* Glucose & Lab Reports Caregiver Card (Feature Flag Guarded) */}
-      {((import.meta as any).env?.VITE_ENABLE_GLUCOSE_FEATURES !== 'false') && onOpenGlucosePortal && (
-        <div 
-          onClick={onOpenGlucosePortal}
-          className="mt-4 p-4 bg-gradient-to-r from-purple-900 to-indigo-950 text-white rounded-3xl shadow-sm border border-purple-800/80 flex items-center justify-between cursor-pointer active:scale-98 transition-all group"
-        >
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 bg-white/10 rounded-2xl flex items-center justify-center text-purple-200 border border-white/10 group-hover:scale-105 transition-transform">
-              <Activity className="w-5 h-5 text-purple-200" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <h3 className="font-bold text-xs text-white">Glucose Trends &amp; Clinical Alerts</h3>
-                <span className="text-[9px] bg-purple-500/30 text-purple-200 px-1.5 py-0.5 rounded-full font-bold">
-                  LIVE
-                </span>
-              </div>
-              <p className="text-[11px] text-purple-200 mt-0.5">
-                Monitor glycemic ranges, automated rules, and lab reports
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-1 text-xs text-purple-200 font-semibold group-hover:translate-x-0.5 transition-transform">
-            <span>View</span>
-            <ChevronRight className="w-4 h-4" />
-          </div>
-        </div>
-      )}
-
-      {/* Safety Protocol Note */}
-      <div className="mt-6 p-4 bg-amber-50/70 border border-amber-200/70 rounded-2xl flex items-start gap-3">
-        <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-        <div>
-          <h4 className="text-xs font-bold text-amber-900">Safety Escalation Ladder</h4>
-          <p className="text-[11px] text-amber-800/90 mt-0.5 leading-relaxed">
-            If a patient fails to answer the AI call after 2 attempts within 30 minutes, an automated high-priority alert with live GPS is sent to primary caregivers.
-          </p>
-        </div>
-      </div>
 
       {/* Add Modal */}
       <AnimatePresence>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'motion/react';
-import { ScreenType, TabType, Language, Medicine, PatientProfile, defaultPatientProfile } from './types';
+import { ScreenType, TabType, Language, Medicine, PatientProfile, Caregiver, defaultPatientProfile } from './types';
 import { translations } from './data/translations';
 import { initialMedicines } from './data/initialData';
 import { SplashScreen } from './components/SplashScreen';
@@ -16,10 +16,13 @@ import { ReportsScreen } from './components/ReportsScreen';
 import { ProfileScreen } from './components/ProfileScreen';
 import { DiabetesRiskModal } from './components/DiabetesRiskModal';
 import { GlucoseAndLabPortal } from './features/GlucoseAndLabPortal';
+import { SOSModal } from './components/SOSModal';
 import { BottomNav } from './components/BottomNav';
 import { soundManager } from './utils/audio';
 import { ttsProvider } from './utils/speech';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import { initialCaregivers } from './data/initialData';
+import { AlertOctagon } from 'lucide-react';
 
 function MainApp() {
   const [screen, setScreen] = useState<ScreenType>('splash');
@@ -34,6 +37,24 @@ function MainApp() {
       return defaultPatientProfile;
     }
   });
+  const [caregivers, setCaregivers] = useState<Caregiver[]>(() => {
+    try {
+      const saved = localStorage.getItem('smartmed_caregivers');
+      return saved ? JSON.parse(saved) : initialCaregivers;
+    } catch {
+      return initialCaregivers;
+    }
+  });
+  const [isSOSOpen, setIsSOSOpen] = useState(false);
+
+  const handleUpdateCaregivers = (newCaregivers: Caregiver[]) => {
+    setCaregivers(newCaregivers);
+    try {
+      localStorage.setItem('smartmed_caregivers', JSON.stringify(newCaregivers));
+    } catch (e) {
+      console.warn('Failed to save caregivers:', e);
+    }
+  };
 
   // Splash auto-transition
   useEffect(() => {
@@ -120,7 +141,14 @@ function MainApp() {
           />
         );
       case 'caregiver':
-        return <CaregiverScreen t={t} onOpenGlucosePortal={() => setScreen('glucose_portal')} />;
+        return (
+          <CaregiverScreen 
+            t={t} 
+            onOpenGlucosePortal={() => setScreen('glucose_portal')}
+            caregivers={caregivers}
+            onUpdateCaregivers={handleUpdateCaregivers}
+          />
+        );
       case 'chat':
         return <ChatScreen medicines={medicines} t={t} lang={lang} patientProfile={patientProfile} />;
       case 'reports':
@@ -131,7 +159,7 @@ function MainApp() {
             close={() => setScreen('home')} 
             patientProfile={patientProfile}
             t={t} 
-          />
+            />
         );
       case 'glucose_portal':
         return (
@@ -151,6 +179,8 @@ function MainApp() {
             t={t} 
             logout={() => setScreen('login')} 
             onNavigateToCaregiver={() => setScreen('caregiver')}
+            caregivers={caregivers}
+            onUpdateCaregivers={handleUpdateCaregivers}
           />
         );
       default:
@@ -176,7 +206,7 @@ function MainApp() {
       }`}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      {/* Top Application Header with Brand and Multilingual Access */}
+      {/* Top Application Header with Brand, Voice AI and Persistent SOS Access */}
       {screen !== 'splash' && screen !== 'phone_call' && (
         <header className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-md border-b border-gray-200/80 px-4 py-2.5 flex items-center justify-between text-xs shadow-xs">
           <div className="w-full max-w-5xl mx-auto flex items-center justify-between">
@@ -195,6 +225,21 @@ function MainApp() {
                 Care AI
               </span>
             </div>
+
+            {/* Red SOS Emergency Button */}
+            <button
+              type="button"
+              onClick={() => {
+                ttsProvider.unlock();
+                soundManager.resumeAudioContext();
+                setIsSOSOpen(true);
+              }}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-red-600 hover:bg-red-700 active:scale-95 text-white font-extrabold text-xs shadow-md shadow-red-600/30 transition-all border border-red-500 cursor-pointer"
+              aria-label="SOS Emergency"
+            >
+              <AlertOctagon className="w-4 h-4 animate-pulse" />
+              <span>SOS EMERGENCY</span>
+            </button>
           </div>
         </header>
       )}
@@ -223,6 +268,17 @@ function MainApp() {
           t={t} 
         />
       )}
+
+      {/* SOS Emergency Modal */}
+      <SOSModal
+        isOpen={isSOSOpen}
+        onClose={() => setIsSOSOpen(false)}
+        patientProfile={patientProfile}
+        caregivers={caregivers}
+        medicines={medicines}
+        language={lang}
+        onSOSResolved={() => setIsSOSOpen(false)}
+      />
     </div>
   );
 }

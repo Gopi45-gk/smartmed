@@ -1,0 +1,489 @@
+{
+  "active": null,
+  "history": [
+    {
+      "id": "sos-ca824f607f",
+      "patient_name": "Ravi Kumar",
+      "phone_number": "+91 98765 43210",
+      "language": "en",
+      "status": "RESOLVED",
+      "created_at": "2026-11-01T07:59:09.606571+00:00",
+      "updated_at": "2026-11-01T07:59:33.351717+00:00",
+      "caregiver": {
+        "name": "Arun Kumar",
+        "phone": "+91 98765 12345",
+        "relation": "Son"
+      },
+      "location": {
+        "latitude": 13.0827,
+        "longitude": 80.2707
+      },
+      "vital_info": {
+        "bloodGroup": "O+",
+        "condition": "Hypertension, Type 2 Diabetes"
+      },
+      "call_status": "READY_TO_DIAL",
+      "delivery_status": {
+        "sms": "FAILED",
+        "push": "QUEUED",
+        "call": "NOT_INITIATED",
+        "confirmed_delivered": false
+      },
+      "conversation": [
+        {
+          "timestamp": "2026-11-01T07:59:25.256474+00:00",
+          "patient": "I have severe chest pain and cannot breathe",
+          "assistant": "This could be a serious emergency. Please call 112 or your local emergency ambulance immediately. Do not wait for your caregiver to arrive. Sit comfortably and do not exert yourself.",
+          "risk_level": "CRITICAL"
+        }
+      ],
+      "resolution_notes": "Ambulance arrived and caregiver is with patient",
+      "notes": [
+        {
+          "time": "2026-11-01T07:59:33.351717+00:00",
+          "note": "Ambulance arrived and caregiver is with patient"
+        }
+      ],
+      "resolved_at": "2026-11-01T07:59:33.351938+00:00"
+    },
+    {
+      "id": "sos-f0e77152e0",
+      "patient_name": "Test Senior Citizen",
+      "phone_number": "+91 98888 77777",
+      "language": "en",
+      "status": "RESOLVED",
+      "created_at": "2026-11-01T08:00:45.915256+00:00",
+      "updated_at": "2026-11-01T08:00:54.127938+00:00",
+      "caregiver": {
+        "name": "Dr. Ramesh",
+        "phone": "+91 98400 12345",
+        "relation": "Doctor"
+      },
+      "location": {
+        "latitude": 12.9716,
+        "longitude": 77.5946
+      },
+      "vital_info": {
+        "bloodGroup": "B+",
+        "condition": "Hypertension"
+      },
+      "call_status": "READY_TO_DIAL",
+      "delivery_status": {
+        "sms": "FAILED",
+        "push": "QUEUED",
+        "call": "NOT_INITIATED",
+        "confirmed_delivered": false
+      },
+      "conversation": [
+        {
+          "timestamp": "2026-11-01T08:00:54.122333+00:00",
+          "patient": "I feel sudden chest pain and pressure",
+          "assistant": "This could be a serious emergency. Please call 112 or your local emergency ambulance immediately. Do not wait for your caregiver to arrive. Sit comfortably and do not exert yourself.",
+          "risk_level": "CRITICAL"
+        }
+      ],
+      "resolution_notes": "Patient attended by doctor",
+      "notes": [
+        {
+          "time": "2026-11-01T08:00:54.126486+00:00",
+          "note": "Acknowledged by Dr. Ramesh: Reaching in 10 minutes"
+        },
+        {
+          "time": "2026-11-01T08:00:54.127938+00:00",
+          "note": "Patient attended by doctor"
+        }
+      ],
+      "resolved_at": "2026-11-01T08:00:54.128161+00:00"
+    },
+    {
+      "id": "sos-0011075145",
+      "patient_name": "Accidental Test",
+      "phone_number": "+91 90000 00000",
+      "language": "ta",
+      "status": "CANCELLED",
+      "created_at": "2026-11-01T08:00:54.130596+00:00",
+      "updated_at": "2026-11-01T08:00:54.606987+00:00",
+      "caregiver": {},
+      "location": null,
+      "vital_info": {},
+      "call_status": "READY_TO_DIAL",
+      "delivery_status": {
+        "sms": "FAILED",
+        "push": "QUEUED",
+        "call": "NOT_INITIATED",
+        "confirmed_delivered": false
+      },
+      "conversation": [],
+      "resolution_notes": null,
+      "notes": [
+        {
+          "time": "2026-11-01T08:00:54.606987+00:00",
+          "note": "Cancelled: False alarm button press"
+        }
+      ]
+    },
+    {
+      "id": "sos-2420149e40",
+      "patient_name": "Test Senior Citizen",
+      "phone_number": "+91 98888 77777",
+      "language": "en",
+      "status": "RESOLVED",
+      "created_at": "2026-11-01T08:01:22.172989+00:00",
+      "updated_at": "2026-11-01T08:01:29.875325+00:00",
+      "caregiver": {
+        "name": "Dr. Ramesh",
+        "phone": "+91 98400 12345",
+        "relation": "Doctor"
+      },
+      "location": {
+        "latitude": 12.9716,
+        "longitude": 77.5946
+      },
+      "vital_info": {
+        "bloodGroup": "B+",
+        "condition": "Hypertension"
+      },
+      "call_status": "READY_TO_DIAL",
+      "delivery_status": {
+        "sms": "FAILED",
+        "push": "QUEUED",
+        "call": "NOT_INITIATED",
+        "confirmed_delivered": false
+      },
+      "conversation": [
+        {
+          "timestamp": "2026-11-01T08:01:29.869588+00:00",
+          "patient": "I feel sudden chest pain and pressure",
+          "assistant": "This could be a serious emergency. Please call 112 or your local emergency ambulance immediately. Do not wait for your caregiver to arrive. Sit comfortably and do not exert yourself.",
+          "risk_level": "CRITICAL"
+        }
+      ],
+      "resolution_notes": "Patient attended by doctor",
+      "notes": [
+        {
+          "time": "2026-11-01T08:01:29.873927+00:00",
+          "note": "Acknowledged by Dr. Ramesh: Reaching in 10 minutes"
+        },
+        {
+          "time": "2026-11-01T08:01:29.875325+00:00",
+          "note": "Patient attended by doctor"
+        }
+      ],
+      "resolved_at": "2026-11-01T08:01:29.875629+00:00"
+    },
+    {
+      "id": "sos-17ad172249",
+      "patient_name": "Accidental Test",
+      "phone_number": "+91 90000 00000",
+      "language": "ta",
+      "status": "CANCELLED",
+      "created_at": "2026-11-01T08:01:29.878192+00:00",
+      "updated_at": "2026-11-01T08:01:30.434612+00:00",
+      "caregiver": {},
+      "location": null,
+      "vital_info": {},
+      "call_status": "READY_TO_DIAL",
+      "delivery_status": {
+        "sms": "FAILED",
+        "push": "QUEUED",
+        "call": "NOT_INITIATED",
+        "confirmed_delivered": false
+      },
+      "conversation": [],
+      "resolution_notes": null,
+      "notes": [
+        {
+          "time": "2026-11-01T08:01:30.434612+00:00",
+          "note": "Cancelled: False alarm button press"
+        }
+      ]
+    },
+    {
+      "id": "sos-81115c098a",
+      "patient_name": "Gopikrishna",
+      "phone_number": "+91 98765 43210",
+      "language": "en",
+      "status": "EMERGENCY RESOLVED",
+      "created_at": "2026-11-01T09:32:33.636111+00:00",
+      "updated_at": "2026-11-01T09:38:28.912957+00:00",
+      "caregiver": {
+        "name": "Primary Caregiver",
+        "phone": "+91 98765 12345"
+      },
+      "location": null,
+      "vital_info": {},
+      "call_status": "FAILED",
+      "delivery_status": {
+        "sms": "FAILED",
+        "push": "QUEUED",
+        "call": "NOT_INITIATED",
+        "confirmed_delivered": false,
+        "alternate_sms": "FAILED"
+      },
+      "conversation": [
+        {
+          "timestamp": "2026-11-01T09:32:43.388389+00:00",
+          "patient": "I am having chest pain",
+          "assistant": "This could be a serious emergency. Please call 112 or your local emergency ambulance immediately. Do not wait for your caregiver to arrive. Sit comfortably and do not exert yourself.",
+          "risk_level": "CRITICAL"
+        },
+        {
+          "timestamp": "2026-11-01T09:32:46.059989+00:00",
+          "patient": "I am feeling dizzy",
+          "assistant": "I understand. I am alerting your caregiver right now. Are you experiencing any chest pain or difficulty breathing? Please stay still and breathe slowly.",
+          "risk_level": "MODERATE"
+        },
+        {
+          "timestamp": "2026-11-01T09:34:10.790413+00:00",
+          "patient": "I am having chest pain",
+          "assistant": "I understand. Your emergency alert is being processed. Chest pain can be serious. Please seek immediate emergency medical assistance. Do not wait for the caregiver if you are experiencing severe symptoms.",
+          "risk_level": "CRITICAL"
+        },
+        {
+          "timestamp": "2026-11-01T09:34:13.082996+00:00",
+          "patient": "I am feeling dizzy",
+          "assistant": "Please remain seated or lie down safely. I am here to assist you. If you need immediate emergency help, call 112.",
+          "risk_level": "MODERATE"
+        },
+        {
+          "timestamp": "2026-11-01T09:34:35.665363+00:00",
+          "patient": "எனக்கு நெஞ்சு வலி அதிகமாக உள்ளது",
+          "assistant": "புரிந்துகொண்டேன். உங்கள் அவசர எச்சரிக்கை அனுப்பப்படுகிறது. நெஞ்சு வலி தீவிரமாக இருக்கலாம். உடனடியாக அவசர மருத்துவ உதவியை நாடவும். தீவிர அறிகுறிகள் இருந்தால் பராமரிப்பாளர் வரும் வரை காத்திருக்க வேண்டாம்.",
+          "risk_level": "CRITICAL"
+        },
+        {
+          "timestamp": "2026-11-01T09:34:35.690250+00:00",
+          "patient": "எனக்கு தலைச்சுற்றல் உள்ளது",
+          "assistant": "தயவுசெய்து பாதுகாப்பாக அமரவும் அல்லது படுக்கவும். நான் உங்களுக்கு உதவ இங்கே இருக்கிறேன். உங்களுக்கு உடனடி அவசர உதவி தேவைப்பட்டால் 112-ஐ அழைக்கவும்.",
+          "risk_level": "MODERATE"
+        },
+        {
+          "timestamp": "2026-11-01T09:38:25.243987+00:00",
+          "patient": "I am having chest pain",
+          "assistant": "I understand. Your emergency alert is being processed. Chest pain can be serious. Please seek immediate emergency medical assistance. Do not wait for the caregiver if you are experiencing severe symptoms.",
+          "risk_level": "CRITICAL"
+        },
+        {
+          "timestamp": "2026-11-01T09:38:27.316170+00:00",
+          "patient": "I am feeling dizzy",
+          "assistant": "Please remain seated or lie down safely. I am here to assist you. If you need immediate emergency help, call 112.",
+          "risk_level": "MODERATE"
+        }
+      ],
+      "resolution_notes": "Doctor arrived",
+      "notes": [
+        {
+          "time": "2026-11-01T09:33:56.098343+00:00",
+          "note": "Caregiver call initiated to +91****2345 (attempt 1)"
+        },
+        {
+          "time": "2026-11-01T09:33:57.333943+00:00",
+          "note": "Call failed: HTTP 422 error: Unable to create record: No Twilio trial phone number is assigned for voice calls to this destination number. Please add the \"to\" number as a verified recipient."
+        },
+        {
+          "time": "2026-11-01T09:33:57.846303+00:00",
+          "note": "Alternate alert dispatched after call failure/unanswered."
+        },
+        {
+          "time": "2026-11-01T09:34:13.134903+00:00",
+          "note": "Caregiver acknowledged alert via phone keypad input: 1"
+        },
+        {
+          "time": "2026-11-01T09:34:13.150515+00:00",
+          "note": "Caregiver call ended with status: failed"
+        },
+        {
+          "time": "2026-11-01T09:34:13.939379+00:00",
+          "note": "Alternate alert dispatched after call failure/unanswered."
+        },
+        {
+          "time": "2026-11-01T09:34:35.537024+00:00",
+          "note": "Caregiver call initiated to +91****2345 (attempt 1)"
+        },
+        {
+          "time": "2026-11-01T09:34:36.380918+00:00",
+          "note": "Call failed: HTTP 422 error: Unable to create record: No Twilio trial phone number is assigned for voice calls to this destination number. Please add the \"to\" number as a verified recipient."
+        },
+        {
+          "time": "2026-11-01T09:34:36.999930+00:00",
+          "note": "Alternate alert dispatched after call failure/unanswered."
+        },
+        {
+          "time": "2026-11-01T09:38:08.614755+00:00",
+          "note": "Caregiver call initiated to +91****2345 (attempt 1)"
+        },
+        {
+          "time": "2026-11-01T09:38:09.441820+00:00",
+          "note": "Call failed: HTTP 422 error: Unable to create record: No Twilio trial phone number is assigned for voice calls to this destination number. Please add the \"to\" number as a verified recipient."
+        },
+        {
+          "time": "2026-11-01T09:38:10.676772+00:00",
+          "note": "Alternate alert dispatched after call failure/unanswered."
+        },
+        {
+          "time": "2026-11-01T09:38:27.412480+00:00",
+          "note": "Caregiver acknowledged alert via phone keypad input: 1"
+        },
+        {
+          "time": "2026-11-01T09:38:27.419199+00:00",
+          "note": "Caregiver call ended with status: failed"
+        },
+        {
+          "time": "2026-11-01T09:38:27.995473+00:00",
+          "note": "Alternate alert dispatched after call failure/unanswered."
+        },
+        {
+          "time": "2026-11-01T09:38:28.026225+00:00",
+          "note": "Caregiver call initiated to +91****2345 (attempt 2)"
+        },
+        {
+          "time": "2026-11-01T09:38:28.454415+00:00",
+          "note": "Call failed: HTTP 422 error: Unable to create record: No Twilio trial phone number is assigned for voice calls to this destination number. Please add the \"to\" number as a verified recipient."
+        },
+        {
+          "time": "2026-11-01T09:38:28.905921+00:00",
+          "note": "Alternate alert dispatched after call failure/unanswered."
+        },
+        {
+          "time": "2026-11-01T09:38:28.912957+00:00",
+          "note": "Doctor arrived"
+        }
+      ],
+      "resolved_at": "2026-11-01T09:38:28.914006+00:00"
+    },
+    {
+      "id": "sos-e031bd87d1",
+      "patient_name": "கோபிகிருஷ்ணா",
+      "phone_number": "+91 98765 43210",
+      "language": "ta",
+      "status": "CANCELLED",
+      "created_at": "2026-11-01T09:38:28.920149+00:00",
+      "updated_at": "2026-11-01T10:32:19.980879+00:00",
+      "caregiver": {
+        "name": "அருண் குமார்",
+        "phone": "+91 98765 12345"
+      },
+      "location": null,
+      "vital_info": {},
+      "call_status": "queued",
+      "retry_count": 0,
+      "delivery_status": {
+        "sms": "QUEUED",
+        "call": "NOT_INITIATED",
+        "confirmed_delivered": false,
+        "alternate_sms": "FAILED",
+        "call_sid": "CA5cac99d009090cc02fa7699366f8e9bf"
+      },
+      "conversation": [],
+      "resolution_notes": null,
+      "notes": [
+        {
+          "time": "2026-11-01T09:38:28.925967+00:00",
+          "note": "Caregiver call initiated to +91****2345 (attempt 1)"
+        },
+        {
+          "time": "2026-11-01T09:38:29.514740+00:00",
+          "note": "Call failed: HTTP 422 error: Unable to create record: No Twilio trial phone number is assigned for voice calls to this destination number. Please add the \"to\" number as a verified recipient."
+        },
+        {
+          "time": "2026-11-01T09:38:30.408491+00:00",
+          "note": "Alternate alert dispatched after call failure/unanswered."
+        },
+        {
+          "time": "2026-11-01T10:31:50.487205+00:00",
+          "note": "Caregiver call initiated to +91****3010 (attempt 1)"
+        },
+        {
+          "time": "2026-11-01T10:31:52.774602+00:00",
+          "note": "Twilio Call SID: CA5cac99d009090cc02fa7699366f8e9bf"
+        },
+        {
+          "time": "2026-11-01T10:32:19.980879+00:00",
+          "note": "Cancelled: False alarm cancelled by patient."
+        }
+      ]
+    },
+    {
+      "id": "sos-fd0e6941af",
+      "patient_name": "Gopikrishna",
+      "phone_number": "+91 98765 43210",
+      "language": "en",
+      "status": "ALTERNATE ALERT SENT",
+      "created_at": "2026-11-01T10:48:53.325618+00:00",
+      "updated_at": "2026-11-01T10:50:01.078287+00:00",
+      "caregiver": {
+        "name": "Arun Kumar",
+        "phone": "+91 98765 12345",
+        "relation": "Son"
+      },
+      "location": null,
+      "vital_info": {
+        "bloodGroup": "O+",
+        "condition": "Hypertension"
+      },
+      "call_status": "FAILED",
+      "retry_count": 0,
+      "delivery_status": {
+        "sms": "QUEUED",
+        "call": "NOT_INITIATED",
+        "confirmed_delivered": false,
+        "alternate_sms": "FAILED"
+      },
+      "conversation": [
+        {
+          "timestamp": "2026-11-01T10:49:36.086175+00:00",
+          "patient": "I have severe chest pain radiating to my left arm",
+          "assistant": "I understand. Your emergency alert is being processed. Chest pain can be serious. Please seek immediate emergency medical assistance. Do not wait for the caregiver if you are experiencing severe symptoms.",
+          "risk_level": "CRITICAL"
+        },
+        {
+          "timestamp": "2026-11-01T10:50:00.234623+00:00",
+          "patient": "I have severe chest pain radiating to my left arm",
+          "assistant": "I understand. Your emergency alert is being processed. Chest pain can be serious. Please seek immediate emergency medical assistance. Do not wait for the caregiver if you are experiencing severe symptoms.",
+          "risk_level": "CRITICAL"
+        }
+      ],
+      "resolution_notes": "Assistance completed safely",
+      "notes": [
+        {
+          "time": "2026-11-01T10:48:53.354463+00:00",
+          "note": "Caregiver call initiated to +91****2345 (attempt 1)"
+        },
+        {
+          "time": "2026-11-01T10:49:32.094507+00:00",
+          "note": "Caregiver call initiated to +91****2345 (attempt 1)"
+        },
+        {
+          "time": "2026-11-01T10:49:32.821074+00:00",
+          "note": "Call failed: HTTP 422 error: Unable to create record: No Twilio trial phone number is assigned for voice calls to this destination number. Please add the \"to\" number as a verified recipient."
+        },
+        {
+          "time": "2026-11-01T10:49:33.225599+00:00",
+          "note": "Alternate alert dispatched after call failure/unanswered."
+        },
+        {
+          "time": "2026-11-01T10:50:00.226446+00:00",
+          "note": "Caregiver call initiated to +91****2345 (attempt 1)"
+        },
+        {
+          "time": "2026-11-01T10:50:00.247530+00:00",
+          "note": "Caregiver acknowledged alert via phone keypad input: 1"
+        },
+        {
+          "time": "2026-11-01T10:50:00.252395+00:00",
+          "note": "Assistance completed safely"
+        },
+        {
+          "time": "2026-11-01T10:50:00.569028+00:00",
+          "note": "Call failed: HTTP 422 error: Unable to create record: No Twilio trial phone number is assigned for voice calls to this destination number. Please add the \"to\" number as a verified recipient."
+        },
+        {
+          "time": "2026-11-01T10:50:01.078287+00:00",
+          "note": "Alternate alert dispatched after call failure/unanswered."
+        }
+      ],
+      "resolved_at": "2026-11-01T10:50:00.252950+00:00"
+    }
+  ],
+  "updated_at": "2026-11-01T10:50:01.078340+00:00"
+}

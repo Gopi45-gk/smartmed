@@ -25,8 +25,8 @@ interface Props {
 
 type CallState = 'incoming' | 'connected' | 'responded';
 type VoiceState = 'idle' | 'listening' | 'processing' | 'speaking' | 'error';
-type VoicePromptType = 'GREETING' | 'TAKEN_ACK' | 'DELAY_ACK' | 'SKIP_ACK' | 'CLARIFY' | 'MAX_CLARIFY';
-type MedicationIntent = 'TAKEN' | 'NOT_TAKEN' | 'DELAYED' | 'SKIPPED' | 'CLINICAL_QUERY' | 'UNCLEAR';
+type VoicePromptType = 'GREETING' | 'TAKEN_ACK' | 'DELAY_ACK' | 'SKIP_ACK' | 'FAREWELL' | 'EMERGENCY' | 'CLARIFY' | 'MAX_CLARIFY';
+type MedicationIntent = 'EMERGENCY' | 'FAREWELL' | 'TAKEN' | 'NOT_TAKEN' | 'DELAYED' | 'SKIPPED' | 'CLINICAL_QUERY' | 'UNCLEAR';
 
 // ─── Voice Script Generator (User Registered Data Only - No Hallucinations) ──
 function buildVoiceScript(
@@ -41,151 +41,237 @@ function buildVoiceScript(
   switch (type) {
     case 'GREETING':
       if (lang === 'ta') {
-        const greeting = pName ? `வணக்கம் ${pName}.` : 'வணக்கம்.';
-        const medPart = med ? ` உங்கள் ${med} மருந்தை எடுத்துக்கொள்ள வேண்டிய நேரம் இது.` : ' உங்கள் மருந்தை எடுத்துக்கொள்ள வேண்டிய நேரம் இது.';
-        return `${greeting} இது உங்கள் SmartMed AI உதவியாளர்.${medPart}`;
+        const pStr = pName ? `${pName} ஐயா` : 'ஐயா';
+        const medStr = med ? `உங்கள் ${med} மருந்தை` : 'உங்கள் மருந்தை';
+        return `வணக்கம் ${pStr}! நலமாக இருக்கிறீர்களா? இப்போது ${medStr} எடுத்துக்கொள்ளும் நேரம். மருந்தை எடுத்துக்கொண்டீர்களா?`;
       } else if (lang === 'hi') {
-        const greeting = pName ? `नमस्ते ${pName}।` : 'नमस्ते।';
-        const medPart = med ? ` आपकी ${med} दवा लेने का समय हो गया है।` : ' आपकी दवा लेने का समय हो गया है।';
-        return `${greeting} यह आपका SmartMed AI सहायक है।${medPart}`;
+        const pStr = pName ? `${pName} जी` : 'जी';
+        const medStr = med ? `आपकी ${med} दवा` : 'आपकी दवा';
+        return `नमस्ते ${pStr}! आप कैसे हैं? अभी ${medStr} लेने का समय हो गया है। क्या आपने पानी के साथ अपनी दवा ले ली है?`;
       } else if (lang === 'te') {
-        const greeting = pName ? `నమస్కారం ${pName}.` : 'నమస్కారం.';
-        const medPart = med ? ` మీ ${med} మందు వేసుకునే సమయం ఇది.` : ' మీ మందు వేసుకునే సమయం ఇది.';
-        return `${greeting} ఇది మీ SmartMed AI సహాయకుడు.${medPart}`;
+        const pStr = pName ? `${pName} గారు` : 'గారు';
+        const medStr = med ? `మీ ${med} మందు` : 'మీ మందు';
+        return `నమస్కారం ${pStr}! బాగున్నారా? ఇప్పుడు ${medStr} వేసుకునే సమయం. మీరు మందు తీసుకున్నారా?`;
       } else if (lang === 'kn') {
-        const greeting = pName ? `ನಮಸ್ಕಾರ ${pName}.` : 'ನಮಸ್ಕಾರ.';
-        const medPart = med ? ` ನಿಮ್ಮ ${med} ಔಷಧಿ ತೆಗೆದುಕೊಳ್ಳುವ ಸಮಯವಿದು.` : ' ನಿಮ್ಮ ಔಷಧಿ ತೆಗೆದುಕೊಳ್ಳುವ ಸಮಯವಿದು.';
-        return `${greeting} ಇದು ನಿಮ್ಮ SmartMed AI ಸಹಾಯಕ.${medPart}`;
+        const pStr = pName ? `${pName} ಅವರೇ` : 'ಅವರೇ';
+        const medStr = med ? `ನಿಮ್ಮ ${med} ಔಷಧಿ` : 'ನಿಮ್ಮ ಔಷಧಿ';
+        return `ನಮಸ್ಕಾರ ${pStr}! ಹೇಗಿದ್ದೀರಿ? ಈಗ ${medStr} ತೆಗೆದುಕೊಳ್ಳುವ ಸಮಯ. ನೀವು ಔಷಧಿ ತೆಗೆದುಕೊಂಡಿದ್ದೀರಾ?`;
       } else if (lang === 'ml') {
-        const greeting = pName ? `നമസ്കാരം ${pName}.` : 'നമസ്കാരം.';
-        const medPart = med ? ` നിങ്ങളുടെ ${med} മരുന്ന് കഴിക്കാനുള്ള സമയമായി.` : ' നിങ്ങളുടെ മരുന്ന് കഴിക്കാനുള്ള സമയമായി.';
-        return `${greeting} ഇത് നിങ്ങളുടെ SmartMed AI സഹായിയാണ്.${medPart}`;
+        const pStr = pName ? `${pName} ചേട്ടാ` : 'ചേട്ടാ';
+        const medStr = med ? `നിങ്ങളുടെ ${med} മരുന്ന്` : 'നിങ്ങളുടെ മരുന്ന്';
+        return `നമസ്കാരം ${pStr}! സുഖമാണോ? ഇപ്പോൾ ${medStr} കഴിക്കാനുള്ള സമയമാണ്. മരുന്ന് കഴിച്ചോ?`;
       } else {
-        const greeting = pName ? `Hello ${pName}.` : 'Hello.';
-        const medPart = med ? ` It is time to take your ${med}.` : ' It is time to take your medicine.';
-        return `${greeting} This is your SmartMed AI assistant.${medPart}`;
+        const pStr = pName ? pName : 'there';
+        const medStr = med ? `your ${med}` : 'your medication';
+        return `Hello ${pStr}! I hope you're having a good day. It is time for ${medStr}. Have you had a chance to take it with some water yet?`;
       }
 
     case 'TAKEN_ACK':
       if (lang === 'ta') {
-        return pName
-          ? `மிக்க நன்றி ${pName}! உங்கள் மருந்து உட்கொள்ளல் பதிவு செய்யப்பட்டது. உடலை நன்றாகப் பார்த்துக் கொள்ளுங்கள்.`
-          : 'மிக்க நன்றி! உங்கள் மருந்து உட்கொள்ளல் பதிவு செய்யப்பட்டது. உடலை நன்றாகப் பார்த்துக் கொள்ளுங்கள்.';
+        const pStr = pName ? `${pName} ஐயா` : 'ஐயா';
+        const medStr = med ? `உங்கள் ${med} மருந்தை` : 'மருந்தை';
+        return `ரொம்ப மகிழ்ச்சி ${pStr}! ${medStr} சரியான நேரத்தில் எடுத்துக்கொண்டீர்கள். அதை நான் குறித்துக் கொண்டேன். உடம்பை நல்லா பாத்துக்கோங்க! வேறு ஏதேனும் சந்தேகம் இருக்கிறதா?`;
       } else if (lang === 'hi') {
-        return pName
-          ? `धन्यवाद ${pName}! आपकी दवा लेने की पुष्टि दर्ज कर ली गई है। अपना ख्याल रखें।`
-          : 'धन्यवाद! आपकी दवा लेने की पुष्टि दर्ज कर ली गई है। अपना ख्याल रखें।';
+        const pStr = pName ? `${pName} जी` : 'जी';
+        const medStr = med ? `अपनी ${med} दवा` : 'दवा';
+        return `बहुत अच्छा ${pStr}! आपने समय पर ${medStr} ले ली है। मैंने इसे दर्ज कर लिया है। पर्याप्त पानी पिएं। क्या आप कुछ और पूछना चाहते हैं?`;
       } else if (lang === 'te') {
-        return pName
-          ? `ధన్యవాదాలు ${pName}! మీ మందుల వివరాలు నమోదు చేయబడ్డాయి. జాగ్రత్తగా ఉండండి.`
-          : 'ధన్యవాదాలు! మీ మందుల వివరాలు నమోదు చేయబడ్డాయి. జాగ్రత్తగా ఉండండి.';
+        const pStr = pName ? `${pName} గారు` : 'గారు';
+        const medStr = med ? `${med} మందు` : 'మందు';
+        return `చాలా సంతోషం ${pStr}! మీరు సమయానికి ${medStr} తీసుకున్నారు. నేను నమోదు చేశాను. మంచి నీరు త్రాగండి. ఇంకా ఏమైనా సందేహం ఉందా?`;
       } else if (lang === 'kn') {
-        return pName
-          ? `ಧನ್ಯವಾದಗಳು ${pName}! ನಿಮ್ಮ ಔಷಧಿ ವಿವರ ದಾಖಲಾಗಿದೆ. ಆರೋಗ್ಯವಾಗಿರಿ.`
-          : 'ಧನ್ಯವಾದಗಳು! ನಿಮ್ಮ ಔಷಧಿ ವಿವರ ದಾಖಲಾಗಿದೆ. ಆರೋಗ್ಯವಾಗಿರಿ.';
+        const pStr = pName ? `${pName} ಅವರೇ` : 'ಅವರೇ';
+        return `ತುಂಬಾ ಸಂತೋಷ ${pStr}! ನೀವು ಸಮಯಕ್ಕೆ ಸರಿಯಾಗಿ ಔಷಧಿ ತೆಗೆದುಕೊಂಡಿದ್ದೀರಿ. ನಾನು ದಾಖಲಿಸಿದ್ದೇನೆ. ಆರೋಗ್ಯವಾಗಿರಿ!`;
       } else if (lang === 'ml') {
-        return pName
-          ? `നന്ദി ${pName}! നിങ്ങൾ മരുന്ന് കഴിച്ചത് രേഖപ്പെടുത്തി. ആരോഗ്യം ശ്രദ്ധിക്കുക.`
-          : 'നന്ദി! നിങ്ങൾ മരുന്ന് കഴിച്ചത് രേഖപ്പെടുത്തി. ആരോഗ്യം ശ്രദ്ധിക്കുക.';
+        const pStr = pName ? `${pName} ചേട്ടാ` : 'ചേട്ടാ';
+        return `വളരെ സന്തോഷം ${pStr}! കൃത്യസമയത്ത് മരുന്ന് കഴിച്ചതിൽ സന്തോഷം. ഞാൻ രേഖപ്പെടുത്തിയിട്ടുണ്ട്. ഇപ്പോൾ എങ്ങനെയുണ്ട്?`;
       } else {
-        return pName
-          ? `Thank you ${pName}! Your medication has been marked as taken. Take care!`
-          : 'Thank you! Your medication has been marked as taken. Take care!';
+        const pStr = pName ? pName : 'friend';
+        const medStr = med ? `your ${med}` : 'your medicine';
+        return `Wonderful, ${pStr}! I'm so glad you've taken ${medStr} on time. I have marked it in your record. Please drink some water to stay hydrated. How are you feeling right now?`;
       }
 
     case 'DELAY_ACK':
       if (lang === 'ta') {
-        return pName
-          ? `சரி ${pName}, 15 நிமிடங்களுக்குப் பிறகு மீண்டும் நினைவூட்டுகிறேன். தயவுசெய்து விரைவில் மருந்தை எடுத்துக் கொள்ளுங்கள்.`
-          : 'சரி, 15 நிமிடங்களுக்குப் பிறகு மீண்டும் நினைவூட்டுகிறேன். தயவுசெய்து விரைவில் மருந்தை எடுத்துக் கொள்ளுங்கள்.';
+        const pStr = pName ? `${pName} ஐயா` : 'ஐயா';
+        return `பரவாயில்லைங்க ${pStr}, பொறுமையாக சாப்பிட்டு முடியுங்கள். இன்னும் பதினைந்து நிமிடங்களில் நான் மீண்டும் நினைவூட்டுகிறேன். கவலைப்படாதீர்கள்!`;
       } else if (lang === 'hi') {
-        return pName
-          ? `समझ गया ${pName}। मैं 15 मिनट बाद दोबारा याद दिलाऊंगा। कृपया समय पर दवा लें।`
-          : 'समझ गया। मैं 15 मिनट बाद दोबारा याद दिलाऊंगा। कृपया समय पर दवा लें।';
+        const pStr = pName ? `${pName} जी` : 'जी';
+        return `कोई बात नहीं ${pStr}, आप आराम से भोजन करें। मैं 15 मिनट बाद दोबारा याद दिलाऊंगा। अपना ख्याल रखें!`;
       } else if (lang === 'te') {
-        return pName
-          ? `సరే ${pName}, 15 నిమిషాల తర్వాత మళ్లీ గుర్తుచేస్తాను. దయచేసి త్వరగా మందు తీసుకోండి.`
-          : 'సరే, 15 నిమిషాల తర్వాత మళ్లీ గుర్తుచేస్తాను. దయచేసి త్వరగా మందు తీసుకోండి.';
+        const pStr = pName ? `${pName} గారు` : 'గారు';
+        return `ఏమీ పర్వాలేదు ${pStr}, ప్రశాంతంగా భోజనం చేయండి. నేను 15 నిమిషాల తర్వాత మళ్లీ గుర్తుచేస్తాను!`;
       } else if (lang === 'kn') {
-        return pName
-          ? `ಸರಿ ${pName}, 15 ನಿಮಿಷಗಳ ನಂತರ ಮತ್ತೆ ನೆನಪಿಸುತ್ತೇನೆ. ದಯವಿಟ್ಟು ಬೇಗ ಔಷಧಿ ತೆಗೆದುಕೊಳ್ಳಿ.`
-          : 'ಸರಿ, 15 ನಿಮಿಷಗಳ ನಂತರ ಮತ್ತೆ ನೆನಪಿಸುತ್ತೇನೆ. ದಯವಿಟ್ಟು ಬೇಗ ಔಷಧಿ ತೆಗೆದುಕೊಳ್ಳಿ.';
+        const pStr = pName ? `${pName} ಅವರೇ` : 'ಅವರೇ';
+        return `ಏನೂ ತೊಂದರೆಯಿಲ್ಲ ${pStr}, ನಿಧಾನವಾಗಿ ಊಟ ಮುಗಿಸಿ. ನಾನು 15 ನಿಮಿಷಗಳ ನಂತರ ಮತ್ತೆ ನೆನಪಿಸುತ್ತೇನೆ!`;
       } else if (lang === 'ml') {
-        return pName
-          ? `ശരി ${pName}, 15 മിനിറ്റിനു ശേഷം വീണ്ടും ഓർമ്മിപ്പിക്കാം. ദയവായി വേഗം മരുന്ന് കഴിക്കുക.`
-          : 'ശരി, 15 മിനിറ്റിനു ശേഷം വീണ്ടും ഓർമ്മിപ്പിക്കാം. ദയവായി വേഗം മരുന്ന് കഴിക്കുക.';
+        const pStr = pName ? `${pName} ചേട്ടാ` : 'ചേട്ടാ';
+        return `ഒരു കുഴപ്പവുമില്ല ${pStr}, സാവധാനം ഭക്ഷണം കഴിക്കുക. 15 മിനിറ്റിനു ശേഷം ഞാൻ വീണ്ടും ഓർമ്മിപ്പിക്കാം!`;
       } else {
-        return pName
-          ? `Understood ${pName}. I will remind you again in 15 minutes. Please remember to take your medicine.`
-          : 'Understood. I will remind you again in 15 minutes. Please remember to take your medicine.';
+        const pStr = pName ? pName : 'friend';
+        return `No problem at all, ${pStr}! Please take your time, and I will remind you again in 15 minutes. Take good care!`;
       }
 
     case 'SKIP_ACK':
-      if (lang === 'ta') return 'சரி, இந்த முறை மருந்து தவிர்க்கப்பட்டதாகக் குறிக்கப்பட்டுள்ளது. தேவைப்பட்டால் மருத்துவரை அணுகவும்.';
-      if (lang === 'hi') return 'समझ गया। इस खुराक को छोड़ दिया गया है। अधिक खुराक छूटने पर डॉक्टर से परामर्श करें।';
-      if (lang === 'te') return 'సరే, ఈ మోతాదు తీసుకోలేదని నమోదు చేయబడింది.';
-      if (lang === 'kn') return 'ಸರಿ, ಈ ಡೋಸ್ ತೆಗೆದುಕೊಳ್ಳಲಾಗಿಲ್ಲ ಎಂದು ನಮೂದಿಸಲಾಗಿದೆ.';
-      if (lang === 'ml') return 'ശരി, ഈ ഡോസ് ഒഴിവാക്കിയതായി രേഖപ്പെടുത്തി.';
-      return 'Understood. I have recorded this dose as skipped. Please consult your physician if you miss multiple doses.';
+      if (lang === 'ta') {
+        return 'சரிங்க ஐயா, இந்த முறை மருந்தை தவிர்த்ததாகக் குறித்துக்கொள்கிறேன். அடுத்த முறை இரட்டை மாத்திரை எடுக்காதீர்கள், ஏதேனும் அசௌகரியம் இருந்தால் மருத்துவரை தொடர்பு கொள்ளவும்.';
+      } else if (lang === 'hi') {
+        return 'समझ गया। इस खुराक को छूटा हुआ दर्ज किया गया है। अगली बार दोहरी खुराक न लें, और तबियत ठीक न लगे तो डॉक्टर से बात करें।';
+      } else if (lang === 'te') {
+        return 'అర్థమైంది, ఈ మోతాదు తీసుకోలేదని నమోదు చేశాను. తదుపరి సారి డబుల్ డోస్ తీసుకోవద్దు, ఏదైనా సమస్య ఉంటే వైద్యుడిని సంప్రదించండి.';
+      } else if (lang === 'kn') {
+        return 'ಅರ್ಥವಾಯಿತು, ಈ ಡೋಸ್ ತೆಗೆದುಕೊಳ್ಳಲಾಗಿಲ್ಲ ಎಂದು ನಮೂದಿಸಲಾಗಿದೆ. ಮುಂದಿನ ಬಾರಿ ಡಬಲ್ ಡೋಸ್ ತೆಗೆದುಕೊಳ್ಳಬೇಡಿ.';
+      } else if (lang === 'ml') {
+        return 'മനസ്സിലായി, ഈ ഡോസ് ഒഴിവാക്കിയതായി രേഖപ്പെടുത്തി. അടുത്ത തവണ ഇരട്ടി ഡോസ് കഴിക്കരുത്.';
+      } else {
+        return 'I understand. I have recorded this dose as skipped. Please remember never to take a double dose next time, and do contact your doctor if you feel unwell.';
+      }
+
+    case 'FAREWELL':
+      if (lang === 'ta') {
+        const pStr = pName ? `${pName} ஐயா` : 'ஐயா';
+        return `கேட்கவே மிக்க மகிழ்ச்சியாக இருக்கிறது ${pStr}! உடம்பை நன்றாகப் பார்த்துக் கொள்ளுங்கள். இனிய நாளாக அமையட்டும். வணக்கம்!`;
+      } else if (lang === 'hi') {
+        const pStr = pName ? `${pName} जी` : 'जी';
+        return `यह सुनकर बहुत अच्छा लगा ${pStr}! अपना ख्याल रखें और आपका दिन शुभ हो। नमस्ते!`;
+      } else if (lang === 'te') {
+        const pStr = pName ? `${pName} గారు` : 'గారు';
+        return `ఇది విని చాలా ఆనందంగా ఉంది ${pStr}! జాగ్రత్తగా ఉండండి, మంచి రోజు కావాలని కోరుకుంటున్నాను. నమస్కారం!`;
+      } else if (lang === 'kn') {
+        return 'ತುಂಬಾ ಸಂತೋಷ! ನಿಮ್ಮ ಆರೋಗ್ಯವನ್ನು ಚೆನ್ನಾಗಿ ನೋಡಿಕೊಳ್ಳಿ. ನಮಸ್ಕಾರ!';
+      } else if (lang === 'ml') {
+        return 'വളരെ സന്തോഷം! ആരോഗ്യം ശ്രദ്ധിക്കുക. നല്ലൊരു ദിവസം ആശംസിക്കുന്നു. നമസ്കാരം!';
+      } else {
+        const pStr = pName ? pName : 'friend';
+        return `That is wonderful to hear, ${pStr}! You take care and have a blessed, healthy day. Feel free to reach out anytime. Goodbye!`;
+      }
+
+    case 'EMERGENCY':
+      if (lang === 'ta') {
+        const pStr = pName ? `${pName} ஐயா, ` : '';
+        return `${pStr}நெஞ்சு வலி மற்றும் மூச்சுத் திணறல் தீவிரமான அவசர நிலை. உடனே உட்கார்ந்து அமைதியாக இருங்கள், உடனடியாக அவசர மருத்துவ சேவையை அல்லது ஆம்புலன்ஸை அழையுங்கள்!`;
+      } else if (lang === 'hi') {
+        const pStr = pName ? `${pName} जी, ` : '';
+        return `${pStr}सीने में दर्द और सांस लेने में कठिनाई गंभीर आपातकाल है। कृपया तुरंत बैठ जाएं और एम्बुलेंस या आपातकालीन सेवा को कॉल करें!`;
+      } else if (lang === 'te') {
+        const pStr = pName ? `${pName} గారు, ` : '';
+        return `${pStr}ఛాతీ నొప్పి మరియు శ్వాసలో ఇబ్బంది తీవ్రమైన అత్యవసర పరిస్థితి. వెంటనే కూర్చోండి మరియు అత్యవసర వైద్య సహాయం పొందండి!`;
+      } else {
+        const pStr = pName ? `${pName}, ` : '';
+        return `${pStr}chest pain and difficulty breathing are medical emergencies. Please sit down immediately, remain calm, and call emergency services or an ambulance right away!`;
+      }
 
     case 'CLARIFY':
-      if (lang === 'ta') return 'மன்னிக்கவும், எனக்கு புரியவில்லை. உங்கள் மருந்தை எடுத்துவிட்டீர்களா?';
-      if (lang === 'hi') return 'क्षमा करें, मुझे समझ नहीं आया। क्या आपने अपनी दवा ले ली है?';
-      if (lang === 'te') return 'క్షమించండి, నాకు అర్థం కాలేదు. మీరు మీ మందులు వేసుకున్నారా?';
-      if (lang === 'kn') return 'ಕ್ಷಮಿಸಿ, ಅರ್ಥವಾಗಲಿಲ್ಲ. ನೀವು ಔಷಧಿ ತೆಗೆದುಕೊಂಡಿದ್ದೀರಾ?';
-      if (lang === 'ml') return 'ക്ഷമിക്കണം, വ്യക്തമായില്ല. നിങ്ങൾ മരുന്ന് കഴിച്ചോ?';
-      return "Sorry, I didn't understand. Did you take your medicine?";
+      if (lang === 'ta') {
+        const pStr = pName ? `${pName} ஐயா` : 'ஐயா';
+        return `மன்னிக்கவும் ${pStr}, எனக்கு சரியாக கேட்கவில்லை. உங்கள் மருந்தை எடுத்துக்கொண்டீர்களா அல்லது ஏதேனும் சந்தேகம் இருக்கிறதா?`;
+      } else if (lang === 'hi') {
+        const pStr = pName ? `${pName} जी` : 'जी';
+        return `क्षमा करें ${pStr}, मैं सुन नहीं पाया। क्या आपने अपनी दवा ले ली है या कोई स्वास्थ्य संबंधी प्रश्न है?`;
+      } else if (lang === 'te') {
+        const pStr = pName ? `${pName} గారు` : 'గారు';
+        return `క్షమించండి ${pStr}, స్పష్టంగా వినిపించలేదు. మీరు మందు తీసుకున్నారా లేదా ఏదైనా ప్రశ్న ఉందా?`;
+      } else if (lang === 'kn') {
+        return 'ಕ್ಷಮಿಸಿ, ಅರ್ಥವಾಗಲಿಲ್ಲ. ನೀವು ಔಷಧಿ ತೆಗೆದುಕೊಂಡಿದ್ದೀರಾ?';
+      } else if (lang === 'ml') {
+        return 'ക്ഷമിക്കണം, വ്യക്തമായില്ല. നിങ്ങൾ മരുന്ന് കഴിച്ചോ?';
+      } else {
+        const pStr = pName ? pName : 'friend';
+        return `I didn't quite catch that, ${pStr}. Could you please repeat if you have taken your medicine or if you need any advice?`;
+      }
 
     case 'MAX_CLARIFY':
       if (lang === 'ta') return 'உங்கள் பதிலை உறுதிப்படுத்த முடியவில்லை. திரையில் உள்ள பொத்தான்களைப் பயன்படுத்தி உறுதிப்படுத்தவும்.';
       if (lang === 'hi') return 'दवा लेने की पुष्टि नहीं हो सकी। कृपया स्क्रीन पर दिए गए बटन का उपयोग करें।';
-      if (lang === 'te') return 'స్పష్టత రాలేదు. దయచేసి స్క్రీన్‌పై ఉన్న బటన్లను ఉపయోగించండి.';
+      if (lang === 'te') return 'స్పష్టత రాలేదు. దయచేసి స్క్రీన్‌పై ఉన్న బటன்లను ఉపయోగించండి.';
       if (lang === 'kn') return 'ಖಚಿತಪಡಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಪರದೆಯ ಮೇಲಿನ ಬಟನ್ ಬಳಸಿ.';
-      if (lang === 'ml') return 'സ്ഥിരീകരിക്കാൻ കഴിഞ്ഞില്ല. ദയവായി സ്ക്രീനിലെ ബട്ടണുകൾ ഉപയോഗിക്കുക.';
-      return 'I could not confirm if you took your medicine. Please use the buttons on your screen.';
+      if (lang === 'ml') return 'സ്ഥിರീകരിക്കാൻ കഴിഞ്ഞില്ല. ദയവായി സ്ക്രീനിലെ ബട്ടണുകൾ ഉപയോഗിക്കുക.';
+      return 'I could not confirm your response. Please use the buttons on your screen to confirm.';
   }
 }
 
-// ─── Intent Detection Classifier (Natural Multilingual Conversational STT) ─
 function classifyVoiceIntent(spokenText: string): MedicationIntent {
   const lower = spokenText.toLowerCase().trim();
   const tokens = lower.split(/[\s,?.!]+/);
 
+  // 1. Emergency detection
+  const emergencyKeywords = [
+    'chest pain', 'heart attack', 'heart racing', 'cannot breathe', 'cant breathe', "can't breathe",
+    'trouble breathing', 'stroke', 'fainted', 'bleeding heavily', 'emergency',
+    'நெஞ்சு வலி', 'மூச்சு', 'மாரடைப்பு', 'சீने में दर्द', 'सांस', 'ఛాతీ నొప్పి', 'శ్వాస',
+    'നെഞ്ചുവേദന', 'ശ്വാസം', 'ಎದೆ ನೋವು', 'ಉಸಿರಾಟ'
+  ];
+  if (emergencyKeywords.some(kw => lower.includes(kw))) {
+    return 'EMERGENCY';
+  }
+
+  // 2. Farewell / Patient feels fine / Polite closing
+  const farewellKeywords = [
+    'fine', 'feeling fine', 'feeling good', 'all good', 'no questions', 'no thank you', 'no thanks',
+    'thats all', "that's all", 'bye', 'goodbye', 'have a good day', 'thank you', 'thanks',
+    'நல்லா இருக்கேன்', 'நன்றாக இருக்கிறேன்', 'நன்றி', 'போதும்', 'சரி நன்றி', 'வணக்கம்',
+    'ठीक हूँ', 'अच्छा हूँ', 'धन्यवाद', 'नमस्ते', 'अलविदा',
+    'బాగున్నాను', 'ధన్యవాదాలు', 'నమస్కారం',
+    'ಚೆನ್ನಾಗಿದ್ದೇನೆ', 'ಧನ್ಯವಾದಗಳು',
+    'സുഖമാണ്', 'നന്ദി'
+  ];
+  if (farewellKeywords.some(kw => lower.includes(kw))) {
+    return 'FAREWELL';
+  }
+
+  // 3. Clinical & Medication Queries / Symptoms
+  const queryKeywords = [
+    'what', 'why', 'how', 'when', 'who', 'where', 'which', 'side effect', 'food', 'water', 'doctor',
+    'fever', 'pain', 'ache', 'dizzy', 'dizziness', 'sleep', 'sleepy', 'sleepiness', 'drowsy',
+    'tablet', 'medicine', 'pill', 'dose', 'dosage', 'breathe', 'breath',
+    'pressure', 'bp', 'hypertension', 'serious', 'symptom', 'headache', 'eye', 'cough', 'cold',
+    'stomach', 'acidity', 'gas', 'nausea', 'vomit', 'tired', 'fatigue', 'weakness',
+    'miss', 'missed', 'forgot', 'safe', 'harm', 'can i', 'should i', 'is it', 'is this', 'coffee', 'tea', 'milk',
+    // Tamil
+    'என்ன', 'எப்படி', 'எப்போது', 'எதற்கு', 'வலி', 'சாப்பாடு', 'மருந்து', 'மாத்திரை',
+    'மயக்கம்', 'தலைசுற்றல்', 'தலைச்சுற்றல்', 'தூக்கம்', 'கண்', 'தலைவலி', 'வயிறு', 'காய்ச்சல்', 'சளி', 'இருமல்',
+    'இரத்த அழுத்தம்', 'ரத்த அழுத்தம்', 'மறந்து', 'முடியுமா', 'காபி', 'டீ',
+    // Hindi
+    'क्या', 'कैसे', 'कब', 'क्यों', 'दर्द', 'खाना', 'दवा', 'गोली', 'पेट', 'बुखार', 'खांसी', 'सर्दी',
+    'चक्कर', 'नींद', 'आँख', 'सिरदर्द', 'रक्तचाप', 'भूल', 'सकता', 'कॉफी', 'चाय',
+    // Telugu
+    'ఏమిటి', 'ఎలా', 'ఎప్పుడు', 'ఎందుకు', 'నొప్పి', 'ఆహారం', 'మందు', 'మాత్ర', 'కడుపు', 'జ్వరం', 'దగ్గు',
+    'తలతిరగడం', 'నిద్ర', 'కంటి', 'తలనొప్పి', 'రక్తపోటు', 'మర్చి', 'కాఫీ',
+    // Kannada
+    'ಏನು', 'ಹೇಗೆ', 'ಯಾವಾಗ', 'ಏಕೆ', 'ನೋವು', 'ಊಟ', 'ಔಷಧಿ', 'ಮಾತ್ರೆ', 'ಹೊಟ್ಟೆ', 'ಜ್ವರ',
+    'ತಲೆಸುತ್ತು', 'ನಿದ್ದೆ', 'ಕಣ್ಣು', 'ತಲೆನೋವು', 'ಮರೆತು',
+    // Malayalam
+    'എന്ത്', 'എങ്ങനെ', 'എപ്പോൾ', 'എന്തിന്', 'വേദന', 'ഭക്ഷണം', 'മരുന്ന്', 'വയറുവേദന', 'പനി',
+    'തലകറക്കം', 'ഉറക്കം', 'നെഞ്ച്', 'കണ്ണ്', 'തലവേദന', 'മറന്നു'
+  ];
+
+  // Delay / Snooze Keywords
+  const delayKeywords = [
+    'later', 'remind', 'snooze', '15 min', '30 min', 'after', 'busy', 'eating', 'having food',
+    'பிறகு', 'நினைவூட்டு', 'அப்புறம்', 'சாப்பிடுறேன்', 'சாப்பிடுகிறேன்',
+    'बाद में', 'याद', 'खाना खा रहा',
+    'తర్వాత', 'గుర్తు', 'భోజనం',
+    'ಆಮೇಲೆ', 'ನೆನ',
+    'ಪಿന്നെ', 'ഓർമ്മി',
+  ];
+
   // Negative / NOT TAKEN
   const negativeKeywords = [
-    'haven\'t', 'havent', 'not yet', 'have not', 'didn\'t', 'did not', 'no', 'nope',
-    'not now', 'not taken', 'still not', 'wont', 'won\'t',
+    "haven't", 'havent', 'not yet', 'have not', "didn't", 'did not', 'no', 'nope',
+    'not now', 'not taken', 'still not', 'wont', "won't",
     'இல்லை', 'இல்ல', 'இன்னும் எடுக்கவில்லை', 'இன்னும் இல்லை', 'இன்னும் இல்ல', 'எடுக்கல', 'சாப்பிடல', 'போடல',
     'illa', 'illai', 'edukala', 'sappidala',
     'नहीं', 'नहीं ली', 'अभी नहीं', 'nahi', 'nahi li', 'abhi nahi',
     'లేదు', 'ఇంకా తీసుకోలేదు', 'ledu', 'inka ledu',
     'ಇಲ್ಲ', 'ಇನ್ನೂ ತೆಗೆದುಕೊಂಡಿಲ್ಲ',
-    'ഇല്ല', 'ഇതുവരെ കഴിച്ചില്ല',
+    'ಇಲ್ಲ', 'ಇതുവരെ കഴിച്ചಿಲ್ಲ',
   ];
-
-  const hasNegative = negativeKeywords.some(kw => lower.includes(kw) || tokens.includes(kw));
-
-  // Delay / Snooze Keywords
-  const delayKeywords = [
-    'later', 'remind', 'snooze', '15 min', '30 min', 'after', 'busy',
-    'பிறகு', 'நினைவூட்டு', 'அப்புறம்',
-    'बाद में', 'याद',
-    'తర్వాత', 'గుర్తు',
-    'ಆಮೇಲೆ', 'ನೆನ',
-    'പിന്നെ', 'ഓർമ്മി',
-  ];
-
-  const hasDelay = delayKeywords.some(kw => lower.includes(kw));
-
-  if (hasNegative && hasDelay) return 'DELAYED';
-  if (hasNegative) return 'NOT_TAKEN';
-  if (hasDelay) return 'DELAYED';
 
   // Positive / TAKEN Keywords
   const takenKeywords = [
     'took', 'already taken', 'already took', 'had my', 'finished', 'done',
     'yes', 'yeah', 'yup', 'yes i did', 'mark taken', 'swallowed', 'taken',
-    'i took it', 'i have taken',
+    'i took it', 'i have taken', 'took it',
     'எடுத்துக்கிட்டேன்', 'எடுத்துட்டேன்', 'எடுத்தாச்சு', 'சாப்பிட்டேன்', 'சாப்பிட்டாச்சு',
     'குடிச்சேன்', 'குடிச்சாச்சு', 'போட்டேன்', 'போட்டாச்சு', 'முடிஞ்சது', 'ஆம்', 'ஆமாம்',
     'eduthen', 'eduthuten', 'eduthachu', 'aamam', 'aam',
@@ -195,41 +281,40 @@ function classifyVoiceIntent(spokenText: string): MedicationIntent {
     'കഴിച്ചു', 'എടുത്തു', 'ഉവ്വ്', 'കഴിഞ്ഞു', 'athe', 'kazhichu',
   ];
 
-  const hasTaken = takenKeywords.some(kw => lower.includes(kw) || tokens.includes(kw));
-  if (hasTaken) return 'TAKEN';
-
   // Skip Keywords
   const skipKeywords = [
-    'skip', 'skipped', 'missed', 'won\'t take',
+    'skip', 'skipped', 'missed', "won't take", 'dont want', 'refuse',
     'தவிர்த்து', 'வேண்டாம்', 'छोड़', 'వద్దు', 'ಬೇಡ', 'വേണ്ട'
   ];
-  if (skipKeywords.some(kw => lower.includes(kw))) return 'SKIPPED';
 
-  // Clinical / Informational Queries (delegated to unified medical pipeline)
-  const queryKeywords = [
-    'what', 'why', 'how', 'when', 'who', 'where', 'which', 'side effect', 'food', 'water', 'doctor',
-    'fever', 'pain', 'ache', 'dizzy', 'dizziness', 'sleep', 'sleepy', 'sleepiness', 'drowsy',
-    'tablet', 'medicine', 'pill', 'dose', 'dosage', 'chest', 'heart', 'breathe', 'breath',
-    'pressure', 'bp', 'hypertension', 'serious', 'symptom', 'headache', 'eye', 'cough', 'cold',
-    'miss', 'missed', 'forgot', 'safe', 'harm', 'can i', 'should i', 'is it', 'is this',
-    // Tamil
-    'என்ன', 'எப்படி', 'எப்போது', 'எதற்கு', 'வலி', 'சாப்பாடு', 'மருந்து', 'மாத்திரை',
-    'மயக்கம்', 'தலைசுற்றல்', 'தலைச்சுற்றல்', 'தூக்கம்', 'நெஞ்சு', 'கண்', 'தலைவலி',
-    'இரத்த அழுத்தம்', 'ரத்த அழுத்தம்', 'மறந்து', 'முடியுமா',
-    // Hindi
-    'क्या', 'कैसे', 'कब', 'क्यों', 'दर्द', 'खाना', 'दवा', 'गोली',
-    'चक्कर', 'नींद', 'सीने', 'आँख', 'सिरदर्द', 'रक्तचाप', 'भूल', 'सकता',
-    // Telugu
-    'ఏమిటి', 'ఎలా', 'ఎప్పుడు', 'ఎందుకు', 'నొప్పి', 'ఆహారం', 'మందు', 'మాత్ర',
-    'తలతిరగడం', 'నిద్ర', 'ఛాతీ', 'కంటి', 'తలనొప్పి', 'రక్తపోటు', 'మర్చి',
-    // Kannada
-    'ಏನು', 'ಹೇಗೆ', 'ಯಾವಾಗ', 'ಏಕೆ', 'ನೋವು', 'ಊಟ', 'ಔಷಧಿ', 'ಮಾತ್ರೆ',
-    'ತಲೆಸುತ್ತು', 'ನಿದ್ದೆ', 'ಎದೆ', 'ಕಣ್ಣು', 'ತಲೆನೋವು', 'ಮರೆತು',
-    // Malayalam
-    'എന്ത്', 'എങ്ങനെ', 'എപ്പോൾ', 'എന്തിന്', 'വേദന', 'ഭക്ഷണം', 'മരുന്ന്',
-    'തലകറക്കം', 'ഉറക്കം', 'നെഞ്ച്', 'കണ്ണ്', 'തലവേദന', 'മറന്നു'
-  ];
-  if (queryKeywords.some(kw => lower.includes(kw)) || lower.includes('?') || tokens.length >= 3) {
+  const hasQuery = queryKeywords.some(kw => lower.includes(kw));
+  const hasTaken = takenKeywords.some(kw => lower.includes(kw) || tokens.includes(kw));
+  const hasNegative = negativeKeywords.some(kw => lower.includes(kw) || tokens.includes(kw));
+  const hasDelay = delayKeywords.some(kw => lower.includes(kw));
+  const hasSkip = skipKeywords.some(kw => lower.includes(kw));
+
+  // If patient asks about symptoms or medication details, prioritize clinical advice
+  if (hasQuery) {
+    return 'CLINICAL_QUERY';
+  }
+
+  if (hasDelay || (hasNegative && hasDelay)) {
+    return 'DELAYED';
+  }
+
+  if (hasNegative) {
+    return 'NOT_TAKEN';
+  }
+
+  if (hasSkip) {
+    return 'SKIPPED';
+  }
+
+  if (hasTaken) {
+    return 'TAKEN';
+  }
+
+  if (lower.includes('?') || tokens.length >= 3) {
     return 'CLINICAL_QUERY';
   }
 
@@ -371,15 +456,23 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang, p
     setVoiceState('processing');
 
     const registeredName = patientProfile?.name?.trim() || '';
+    const upcomingMed = medicines.find(m => m.status === 'upcoming') || medicines[0];
+    const medName = upcomingMed?.name || '';
     const intent = classifyVoiceIntent(spokenText);
 
-    // 1. Explicit Confirmation: TAKEN
-    if (intent === 'TAKEN') {
-      setClarificationAttempts(0);
-      handleMarkMedicineTaken();
-      const ackMsg = buildVoiceScript('TAKEN_ACK', registeredName, lang);
-      setAiMessage(ackMsg);
-      speakAIResponse(ackMsg, () => {
+    // 1. Emergency Detection
+    if (intent === 'EMERGENCY') {
+      const emergencyMsg = buildVoiceScript('EMERGENCY', registeredName, lang, medName);
+      setAiMessage(emergencyMsg);
+      speakAIResponse(emergencyMsg);
+      return;
+    }
+
+    // 2. Patient feels fine / Farewell / Polite wrap up
+    if (intent === 'FAREWELL') {
+      const farewellMsg = buildVoiceScript('FAREWELL', registeredName, lang, medName);
+      setAiMessage(farewellMsg);
+      speakAIResponse(farewellMsg, () => {
         if (isComponentMounted.current) {
           setCallState('responded');
         }
@@ -387,25 +480,7 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang, p
       return;
     }
 
-    // 2. Delay / Snooze
-    if (intent === 'DELAYED' || intent === 'NOT_TAKEN') {
-      setClarificationAttempts(0);
-      const ackMsg = buildVoiceScript('DELAY_ACK', registeredName, lang);
-      setAiMessage(ackMsg);
-      speakAIResponse(ackMsg);
-      return;
-    }
-
-    // 3. Skip
-    if (intent === 'SKIPPED') {
-      setClarificationAttempts(0);
-      const ackMsg = buildVoiceScript('SKIP_ACK', registeredName, lang);
-      setAiMessage(ackMsg);
-      speakAIResponse(ackMsg);
-      return;
-    }
-
-    // 4. Clinical Query or General Health Question
+    // 3. Clinical & Medication Queries / Symptoms
     if (intent === 'CLINICAL_QUERY') {
       setClarificationAttempts(0);
       try {
@@ -427,32 +502,76 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang, p
 
         if (!isComponentMounted.current) return;
 
-        if (result.success && result.response) {
-          setAiAvailable(true);
-          setAiMessage(result.response);
+        let responseText = result.response;
+        // Clean out bullet points or markdown to ensure spoken human elegance
+        responseText = responseText.replace(/^[•\-\*]\s+/gm, '').replace(/\n+/g, ' ').trim();
 
-          appendTurnToSharedHistory(spokenText, result.response);
-          conversationHistoryRef.current.push(
-            { role: 'user', content: spokenText },
-            { role: 'assistant', content: result.response }
-          );
+        setAiAvailable(true);
+        setAiMessage(responseText);
 
-          speakAIResponse(result.response, () => {
-            if (isComponentMounted.current && callState === 'connected') {
-              startListening();
-            }
-          });
-          return;
-        }
+        appendTurnToSharedHistory(spokenText, responseText);
+        conversationHistoryRef.current.push(
+          { role: 'user', content: spokenText },
+          { role: 'assistant', content: responseText }
+        );
+
+        speakAIResponse(responseText, () => {
+          // Keep continuous two-way voice loop open
+          if (isComponentMounted.current && callState === 'connected') {
+            startListening();
+          }
+        });
+        return;
       } catch (err) {
-        console.warn('[PhoneCallSimulation] Local AI voice query error:', err);
+        console.warn('[PhoneCallSimulation] Voice AI query fallback:', err);
       }
     }
 
-    // 5. Unclear Intent - Failure Handling (Rule 18: Maximum 2 clarification attempts)
+    // 4. Medicine Confirmed TAKEN
+    if (intent === 'TAKEN') {
+      setClarificationAttempts(0);
+      handleMarkMedicineTaken();
+      const ackMsg = buildVoiceScript('TAKEN_ACK', registeredName, lang, medName);
+      setAiMessage(ackMsg);
+      speakAIResponse(ackMsg, () => {
+        // Continuous conversational loop: listen for patient's reply or farewell
+        if (isComponentMounted.current && callState === 'connected') {
+          startListening();
+        }
+      });
+      return;
+    }
+
+    // 5. Delay / Snooze
+    if (intent === 'DELAYED' || intent === 'NOT_TAKEN') {
+      setClarificationAttempts(0);
+      const ackMsg = buildVoiceScript('DELAY_ACK', registeredName, lang, medName);
+      setAiMessage(ackMsg);
+      speakAIResponse(ackMsg, () => {
+        if (isComponentMounted.current && callState === 'connected') {
+          startListening();
+        }
+      });
+      return;
+    }
+
+    // 6. Skip Dose
+    if (intent === 'SKIPPED') {
+      setClarificationAttempts(0);
+      const ackMsg = buildVoiceScript('SKIP_ACK', registeredName, lang, medName);
+      setAiMessage(ackMsg);
+      speakAIResponse(ackMsg, () => {
+        if (isComponentMounted.current && callState === 'connected') {
+          startListening();
+        }
+      });
+      return;
+    }
+
+    // 7. Unclear Intent (Maximum 2 attempts)
     if (clarificationAttempts < 2) {
       setClarificationAttempts(prev => prev + 1);
-      const clarifyPrompt = buildVoiceScript('CLARIFY', registeredName, lang);
+      const clarifyPrompt = buildVoiceScript('CLARIFY', registeredName, lang, medName);
       setAiMessage(clarifyPrompt);
       speakAIResponse(clarifyPrompt, () => {
         if (isComponentMounted.current && callState === 'connected') {
@@ -460,8 +579,7 @@ export function PhoneCallSimulation({ close, medicines, setMedicines, t, lang, p
         }
       });
     } else {
-      // Reached maximum 2 clarification attempts: status = UNCLEAR, do not mark TAKEN
-      const maxClarifyPrompt = buildVoiceScript('MAX_CLARIFY', registeredName, lang);
+      const maxClarifyPrompt = buildVoiceScript('MAX_CLARIFY', registeredName, lang, medName);
       setAiMessage(maxClarifyPrompt);
       speakAIResponse(maxClarifyPrompt);
     }
