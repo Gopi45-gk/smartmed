@@ -10,10 +10,11 @@ interface Props {
 }
 
 export function SplashScreen({ t, onStart }: Props) {
-  useEffect(() => {
-    // Play subtle soft chime on splash entrance
+  const handleStart = () => {
+    soundManager.resumeAudioContext();
     soundManager.playSuccessChime();
-  }, []);
+    onStart?.();
+  };
 
   return (
     <motion.div 
@@ -21,7 +22,7 @@ export function SplashScreen({ t, onStart }: Props) {
       animate={{ opacity: 1 }} 
       exit={{ opacity: 0, scale: 0.97 }} 
       transition={{ duration: 0.35 }}
-      onClick={onStart}
+      onClick={handleStart}
       className="relative flex-1 flex flex-col items-center justify-center w-full h-full min-h-full bg-gradient-to-b from-[#FFFFFF] via-[#F8FAFC] to-[#EEF4FF] px-6 overflow-hidden select-none cursor-pointer"
     >
       {/* Soft Ambient Radial Background Glows */}

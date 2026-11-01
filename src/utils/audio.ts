@@ -1,11 +1,27 @@
 // Web Audio API Sound Synthesizer & Speech Assistant
 
+let hasUserInteracted = false;
+if (typeof window !== 'undefined') {
+  const onInteraction = () => {
+    hasUserInteracted = true;
+    window.removeEventListener('pointerdown', onInteraction, true);
+    window.removeEventListener('touchstart', onInteraction, true);
+    window.removeEventListener('keydown', onInteraction, true);
+    window.removeEventListener('click', onInteraction, true);
+  };
+  window.addEventListener('pointerdown', onInteraction, { capture: true, once: true });
+  window.addEventListener('touchstart', onInteraction, { capture: true, once: true });
+  window.addEventListener('keydown', onInteraction, { capture: true, once: true });
+  window.addEventListener('click', onInteraction, { capture: true, once: true });
+}
+
 class SoundManager {
   private ctx: AudioContext | null = null;
   private ringInterval: number | null = null;
 
   public resumeAudioContext(): void {
     if (typeof window === 'undefined') return;
+    hasUserInteracted = true;
     try {
       if (!this.ctx) {
         const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -22,7 +38,7 @@ class SoundManager {
   }
 
   private getContext(): AudioContext | null {
-    if (typeof window === 'undefined') return null;
+    if (typeof window === 'undefined' || !hasUserInteracted) return null;
     if (!this.ctx) {
       try {
         const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;

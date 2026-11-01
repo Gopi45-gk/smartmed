@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { initializeFirestore, doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
 import type { PatientProfile, Language, MedicationReminder, MedicationAdherenceRecord, ReminderStatus } from "./types";
 
 const firebaseConfig = {
@@ -12,7 +12,9 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+export const db = initializeFirestore(app, {
+  experimentalAutoDetectLongPolling: true,
+});
 
 /**
  * Normalize phone number to a Firestore-safe document ID.
