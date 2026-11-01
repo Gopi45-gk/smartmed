@@ -38,7 +38,7 @@ export function ProfileScreen({
     id: 1,
     name: 'Arun Kumar',
     relation: 'Son',
-    phone: '+91 98765 12345',
+    phone: '+91 79042 23010',
     isPrimary: true,
   };
 

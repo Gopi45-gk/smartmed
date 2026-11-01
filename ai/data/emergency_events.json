@@ -1,5 +1,46 @@
 {
-  "active": null,
+  "active": {
+    "id": "sos-55e37c4846",
+    "patient_name": "Gopikrishna",
+    "phone_number": "7904223010",
+    "language": "en",
+    "status": "CALLING CAREGIVER",
+    "created_at": "2026-11-01T10:58:53.292385+00:00",
+    "updated_at": "2026-11-01T10:58:55.032762+00:00",
+    "caregiver": {
+      "name": "Arun Kumar",
+      "phone": "+91 7904223010",
+      "relation": "Son"
+    },
+    "location": {
+      "latitude": 13.0220032,
+      "longitude": 80.19968
+    },
+    "vital_info": {
+      "bloodGroup": "B+",
+      "condition": "cardiatic arrest"
+    },
+    "call_status": "queued",
+    "retry_count": 0,
+    "delivery_status": {
+      "sms": "QUEUED",
+      "call": "NOT_INITIATED",
+      "confirmed_delivered": false,
+      "call_sid": "CAb0164104aef25edd639a492c316491c3"
+    },
+    "conversation": [],
+    "resolution_notes": null,
+    "notes": [
+      {
+        "time": "2026-11-01T10:58:53.300396+00:00",
+        "note": "Caregiver call initiated to +91****3010 (attempt 1)"
+      },
+      {
+        "time": "2026-11-01T10:58:55.032762+00:00",
+        "note": "Twilio Call SID: CAb0164104aef25edd639a492c316491c3"
+      }
+    ]
+  },
   "history": [
     {
       "id": "sos-ca824f607f",
@@ -410,7 +451,7 @@
       "language": "en",
       "status": "ALTERNATE ALERT SENT",
       "created_at": "2026-11-01T10:48:53.325618+00:00",
-      "updated_at": "2026-11-01T10:50:01.078287+00:00",
+      "updated_at": "2026-11-01T11:05:31.906437+00:00",
       "caregiver": {
         "name": "Arun Kumar",
         "phone": "+91 98765 12345",
@@ -480,10 +521,115 @@
         {
           "time": "2026-11-01T10:50:01.078287+00:00",
           "note": "Alternate alert dispatched after call failure/unanswered."
+        },
+        {
+          "time": "2026-11-01T11:05:31.135477+00:00",
+          "note": "Call failed: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+        },
+        {
+          "time": "2026-11-01T11:05:31.906437+00:00",
+          "note": "Alternate alert dispatched after call failure/unanswered."
         }
       ],
       "resolved_at": "2026-11-01T10:50:00.252950+00:00"
+    },
+    {
+      "id": "sos-34a6c7bd46",
+      "patient_name": "Gopikrishna",
+      "phone_number": "7904223010",
+      "language": "en",
+      "status": "ALTERNATE ALERT SENT",
+      "created_at": "2026-11-01T10:57:49.456835+00:00",
+      "updated_at": "2026-11-01T11:13:59.807467+00:00",
+      "caregiver": {
+        "name": "Arun Kumar",
+        "phone": "+91 7904223010",
+        "relation": "Son"
+      },
+      "location": null,
+      "vital_info": {
+        "bloodGroup": "B+",
+        "condition": "cardiatic arrest"
+      },
+      "call_status": "FAILED",
+      "retry_count": 0,
+      "delivery_status": {
+        "sms": "QUEUED",
+        "call": "NOT_INITIATED",
+        "confirmed_delivered": false,
+        "alternate_sms": "FAILED"
+      },
+      "conversation": [],
+      "resolution_notes": null,
+      "notes": [
+        {
+          "time": "2026-11-01T10:57:49.482804+00:00",
+          "note": "Caregiver call initiated to +91****3010 (attempt 1)"
+        },
+        {
+          "time": "2026-11-01T10:58:47.393201+00:00",
+          "note": "Cancelled: False alarm cancelled by patient."
+        },
+        {
+          "time": "2026-11-01T11:13:59.052639+00:00",
+          "note": "Call failed: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+        },
+        {
+          "time": "2026-11-01T11:13:59.807467+00:00",
+          "note": "Alternate alert dispatched after call failure/unanswered."
+        }
+      ]
+    },
+    {
+      "id": "sos-55e37c4846",
+      "patient_name": "Gopikrishna",
+      "phone_number": "7904223010",
+      "language": "en",
+      "status": "CALLING CAREGIVER",
+      "created_at": "2026-11-01T10:58:53.292385+00:00",
+      "updated_at": "2026-11-01T11:29:00.244044+00:00",
+      "caregiver": {
+        "name": "Arun Kumar",
+        "phone": "+91 7904223010",
+        "relation": "Son"
+      },
+      "location": {
+        "latitude": 13.0220032,
+        "longitude": 80.19968
+      },
+      "vital_info": {
+        "bloodGroup": "B+",
+        "condition": "cardiatic arrest"
+      },
+      "call_status": "queued",
+      "retry_count": 0,
+      "delivery_status": {
+        "sms": "QUEUED",
+        "call": "NOT_INITIATED",
+        "confirmed_delivered": false,
+        "call_sid": "CA0be8ff3d81501954a0701060ff4443fe"
+      },
+      "conversation": [],
+      "resolution_notes": null,
+      "notes": [
+        {
+          "time": "2026-11-01T10:58:53.300396+00:00",
+          "note": "Caregiver call initiated to +91****3010 (attempt 1)"
+        },
+        {
+          "time": "2026-11-01T10:58:55.032762+00:00",
+          "note": "Twilio Call SID: CAb0164104aef25edd639a492c316491c3"
+        },
+        {
+          "time": "2026-11-01T11:28:52.141860+00:00",
+          "note": "Caregiver call initiated to +91****3010 (attempt 1)"
+        },
+        {
+          "time": "2026-11-01T11:29:00.244044+00:00",
+          "note": "Twilio Call SID: CA0be8ff3d81501954a0701060ff4443fe"
+        }
+      ]
     }
   ],
-  "updated_at": "2026-11-01T10:50:01.078340+00:00"
+  "updated_at": "2026-11-01T11:29:00.244070+00:00"
 }

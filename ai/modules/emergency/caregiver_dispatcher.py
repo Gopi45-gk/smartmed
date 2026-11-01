@@ -29,6 +29,37 @@ from .caregiver_alert import caregiver_alert_service
 
 logger = logging.getLogger("smartmed.ai.emergency.dispatcher")
 
+# Dedicated Twilio Credentials strictly for SOS Emergency Calls (loaded from .env)
+SOS_TWILIO_ACCOUNT_SID = os.getenv("SOS_TWILIO_ACCOUNT_SID", "")
+SOS_TWILIO_AUTH_TOKEN = os.getenv("SOS_TWILIO_AUTH_TOKEN", "")
+SOS_TWILIO_API_KEY = os.getenv("SOS_TWILIO_API_KEY", "")
+SOS_TWILIO_API_SECRET = os.getenv("SOS_TWILIO_API_SECRET", "")
+SOS_TWILIO_PHONE_NUMBER = os.getenv("SOS_TWILIO_PHONE_NUMBER", "+17372508034")
+
+_sos_twilio_client = None
+
+def get_sos_twilio_client():
+    """Retrieve dedicated Twilio client initialized with SOS credentials."""
+    global _sos_twilio_client
+    if _sos_twilio_client is not None:
+        return _sos_twilio_client
+
+    try:
+        from twilio.rest import Client
+        if SOS_TWILIO_API_KEY and SOS_TWILIO_API_SECRET and SOS_TWILIO_ACCOUNT_SID:
+            _sos_twilio_client = Client(SOS_TWILIO_API_KEY, SOS_TWILIO_API_SECRET, account_sid=SOS_TWILIO_ACCOUNT_SID)
+            logger.info("✓ SOS Dedicated Twilio Client initialized with API Key.")
+        elif SOS_TWILIO_ACCOUNT_SID and SOS_TWILIO_AUTH_TOKEN:
+            _sos_twilio_client = Client(SOS_TWILIO_ACCOUNT_SID, SOS_TWILIO_AUTH_TOKEN)
+            logger.info("✓ SOS Dedicated Twilio Client initialized with Auth Token.")
+    except Exception as e:
+        logger.warning(f"Could not initialize dedicated SOS Twilio client: {e}")
+
+    if _sos_twilio_client is None:
+        _sos_twilio_client = get_twilio_client()
+
+    return _sos_twilio_client
+
 # In-memory audio cache for caregiver voice calls
 _sos_audio_cache: Dict[str, bytes] = {}
 
@@ -151,12 +182,13 @@ class CaregiverCallDispatcher:
             note=f"Caregiver call initiated to {mask_phone_number(caregiver_phone)} (attempt {retry_count + 1})",
         )
 
-        client = get_twilio_client()
+        client = get_sos_twilio_client()
+        from_phone = SOS_TWILIO_PHONE_NUMBER or TWILIO_PHONE_NUMBER
         formatted_phone = format_e164_phone(caregiver_phone)
         masked_phone = mask_phone_number(formatted_phone)
 
         # Twilio unavailable / Mock Telephony Mode
-        if client is None or not TWILIO_PHONE_NUMBER:
+        if client is None or not from_phone:
             logger.warning(
                 f"[Caregiver Call] Twilio not configured. Prepared native Android dialer fallback for {masked_phone}."
             )
@@ -181,11 +213,11 @@ class CaregiverCallDispatcher:
                 f"?emergency_id={quote(emergency_id)}"
             )
 
-            logger.info(f"Initiating Twilio Caregiver Voice Call -> To: {masked_phone}, From: {TWILIO_PHONE_NUMBER}")
+            logger.info(f"Initiating Twilio Caregiver Voice Call -> To: {masked_phone}, From: {from_phone} (SOS Twilio Account)")
 
             call = client.calls.create(
                 to=formatted_phone,
-                from_=TWILIO_PHONE_NUMBER,
+                from_=from_phone,
                 url=webhook_url,
                 status_callback=status_callback_url,
                 status_callback_event=["initiated", "ringing", "answered", "completed"],

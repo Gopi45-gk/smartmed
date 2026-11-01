@@ -169,9 +169,9 @@ class CaregiverAlertService:
     """
 
     def __init__(self):
-        self.twilio_account_sid = os.getenv("TWILIO_ACCOUNT_SID", "")
-        self.twilio_auth_token = os.getenv("TWILIO_AUTH_TOKEN", "")
-        self.twilio_phone_number = os.getenv("TWILIO_PHONE_NUMBER", "")
+        self.twilio_account_sid = os.getenv("SOS_TWILIO_ACCOUNT_SID") or os.getenv("TWILIO_ACCOUNT_SID", "")
+        self.twilio_auth_token = os.getenv("SOS_TWILIO_AUTH_TOKEN") or os.getenv("TWILIO_AUTH_TOKEN", "")
+        self.twilio_phone_number = os.getenv("SOS_TWILIO_PHONE_NUMBER") or os.getenv("TWILIO_PHONE_NUMBER", "+17372508034")
 
     def dispatch_alert(
         self,
