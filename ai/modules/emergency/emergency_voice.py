@@ -201,30 +201,32 @@ def analyze_emergency_symptoms(text: str, language: str = "en") -> Tuple[bool, s
 
 class EmergencyVoiceService:
     """
-    Synthesizes emergency speech using Kokoro TTS (English) and Indic offline TTS (Indian languages).
+    Synthesizes emergency speech using ultra-humanoid Neural TTS (Indic languages & English),
+    with Kokoro af_bella local neural fallback for natural, warm, empathetic speech delivery.
     """
 
     def synthesize_reassurance_prompt(self, language: str = "en") -> Dict[str, Any]:
-        """Synthesize the initial emergency voice reassurance."""
+        """Synthesize the initial emergency voice reassurance with a humanoid, calming voice."""
         lang = (language or "en").lower().split("-")[0].strip()
         text = EMERGENCY_REASSURANCE_PROMPTS.get(lang, EMERGENCY_REASSURANCE_PROMPTS["en"])
 
         try:
-            # Slower rate (0.9) for calm, elderly-accessible delivery
-            wav_bytes, engine_used = tts_manager.synthesize(
+            # Natural humanoid synthesis with warm, empathetic cadence
+            audio_bytes, mime_type, engine_used = tts_manager.synthesize_neural_humanoid(
                 text=text,
-                speed=0.9,
+                voice="af_bella",
+                speed=1.0,
                 lang=lang,
             )
-            audio_base64 = base64.b64encode(wav_bytes).decode("ascii")
+            audio_base64 = base64.b64encode(audio_bytes).decode("ascii")
             return {
                 "success": True,
                 "text": text,
-                "audio_base64": f"data:audio/wav;base64,{audio_base64}",
+                "audio_base64": f"data:{mime_type};base64,{audio_base64}",
                 "engine_used": engine_used,
             }
         except Exception as e:
-            logger.error(f"Failed to synthesize emergency voice reassurance: {e}")
+            logger.error(f"Failed to synthesize humanoid emergency voice reassurance: {e}")
             return {
                 "success": False,
                 "text": text,
@@ -240,7 +242,7 @@ class EmergencyVoiceService:
     ) -> Dict[str, Any]:
         """
         Processes patient's voice response, checks for critical life threats,
-        and returns spoken guidance via Kokoro/Indic TTS.
+        and returns spoken guidance via humanoid Neural/Kokoro TTS.
         """
         lang = (language or "en").lower().split("-")[0].strip()
         is_critical, risk_level, ai_response_text = analyze_emergency_symptoms(patient_message, language=lang)
@@ -248,13 +250,14 @@ class EmergencyVoiceService:
         audio_data = None
         engine_used = "none"
         try:
-            wav_bytes, engine_used = tts_manager.synthesize(
+            audio_bytes, mime_type, engine_used = tts_manager.synthesize_neural_humanoid(
                 text=ai_response_text,
-                speed=0.9,
+                voice="af_bella",
+                speed=1.0,
                 lang=lang,
             )
-            audio_base64 = base64.b64encode(wav_bytes).decode("ascii")
-            audio_data = f"data:audio/wav;base64,{audio_base64}"
+            audio_base64 = base64.b64encode(audio_bytes).decode("ascii")
+            audio_data = f"data:{mime_type};base64,{audio_base64}"
         except Exception as e:
             logger.warning(f"Emergency response TTS synthesis error: {e}")
 

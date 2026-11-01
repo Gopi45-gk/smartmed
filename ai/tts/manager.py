@@ -146,11 +146,11 @@ class TTSManager:
     def synthesize_kokoro(
         self,
         text: str,
-        voice: str = "af_sarah",
+        voice: str = "af_bella",
         speed: float = 1.0,
         lang: str = "en-us",
     ) -> bytes:
-        """Synthesize speech using Kokoro TTS to WAV bytes."""
+        """Synthesize speech using Kokoro TTS to WAV bytes (af_bella is ultra-humanoid)."""
         kokoro = self.get_kokoro_voice()
         if not kokoro:
             raise RuntimeError("Kokoro TTS model not loaded or not found in models/kokoro/")
@@ -160,7 +160,7 @@ class TTSManager:
         clean_text = text.strip()
         # Fallback to available voice style if given voice not found
         available = kokoro.get_voices()
-        target_voice = voice if voice in available else (available[0] if available else "af_sarah")
+        target_voice = voice if voice in available else (available[0] if available else "af_bella")
 
         samples, sample_rate = kokoro.create(
             clean_text,
@@ -207,6 +207,83 @@ class TTSManager:
         if not res.stdout:
             raise RuntimeError("Offline Indic TTS returned empty audio")
         return res.stdout
+
+    def synthesize_neural_humanoid(
+        self,
+        text: str,
+        voice: str = "af_bella",
+        speed: float = 1.0,
+        lang: str = "en",
+    ) -> tuple[bytes, str, str]:
+        """
+        Synthesizes humanoid natural speech:
+        1. Cloud Neural TTS for native, warm human cadence across Indic languages (ta, hi, te, kn, ml, mr, bn, ur) and English.
+        2. Kokoro StyleTTS2 with 'af_bella' (warm humanoid female) at 1.0 natural speed for English on-device.
+        3. Piper ONNX / Indic offline fallback.
+        Returns: (audio_bytes, mime_type, engine_used)
+        """
+        clean_text = text.strip()
+        norm_lang = (lang or "en").lower().split("-")[0].strip()
+
+        # Cache check
+        cache_key = f"humanoid:{norm_lang}:{speed:.2f}:{clean_text}"
+        if cache_key in self._audio_cache:
+            data = self._audio_cache[cache_key]
+            mime = "audio/mpeg" if (data.startswith(b"ID3") or data.startswith(b"\xff\xfb") or data.startswith(b"\xff\xf3") or data.startswith(b"\xff\xf2")) else "audio/wav"
+            return data, mime, f"cache_{norm_lang}"
+
+        # 1. Cloud Neural Humanoid Synthesis (Google Neural TTS - sounds like real human speaker)
+        try:
+            import urllib.parse
+            import urllib.request
+            import re
+
+            # Google TTS tw-ob endpoint requires text chunks <= 100 characters
+            raw_parts = [p.strip() for p in re.split(r'([.?!,;\n]+)', clean_text) if p.strip()]
+            chunks = []
+            curr = ""
+            for part in raw_parts:
+                if len(curr) + len(part) < 85:
+                    curr += (" " if curr and not curr.endswith((".", "!", "?", ",", ";")) else "") + part
+                else:
+                    if curr:
+                        chunks.append(curr)
+                    curr = part
+            if curr:
+                chunks.append(curr)
+            if not chunks:
+                chunks = [clean_text[:90]]
+
+            combined_audio = b""
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"}
+            for chunk in chunks:
+                encoded = urllib.parse.quote(chunk)
+                url = f"https://translate.google.com/translate_tts?ie=UTF-8&tl={norm_lang}&client=tw-ob&q={encoded}"
+                req = urllib.request.Request(url, headers=headers)
+                with urllib.request.urlopen(req, timeout=4) as response:
+                    part_bytes = response.read()
+                    if part_bytes:
+                        combined_audio += part_bytes
+
+            if combined_audio and len(combined_audio) > 600:
+                self._audio_cache[cache_key] = combined_audio
+                return combined_audio, "audio/mpeg", f"neural_{norm_lang}"
+        except Exception as e:
+            logger.debug(f"Cloud neural speech fallback: {e}")
+
+        # 2. Local Kokoro Neural Model for English (using af_bella for warm, natural human inflection)
+        if norm_lang == "en":
+            try:
+                wav = self.synthesize_kokoro(clean_text, voice=voice or "af_bella", speed=speed)
+                self._audio_cache[cache_key] = wav
+                return wav, "audio/wav", "kokoro_bella"
+            except Exception as e:
+                logger.warning(f"Kokoro local neural fallback: {e}")
+
+        # 3. Local offline fallback
+        wav, engine = self.synthesize(clean_text, voice=voice or "af_bella", speed=speed, lang=norm_lang)
+        self._audio_cache[cache_key] = wav
+        return wav, "audio/wav", engine
 
     def synthesize(
         self,

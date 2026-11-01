@@ -204,7 +204,9 @@ async def get_emergency_twiml_endpoint(
 
     clean_lang = (lang or "en").lower().split("-")[0].strip()
     voice_cfg = LANGUAGE_VOICE_CONFIG.get(clean_lang, LANGUAGE_VOICE_CONFIG["en"])
-    polly_voice = voice_cfg.get("voice", "Polly.Aditi")
+    polly_voice = voice_cfg.get("voice", "Polly.Kajal-Neural")
+    if "neural" not in polly_voice.lower():
+        polly_voice = "Polly.Kajal-Neural" if clean_lang == "en" else "Polly.Aditi-Neural"
     polly_locale = get_locale_for_language(clean_lang)
 
     audio_url = f"{BASE_WEBHOOK_URL}/api/emergency/sos/call/audio?emergency_id={emergency_id}"
@@ -235,19 +237,21 @@ async def get_emergency_twiml_endpoint(
 @router.get("/call/audio")
 async def get_emergency_audio(emergency_id: str = Query(...)):
     """
-    Serves pre-synthesized Kokoro/Piper WAV audio for Twilio <Play>.
+    Serves pre-synthesized humanoid Neural/Kokoro audio for Twilio <Play>.
     """
-    wav_bytes = caregiver_call_dispatcher.get_cached_audio(emergency_id)
-    if not wav_bytes:
+    audio_bytes = caregiver_call_dispatcher.get_cached_audio(emergency_id)
+    if not audio_bytes:
         # Fallback synthesis if cache miss
         event = emergency_tracker.get_status(emergency_id).get("emergency")
         patient_name = event.get("patient_name", "Patient") if event else "Patient"
         lang = event.get("language", "en") if event else "en"
         msg = generate_caregiver_call_message(patient_name, language=lang)
-        wav_bytes = caregiver_call_dispatcher.synthesize_call_audio(emergency_id, msg, language=lang)
+        audio_bytes = caregiver_call_dispatcher.synthesize_call_audio(emergency_id, msg, language=lang)
 
-    if wav_bytes:
-        return Response(content=wav_bytes, media_type="audio/wav")
+    if audio_bytes:
+        is_mp3 = audio_bytes.startswith(b"ID3") or audio_bytes.startswith(b"\xff\xfb") or audio_bytes.startswith(b"\xff\xf3") or audio_bytes.startswith(b"\xff\xf2")
+        media_type = "audio/mpeg" if is_mp3 else "audio/wav"
+        return Response(content=audio_bytes, media_type=media_type)
     raise HTTPException(status_code=404, detail="Audio not found")
 
 

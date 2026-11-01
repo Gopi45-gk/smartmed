@@ -127,18 +127,19 @@ class CaregiverCallDispatcher:
     """
 
     def synthesize_call_audio(self, emergency_id: str, message_text: str, language: str = "en") -> Optional[bytes]:
-        """Pre-synthesize Kokoro/Piper/Indic WAV audio for Twilio <Play>."""
+        """Pre-synthesize humanoid Neural/Kokoro audio for Twilio <Play>."""
         try:
-            wav_bytes, engine_used = tts_manager.synthesize(
+            audio_bytes, mime_type, engine_used = tts_manager.synthesize_neural_humanoid(
                 text=message_text,
+                voice="af_bella",
+                speed=1.0,
                 lang=language,
-                speed=0.95,
             )
-            _sos_audio_cache[emergency_id] = wav_bytes
-            logger.info(f"Synthesized emergency call audio for {emergency_id} using {engine_used} ({len(wav_bytes)} bytes)")
-            return wav_bytes
+            _sos_audio_cache[emergency_id] = audio_bytes
+            logger.info(f"Synthesized humanoid emergency call audio for {emergency_id} using {engine_used} ({len(audio_bytes)} bytes)")
+            return audio_bytes
         except Exception as e:
-            logger.warning(f"Could not synthesize call audio for {emergency_id}: {e}")
+            logger.warning(f"Could not synthesize humanoid call audio for {emergency_id}: {e}")
             return None
 
     def get_cached_audio(self, emergency_id: str) -> Optional[bytes]:
