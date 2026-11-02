@@ -24,6 +24,7 @@ import {
 } from '../utils/aiClient';
 import { PatientProfile, TranslationStrings } from '../types';
 import { soundManager } from '../utils/audio';
+import { useLanguage } from '../context/LanguageContext';
 
 interface Props {
   close: () => void;
@@ -31,7 +32,9 @@ interface Props {
   t?: TranslationStrings;
 }
 
-export function DiabetesRiskModal({ close, patientProfile }: Props) {
+export function DiabetesRiskModal({ close, patientProfile, t }: Props) {
+  const { t: contextT } = useLanguage();
+  const activeT = t || contextT;
   // Input parameters
   const [glucose, setGlucose] = useState<number>(135);
   const [bmi, setBmi] = useState<number>(27.8);
@@ -138,10 +141,10 @@ export function DiabetesRiskModal({ close, patientProfile }: Props) {
       <div className="flex items-center justify-between mb-5">
         <button
           onClick={close}
-          className="p-2.5 rounded-2xl bg-white hover:bg-gray-100 text-gray-700 active:scale-95 transition-all border border-gray-200/80 shadow-xs flex items-center gap-1.5 text-xs font-semibold"
+          className="p-2.5 rounded-2xl bg-white hover:bg-gray-100 text-gray-700 active:scale-95 transition-all border border-gray-200/80 shadow-xs flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Dashboard</span>
+          <span>{activeT.home || 'Back to Dashboard'}</span>
         </button>
 
         <div className="flex items-center gap-2">
@@ -166,7 +169,7 @@ export function DiabetesRiskModal({ close, patientProfile }: Props) {
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              ICU Diabetes Risk Assessment
+              {activeT.diabetesRisk || 'ICU Diabetes Risk Assessment'}
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl leading-relaxed">
               Based on the MathWorks ICU Machine Learning challenge. Predicts whether an admitted patient
@@ -300,7 +303,7 @@ export function DiabetesRiskModal({ close, patientProfile }: Props) {
             <div className="grid grid-cols-2 gap-3.5 pt-1">
               <div>
                 <label className="text-xs font-semibold text-gray-700 block mb-1">
-                  Age (Years)
+                  {activeT.age || 'Age'} (Years)
                 </label>
                 <input
                   type="number"
@@ -490,7 +493,7 @@ export function DiabetesRiskModal({ close, patientProfile }: Props) {
                 ) : (
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 )}
-                <span>{result.risk_level.toUpperCase()}</span>
+                <span>{isHighRisk ? (activeT.highRisk || 'HIGH') : isModerate ? (activeT.moderateRisk || 'MODERATE') : (activeT.lowRisk || 'LOW')}</span>
               </div>
 
               {/* Animated Risk Donut Gauge */}
@@ -566,7 +569,7 @@ export function DiabetesRiskModal({ close, patientProfile }: Props) {
               <div className="w-full mt-5 pt-4 border-t border-gray-100 text-left">
                 <span className="text-xs font-bold text-gray-900 block mb-2 flex items-center gap-1.5">
                   <Info className="w-3.5 h-3.5 text-[#0071E3]" />
-                  ICU Clinical Recommendations:
+                  {activeT.clinicalRecommendation || 'ICU Clinical Recommendations'}:
                 </span>
                 <ul className="space-y-1.5">
                   {result.recommendations.map((rec, i) => (

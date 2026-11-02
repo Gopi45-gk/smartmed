@@ -7,6 +7,7 @@ import { soundManager } from '../utils/audio';
 import { ttsProvider } from '../utils/speech';
 import { triggerTwilioCallNow } from '../utils/aiClient';
 import { useLanguage } from '../context/LanguageContext';
+import { formatFoodInstruction } from '../utils/formatters';
 
 interface Props {
   medicines: Medicine[];
@@ -106,7 +107,7 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
               {profile.phone}
             </span>
             <span className="bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded-full border border-slate-200">
-              Age {profile.age} • {profile.gender}
+              {t.age || 'Age'} {profile.age} • {profile.gender === 'Female' ? (t.female || 'Female') : profile.gender === 'Other' ? (t.other || 'Other') : (t.male || 'Male')}
             </span>
             {profile.bloodGroup && (
               <span className="bg-rose-50 text-rose-700 font-bold px-2 py-0.5 rounded-full border border-rose-100">
@@ -168,7 +169,7 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
             <div className="flex-1">
               <h3 className="text-xl font-bold text-[#1D1D1F] leading-tight">{nextMed.name}</h3>
               <p className="text-sm text-[#86868B] mt-0.5 font-medium">
-                {nextMed.dose} • <span className="text-blue-600 font-semibold">{nextMed.food}</span>
+                {nextMed.dose} • <span className="text-blue-600 font-semibold">{formatFoodInstruction(nextMed.food, t)}</span>
               </p>
             </div>
           </div>
@@ -212,7 +213,7 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
         <div>
           <div className="text-xs font-semibold text-[#86868B] uppercase tracking-wider">{t.progress}</div>
           <div className="text-base font-bold text-[#1D1D1F] mt-0.5">
-            {takenCount} of {medicines.length} completed ({progressPercent}%)
+            {takenCount} {t.of || 'of'} {medicines.length} {t.completed || 'completed'} ({progressPercent}%)
           </div>
         </div>
         <div className="w-12 h-12 relative flex items-center justify-center">
@@ -249,7 +250,7 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
           </div>
           <span className="font-bold text-xs text-[#1D1D1F]">{t.addPrescription}</span>
           <span className="text-[10px] text-[#0071E3] mt-0.5 flex items-center gap-0.5">
-            <Sparkles className="w-2.5 h-2.5" /> AI OCR Scan
+            <Sparkles className="w-2.5 h-2.5" /> {t.aiOcrScan || 'AI OCR Scan'}
           </span>
         </button>
 
@@ -266,7 +267,7 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
           </div>
           <span className="font-bold text-xs text-[#1D1D1F]">{t.simulateCall}</span>
           <span className="text-[10px] text-emerald-700 mt-0.5 font-medium">
-            Interactive Voice USP
+            {t.interactiveVoiceUsp || 'Interactive Voice USP'}
           </span>
         </button>
       </div>
@@ -281,7 +282,7 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
             onClick={() => navigate('medicines')} 
             className="text-xs text-[#0071E3] font-semibold flex items-center gap-0.5"
           >
-            <span>View All</span>
+            <span>{t.viewAll || 'View All'}</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -310,7 +311,7 @@ export function HomeScreen({ medicines, setMedicines, navigate, t, patientProfil
                       {m.name}
                     </h4>
                     <p className="text-xs text-[#86868B]">
-                      {m.time} • {m.dose} • <span className="font-medium text-gray-700">{m.food}</span>
+                      {m.time} • {m.dose} • <span className="font-medium text-gray-700">{formatFoodInstruction(m.food, t)}</span>
                     </p>
                   </div>
                 </div>

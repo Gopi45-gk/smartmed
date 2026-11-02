@@ -6,6 +6,7 @@ import { Plus, CheckCircle2, Clock, Trash2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { soundManager } from '../utils/audio';
 import { scheduleTwilioCall } from '../utils/aiClient';
+import { formatFoodInstruction } from '../utils/formatters';
 
 interface Props {
   medicines: Medicine[];
@@ -127,7 +128,7 @@ export function MedicinesScreen({ medicines, setMedicines, navigate, t }: Props)
           className="px-3 py-2 bg-[#0071E3] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm active:scale-95 transition-transform"
         >
           <Plus className="w-4 h-4" />
-          <span>Scan Rx</span>
+          <span>{t.scanPrescription || 'Scan Rx'}</span>
         </button>
       </div>
 
@@ -141,7 +142,7 @@ export function MedicinesScreen({ medicines, setMedicines, navigate, t }: Props)
               filter === tab ? 'bg-white text-[#1D1D1F] shadow-sm' : 'text-gray-600 hover:text-black'
             }`}
           >
-            {tab === 'all' ? 'All Meds' : tab === 'upcoming' ? t.upcoming : t.taken}
+            {tab === 'all' ? (t.allMeds || 'All Meds') : tab === 'upcoming' ? t.upcoming : t.taken}
           </button>
         ))}
       </div>
@@ -150,7 +151,7 @@ export function MedicinesScreen({ medicines, setMedicines, navigate, t }: Props)
       <div className="space-y-3">
         {filteredMeds.length === 0 ? (
           <div className="p-8 text-center bg-white rounded-2xl border border-gray-100 text-gray-400">
-            <p className="text-sm">No medicines found in this category.</p>
+            <p className="text-sm">{t.noMedsFound || 'No medicines found in this category.'}</p>
           </div>
         ) : (
           filteredMeds.map((med) => {
@@ -179,7 +180,7 @@ export function MedicinesScreen({ medicines, setMedicines, navigate, t }: Props)
                         <span>•</span>
                         <span>{med.dose}</span>
                         <span>•</span>
-                        <span className="font-medium text-gray-700">{med.food}</span>
+                        <span className="font-medium text-gray-700">{formatFoodInstruction(med.food, t)}</span>
                       </div>
                     </div>
                   </div>
@@ -198,11 +199,11 @@ export function MedicinesScreen({ medicines, setMedicines, navigate, t }: Props)
                     isTaken ? 'bg-emerald-100 text-[#34C759]' : 'bg-amber-100 text-[#FF9500]'
                   }`}>
                     {isTaken ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
-                    <span>{isTaken ? `Taken at ${med.takenAt || med.time}` : 'Scheduled'}</span>
+                    <span>{isTaken ? `${t.taken} ${med.takenAt || med.time}` : (t.scheduledLabel || 'Scheduled')}</span>
                   </span>
 
-                  <button className="font-semibold text-[#0071E3] hover:underline">
-                    {isTaken ? 'Undo Mark' : t.markTaken}
+                  <button className="font-semibold text-[#0071E3] hover:underline cursor-pointer">
+                    {isTaken ? (t.undoMark || 'Undo Mark') : t.markTaken}
                   </button>
                 </div>
               </div>
@@ -223,18 +224,18 @@ export function MedicinesScreen({ medicines, setMedicines, navigate, t }: Props)
       ) : (
         <form onSubmit={handleAddManual} className="mt-4 p-4 bg-white rounded-2xl border border-gray-200 shadow-md space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="font-bold text-sm text-[#1D1D1F]">Add New Medicine</h4>
+            <h4 className="font-bold text-sm text-[#1D1D1F]">{t.addPrescription}</h4>
             <button 
               type="button" 
               onClick={() => setShowAddManual(false)} 
-              className="text-xs text-gray-500 font-semibold"
+              className="text-xs text-gray-500 font-semibold cursor-pointer"
             >
-              Cancel
+              {t.cancelBtn || 'Cancel'}
             </button>
           </div>
 
           <div>
-            <label className="text-[11px] font-semibold text-gray-500 uppercase">Medicine Name</label>
+            <label className="text-[11px] font-semibold text-gray-500 uppercase">{t.medicines}</label>
             <input 
               type="text" 
               placeholder="e.g. Paracetamol 650mg" 
@@ -247,7 +248,7 @@ export function MedicinesScreen({ medicines, setMedicines, navigate, t }: Props)
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[11px] font-semibold text-gray-500 uppercase">Timing</label>
+              <label className="text-[11px] font-semibold text-gray-500 uppercase">{t.scheduledLabel || 'Timing'}</label>
               <input 
                 type="text" 
                 value={newMedTime} 
@@ -274,10 +275,9 @@ export function MedicinesScreen({ medicines, setMedicines, navigate, t }: Props)
                 onChange={(e) => setNewMedFood(e.target.value)}
                 className="w-full mt-1 p-2 bg-[#F5F5F7] rounded-xl border border-gray-200 text-xs focus:outline-none"
               >
-                <option value="After Food">After Food</option>
-                <option value="Before Food">Before Food</option>
-                <option value="With Meal">With Meal</option>
-                <option value="Empty Stomach">Empty Stomach</option>
+                <option value="After Food">{t.afterFood || 'After Food'}</option>
+                <option value="Before Food">{t.beforeFood || 'Before Food'}</option>
+                <option value="Empty Stomach">{t.emptyStomach || 'Empty Stomach'}</option>
               </select>
             </div>
             <div>
@@ -297,9 +297,9 @@ export function MedicinesScreen({ medicines, setMedicines, navigate, t }: Props)
 
           <button 
             type="submit" 
-            className="w-full py-2.5 bg-[#0071E3] text-white text-xs font-bold rounded-xl shadow-md"
+            className="w-full py-2.5 bg-[#0071E3] text-white text-xs font-bold rounded-xl shadow-md cursor-pointer"
           >
-            Save Medicine
+            {t.confirmSave || 'Save Medicine'}
           </button>
         </form>
       )}

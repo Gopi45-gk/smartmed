@@ -12,6 +12,8 @@ const UNCERTAIN_MESSAGES: Record<string, string> = {
   en: '⚠️ Please verify medicine name, scheduled time, and dosage before scheduling.',
   hi: '⚠️ कृपया शेड्यूल करने से पहले दवा का नाम, समय और खुराक सत्यापित करें।',
   te: '⚠️ దయచేసి మందు పేరు, సమయం మరియు మోతాదును ధృవీకరించండి.',
+  bn: '⚠️ সময়সূচী করার আগে দয়া করে ওষুধের নাম, সময় এবং মাত্রা যাচাই করুন।',
+  mr: '⚠️ वेळापत्रक करण्यापूर्वी कृपया औषधाचे नाव, वेळ आणि डोस तपासा.',
   kn: '⚠️ ದಯವಿಟ್ಟು ಔಷಧಿಯ ಹೆಸರು, ಸಮಯ ಮತ್ತು ಪ್ರಮಾಣವನ್ನು ಪರಿಶೀಲಿಸಿ.',
   ml: '⚠️ ഷെഡ്യൂൾ ചെയ്യുന്നതിന് മുൻപ് മരുന്നിന്റെ പേരും സമയവും അളവും പരിശോധിക്കുക.',
   ur: '⚠️ براہ کرم دوا کا نام، وقت اور خوراک کی تصدیق کریں۔',
@@ -21,6 +23,8 @@ const LOCALE_MAP: Record<string, string> = {
   ta: 'ta-IN',
   hi: 'hi-IN',
   te: 'te-IN',
+  bn: 'bn-IN',
+  mr: 'mr-IN',
   kn: 'kn-IN',
   ml: 'ml-IN',
   en: 'en-IN',
@@ -453,9 +457,9 @@ export function AddPrescriptionFlow({ close, setMedicines, t }: Props) {
             className="my-auto space-y-4"
           >
             <div className="text-center mb-6">
-              <h3 className="text-lg font-bold text-[#1D1D1F]">Scan or Upload Prescription</h3>
+              <h3 className="text-lg font-bold text-[#1D1D1F]">{t.scanPrescription || 'Scan or Upload Prescription'}</h3>
               <p className="text-xs text-[#86868B] mt-1 max-w-xs mx-auto">
-                Our medical AI will automatically extract medicine names, dosages, timings, and dietary instructions.
+                {t.ocrAccuracyDisclaimer || 'Our medical AI will automatically extract medicine names, dosages, timings, and dietary instructions.'}
               </p>
             </div>
 
@@ -548,10 +552,10 @@ export function AddPrescriptionFlow({ close, setMedicines, t }: Props) {
             )}
 
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-[#1D1D1F] text-base">Review & Edit Details</h3>
+              <h3 className="font-bold text-[#1D1D1F] text-base">{t.requiresReview || 'Review & Edit Details'}</h3>
               {medicationsList.length > 1 && (
                 <span className="text-[11px] font-bold text-[#0071E3]">
-                  {activeMedIndex + 1} of {medicationsList.length}
+                  {activeMedIndex + 1} {t.of || 'of'} {medicationsList.length}
                 </span>
               )}
             </div>
@@ -633,12 +637,12 @@ export function AddPrescriptionFlow({ close, setMedicines, t }: Props) {
             <button 
               type="button"
               onClick={handleConfirmSave} 
-              className="w-full py-4 bg-[#34C759] hover:bg-[#2eb34f] text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/20 active:scale-98 transition-all flex items-center justify-center gap-2"
+              className="w-full py-4 bg-[#34C759] hover:bg-[#2eb34f] text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/20 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <Check className="w-5 h-5 stroke-[3]" />
               <span>
                 {medicationsList.length > 1
-                  ? `Confirm & Save All (${medicationsList.length} Medicines)`
+                  ? `${t.confirmSave} (${medicationsList.length})`
                   : t.confirmSave}
               </span>
             </button>

@@ -104,7 +104,7 @@ export function GlucoseAndLabPortal({ close, patientProfile, t, lang = 'en' }: P
             className="flex items-center gap-1.5 text-xs font-bold text-gray-700 hover:text-[#0071E3] active:scale-95 transition-all p-1.5 rounded-xl bg-white border border-gray-200 shadow-2xs"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Home</span>
+            <span>{t.home || 'Home'}</span>
           </button>
 
           {/* Sync Status Badge */}
@@ -138,7 +138,7 @@ export function GlucoseAndLabPortal({ close, patientProfile, t, lang = 'en' }: P
                     : 'text-gray-600 hover:text-black'
                 }`}
               >
-                Senior
+                {t.profile || 'Senior'}
               </button>
               <button
                 type="button"
@@ -149,7 +149,7 @@ export function GlucoseAndLabPortal({ close, patientProfile, t, lang = 'en' }: P
                     : 'text-gray-600 hover:text-black'
                 }`}
               >
-                Caregiver
+                {t.caregiver || 'Caregiver'}
               </button>
             </div>
           </div>
@@ -164,10 +164,10 @@ export function GlucoseAndLabPortal({ close, patientProfile, t, lang = 'en' }: P
                 <span>Clinical Glycemic Care</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">
-                Glucose Log &amp; Lab Reports
+                {t.glucoseAndLabTitle || 'Glucose Log & Lab Reports'}
               </h2>
               <p className="text-xs text-blue-100/90 mt-1">
-                Offline log • Trend alerts • In-memory lab scan • Diabetes risk auto-fill
+                {t.glucoseAndLabSub || 'Offline log • Trend alerts • In-memory lab scan • Diabetes risk auto-fill'}
               </p>
             </div>
 
@@ -175,7 +175,7 @@ export function GlucoseAndLabPortal({ close, patientProfile, t, lang = 'en' }: P
             <button
               type="button"
               onClick={() => setShowLabScanModal(true)}
-              className="px-4 py-2.5 bg-white text-[#0071E3] font-bold text-xs rounded-2xl shadow-sm hover:bg-blue-50 active:scale-95 transition-all flex items-center justify-center gap-2 self-start sm:self-auto shrink-0"
+              className="px-4 py-2.5 bg-white text-[#0071E3] font-bold text-xs rounded-2xl shadow-sm hover:bg-blue-50 active:scale-95 transition-all flex items-center justify-center gap-2 self-start sm:self-auto shrink-0 cursor-pointer"
             >
               <FileText className="w-4 h-4 text-[#0071E3]" />
               <span>Scan Lab Report</span>

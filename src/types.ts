@@ -211,11 +211,110 @@ export interface TranslationStrings {
 
   // ─── SOS & Emergency ─────────────────────────────────────────────────────
   sosButton?: string;
+  sosEmergency?: string;
+  careAI?: string;
+  callAI?: string;
   confirmEmergency?: string;
   callingCaregiver?: string;
   emergencyResolved?: string;
   cancelAlert?: string;
   emergencyInstructions?: string;
+
+  // ─── Dashboard, Hub & Navigation ─────────────────────────────────────────
+  viewAll?: string;
+  aiOcrScan?: string;
+  interactiveVoiceUsp?: string;
+  of?: string;
+  completed?: string;
+  age?: string;
+  genderLabel?: string;
+  male?: string;
+  female?: string;
+  other?: string;
+  activePatient?: string;
+  allMeds?: string;
+  noMedsFound?: string;
+  undoMark?: string;
+
+  // ─── Authentication & Registration ───────────────────────────────────────
+  registerPatientTab?: string;
+  patientLoginTab?: string;
+  patientRegTitle?: string;
+  patientRegSub?: string;
+  patientFullName?: string;
+  primaryConditionLabel?: string;
+  passwordLabel?: string;
+  confirmPasswordLabel?: string;
+  registerContinueBtn?: string;
+  loginContinueBtn?: string;
+  securityNotice?: string;
+  nameRequired?: string;
+  phoneRequired?: string;
+  ageRequired?: string;
+  passwordRequired?: string;
+  passwordMismatch?: string;
+  regFailed?: string;
+  loginFailed?: string;
+
+  // ─── Full SOS Modal Interaction ──────────────────────────────────────────
+  sosActivated?: string;
+  sosAutoCallVoice?: string;
+  sosConfirmTitle?: string;
+  sosConfirmDesc?: string;
+  sosConfirmBtn?: string;
+  sosCancelBtn?: string;
+  sosCaregiverContacted?: string;
+  sosCaregiverFailed?: string;
+  sosCallingCaregiver?: string;
+  sosCaregiverCallConnected?: string;
+  sosCaregiverAck?: string;
+  sosCallFailed?: string;
+  sosAlternateAlertSent?: string;
+  sosTelephonyActive?: string;
+  sosRetryCall?: string;
+  sosDialPhone?: string;
+  sosCriticalGuidance?: string;
+  sosDialAmbulance?: string;
+  sosInteractiveVoice?: string;
+  sosSpeaking?: string;
+  sosMuteVoice?: string;
+  sosListeningNow?: string;
+  sosTapSpeak?: string;
+  sosSpeak?: string;
+  sosStop?: string;
+  sosCallAlertsActive?: string;
+  sosEventRecorded?: string;
+  sosAssistanceArrived?: string;
+  sosResolveClose?: string;
+  sosResolvedSafely?: string;
+  sosResolvedDesc?: string;
+
+  // ─── Profile & Emergency Contacts ────────────────────────────────────────
+  accountEmergencyId?: string;
+  paramedicNotice?: string;
+  caregiverDoctorContacts?: string;
+  emergencyRecipientsSub?: string;
+  alterDetails?: string;
+  primaryCaregiverHeader?: string;
+  personalDoctorHeader?: string;
+  alterCaregiverDoctorTitle?: string;
+  alterCaregiverDoctorSub?: string;
+  caregiverFullName?: string;
+  relationshipLabel?: string;
+  doctorFullName?: string;
+  specialtyLabel?: string;
+  doctorPhoneLabel?: string;
+  saveContactDetails?: string;
+  voiceAudioPrompts?: string;
+  voiceAudioPromptsSub?: string;
+  clinicalSafetyProtocol?: string;
+  clinicalSafetyProtocolSub?: string;
+  activeStatus?: string;
+  knownAllergies?: string;
+  noneReported?: string;
+
+  // ─── Chatbot Disclaimer ──────────────────────────────────────────────────
+  triageDisclaimer?: string;
 }
 
 export type ReminderStatus = 'PENDING' | 'CALLING' | 'COMPLETED' | 'DELAYED' | 'SKIPPED' | 'UNCERTAIN' | 'FAILED';

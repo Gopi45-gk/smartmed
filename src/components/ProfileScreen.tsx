@@ -147,7 +147,7 @@ export function ProfileScreen({
     >
       <div className="pt-2 mb-4">
         <h2 className="text-2xl font-bold text-[#1D1D1F] tracking-tight">{t.profile}</h2>
-        <p className="text-xs text-[#86868B] mt-0.5">Account & Medical Emergency ID</p>
+        <p className="text-xs text-[#86868B] mt-0.5">{t.accountEmergencyId || 'Account & Medical Emergency ID'}</p>
       </div>
 
       {/* User Card */}
@@ -160,10 +160,10 @@ export function ProfileScreen({
           <p className="text-xs text-[#86868B] mt-0.5">{profile.phone}</p>
           <div className="flex items-center gap-1.5 mt-2 flex-wrap">
             <span className="text-[10px] bg-blue-50 text-[#0071E3] font-bold px-2.5 py-0.5 rounded-full border border-blue-100">
-              Age {profile.age} • {profile.gender}
+              {t.age || 'Age'} {profile.age} • {profile.gender === 'Female' ? (t.female || 'Female') : profile.gender === 'Other' ? (t.other || 'Other') : (t.male || 'Male')}
             </span>
             <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2.5 py-0.5 rounded-full border border-emerald-100">
-              Active Patient
+              {t.activePatient || 'Active Patient'}
             </span>
             {profile.condition && (
               <span className="text-[10px] bg-purple-50 text-purple-700 font-bold px-2.5 py-0.5 rounded-full border border-purple-100 truncate max-w-[150px]">
@@ -185,19 +185,19 @@ export function ProfileScreen({
 
         <div className="grid grid-cols-2 gap-3 text-xs">
           <div className="p-3 bg-red-50/50 rounded-xl border border-red-100/80">
-            <span className="text-[10px] uppercase font-bold text-red-500 block">Blood Group</span>
+            <span className="text-[10px] uppercase font-bold text-red-500 block">{t.bloodGroup || 'Blood Group'}</span>
             <span className="font-extrabold text-sm text-[#1D1D1F] mt-0.5 block">{profile.bloodGroup || t.bloodGroup}</span>
           </div>
 
           <div className="p-3 bg-red-50/50 rounded-xl border border-red-100/80">
-            <span className="text-[10px] uppercase font-bold text-red-500 block">Known Allergies</span>
-            <span className="font-bold text-xs text-[#1D1D1F] mt-0.5 block truncate">{t.allergies}</span>
+            <span className="text-[10px] uppercase font-bold text-red-500 block">{t.knownAllergies || 'Known Allergies'}</span>
+            <span className="font-bold text-xs text-[#1D1D1F] mt-0.5 block truncate">{t.noneReported || t.allergies}</span>
           </div>
         </div>
 
         <div className="mt-3 flex items-center gap-2 text-[11px] text-gray-500">
           <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-          <span>Paramedics and emergency doctors can view this without unlocking</span>
+          <span>{t.paramedicNotice || 'Paramedics and emergency doctors can view this without unlocking'}</span>
         </div>
       </div>
 
@@ -209,8 +209,8 @@ export function ProfileScreen({
               <Users className="w-4 h-4" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-purple-900 uppercase tracking-wider">Caregiver & Doctor Contacts</h4>
-              <p className="text-[10px] text-gray-500">Emergency call and medical consult recipients</p>
+              <h4 className="text-xs font-bold text-purple-900 uppercase tracking-wider">{t.caregiverDoctorContacts || 'Caregiver & Doctor Contacts'}</h4>
+              <p className="text-[10px] text-gray-500">{t.emergencyRecipientsSub || 'Emergency call and medical consult recipients'}</p>
             </div>
           </div>
           <button
@@ -219,7 +219,7 @@ export function ProfileScreen({
             className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 active:scale-95 text-purple-700 font-bold text-xs flex items-center gap-1.5 transition-all border border-purple-200/80 cursor-pointer"
           >
             <Pencil className="w-3.5 h-3.5" />
-            <span>Alter Details</span>
+            <span>{t.alterDetails || 'Alter Details'}</span>
           </button>
         </div>
 
@@ -228,7 +228,7 @@ export function ProfileScreen({
           <div className="p-3.5 bg-purple-50/50 rounded-2xl border border-purple-100/80 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase font-bold text-purple-600 block">Primary Caregiver</span>
+                <span className="text-[10px] uppercase font-bold text-purple-600 block">{t.primaryCaregiverHeader || 'Primary Caregiver'}</span>
                 <span className="text-[9px] bg-purple-200/70 text-purple-900 font-extrabold px-1.5 py-0.2 rounded-md">SOS Call</span>
               </div>
               <span className="font-extrabold text-sm text-[#1D1D1F] mt-1 block">
@@ -245,7 +245,7 @@ export function ProfileScreen({
           <div className="p-3.5 bg-blue-50/50 rounded-2xl border border-blue-100/80 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase font-bold text-blue-600 block">Personal Doctor</span>
+                <span className="text-[10px] uppercase font-bold text-blue-600 block">{t.personalDoctorHeader || 'Personal Doctor'}</span>
                 <span className="text-[9px] bg-blue-200/70 text-blue-900 font-extrabold px-1.5 py-0.2 rounded-md">Medical</span>
               </div>
               <span className="font-extrabold text-sm text-[#1D1D1F] mt-1 block">
@@ -314,13 +314,13 @@ export function ProfileScreen({
               <Volume2 className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-sm font-semibold text-[#1D1D1F]">Voice & Audio Prompts</div>
-              <div className="text-xs text-[#86868B]">Chimes & AI Speech Synthesis</div>
+              <div className="text-sm font-semibold text-[#1D1D1F]">{t.voiceAudioPrompts || 'Voice & Audio Prompts'}</div>
+              <div className="text-xs text-[#86868B]">{t.voiceAudioPromptsSub || 'Automatic TTS pronunciation & sound effects'}</div>
             </div>
           </div>
           <button 
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`w-12 h-7 rounded-full transition-colors relative p-1 ${
+            className={`w-12 h-7 rounded-full transition-colors relative p-1 cursor-pointer ${
               soundEnabled ? 'bg-[#34C759]' : 'bg-gray-300'
             }`}
           >
@@ -336,12 +336,12 @@ export function ProfileScreen({
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-sm font-semibold text-[#1D1D1F]">Clinical Safety Protocol</div>
-              <div className="text-xs text-[#86868B]">HIPAA Compliant & End-to-End Encrypted</div>
+              <div className="text-sm font-semibold text-[#1D1D1F]">{t.clinicalSafetyProtocol || 'Clinical Safety Protocol'}</div>
+              <div className="text-xs text-[#86868B]">{t.clinicalSafetyProtocolSub || 'HIPAA Compliant • On-Device AI Triage'}</div>
             </div>
           </div>
           <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-full">
-            Active
+            {t.activeStatus || 'Active'}
           </span>
         </div>
       </div>
@@ -416,7 +416,7 @@ export function ProfileScreen({
                   </span>
 
                   <div>
-                    <label className="text-[11px] font-bold text-gray-600 block mb-1">Caregiver Full Name</label>
+                    <label className="text-[11px] font-bold text-gray-600 block mb-1">{t.caregiverFullName || 'Caregiver Full Name'}</label>
                     <input 
                       type="text" 
                       required
@@ -429,7 +429,7 @@ export function ProfileScreen({
 
                   <div className="grid grid-cols-2 gap-2.5">
                     <div>
-                      <label className="text-[11px] font-bold text-gray-600 block mb-1">Relationship</label>
+                      <label className="text-[11px] font-bold text-gray-600 block mb-1">{t.relationshipLabel || 'Relationship'}</label>
                       <input 
                         type="text" 
                         required
@@ -441,7 +441,7 @@ export function ProfileScreen({
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold text-gray-600 block mb-1">Phone Number</label>
+                      <label className="text-[11px] font-bold text-gray-600 block mb-1">{t.mobileLabel || 'Phone Number'}</label>
                       <input 
                         type="tel" 
                         required
@@ -457,11 +457,11 @@ export function ProfileScreen({
                 {/* Doctor Section */}
                 <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100/70 space-y-3">
                   <span className="text-xs font-bold text-blue-900 uppercase tracking-wide block">
-                    2. Primary Doctor / Physician
+                    {t.personalDoctorHeader || 'Personal Doctor'}
                   </span>
 
                   <div>
-                    <label className="text-[11px] font-bold text-gray-600 block mb-1">Doctor Name</label>
+                    <label className="text-[11px] font-bold text-gray-600 block mb-1">{t.doctorFullName || 'Doctor Name'}</label>
                     <input 
                       type="text" 
                       required
@@ -474,7 +474,7 @@ export function ProfileScreen({
 
                   <div className="grid grid-cols-2 gap-2.5">
                     <div>
-                      <label className="text-[11px] font-bold text-gray-600 block mb-1">Specialty</label>
+                      <label className="text-[11px] font-bold text-gray-600 block mb-1">{t.specialtyLabel || 'Specialty'}</label>
                       <input 
                         type="text" 
                         required
@@ -486,7 +486,7 @@ export function ProfileScreen({
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold text-gray-600 block mb-1">Doctor Phone</label>
+                      <label className="text-[11px] font-bold text-gray-600 block mb-1">{t.doctorPhoneLabel || 'Doctor Phone'}</label>
                       <input 
                         type="tel" 
                         required
@@ -503,17 +503,17 @@ export function ProfileScreen({
                 <div className="pt-2 flex items-center gap-3">
                   <button 
                     type="submit" 
-                    className="flex-1 py-3 px-4 bg-[#0071E3] hover:bg-[#0077ED] active:scale-98 text-white font-extrabold text-sm rounded-xl shadow-md shadow-blue-500/25 transition-all"
+                    className="flex-1 py-3 px-4 bg-[#0071E3] hover:bg-[#0077ED] active:scale-98 text-white font-extrabold text-sm rounded-xl shadow-md shadow-blue-500/25 transition-all cursor-pointer"
                   >
-                    Save Altered Details
+                    {t.saveContactDetails || 'Save Altered Details'}
                   </button>
 
                   <button 
                     type="button" 
                     onClick={() => setShowAlterModal(false)}
-                    className="py-3 px-4 bg-gray-100 hover:bg-gray-200 active:scale-98 text-gray-700 font-bold text-sm rounded-xl transition-all"
+                    className="py-3 px-4 bg-gray-100 hover:bg-gray-200 active:scale-98 text-gray-700 font-bold text-sm rounded-xl transition-all cursor-pointer"
                   >
-                    Cancel
+                    {t.cancelBtn || 'Cancel'}
                   </button>
                 </div>
               </form>

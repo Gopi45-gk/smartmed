@@ -4,7 +4,8 @@ import {
   AlertOctagon, Phone, PhoneCall, ShieldAlert, CheckCircle2, 
   Volume2, Mic, MicOff, X, MapPin, AlertTriangle, UserCheck, RefreshCw, Clock, PhoneForwarded
 } from 'lucide-react';
-import { PatientProfile, Caregiver, Medicine } from '../types';
+import { PatientProfile, Caregiver, Medicine, TranslationStrings } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 import { soundManager } from '../utils/audio';
 import { hybridSttProvider } from '../utils/speech';
 import { 
@@ -20,6 +21,7 @@ interface Props {
   caregivers?: Caregiver[];
   medicines?: Medicine[];
   language?: string;
+  t?: TranslationStrings;
   onSOSResolved?: () => void;
 }
 
@@ -41,8 +43,11 @@ export function SOSModal({
   caregivers = [],
   medicines = [],
   language = 'en',
+  t,
   onSOSResolved,
 }: Props) {
+  const { t: contextT } = useLanguage();
+  const activeT = t || contextT;
   const [step, setStep] = useState<SOSStep>('CONFIRMATION');
   const [loading, setLoading] = useState(false);
   const [retryingCall, setRetryingCall] = useState(false);
@@ -394,15 +399,14 @@ export function SOSModal({
   };
 
   // Critical contact status text rule:
-  // "Say 'Your caregiver has been contacted' only after the call has actually connected or the caregiver has acknowledged the alert. Until then, say 'Calling your caregiver.'"
   const isCaregiverContacted = 
     emergencyStatus === 'CAREGIVER CALL CONNECTED' || emergencyStatus === 'CAREGIVER ACKNOWLEDGED';
 
   const caregiverHeadingText = isCaregiverContacted 
-    ? 'Your caregiver has been contacted.' 
+    ? (activeT.sosCaregiverContacted || 'Your caregiver has been contacted.')
     : emergencyStatus === 'CALL FAILED'
-    ? 'Caregiver call failed. Alternate alert sent.'
-    : 'Calling your caregiver...';
+    ? (activeT.sosCaregiverFailed || 'Caregiver call failed. Alternate alert sent.')
+    : (activeT.sosCallingCaregiver || 'Calling your caregiver...');
 
   if (!isOpen) return null;
 
@@ -421,8 +425,8 @@ export function SOSModal({
               <AlertOctagon className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-black tracking-tight uppercase">SOS EMERGENCY ACTIVATED</h2>
-              <p className="text-xs text-red-100 font-medium">Automatic Caregiver Phone Call & Voice Alert</p>
+              <h2 className="text-xl font-black tracking-tight uppercase">{activeT.sosActivated || 'SOS EMERGENCY ACTIVATED'}</h2>
+              <p className="text-xs text-red-100 font-medium">{activeT.sosAutoCallVoice || 'Automatic Caregiver Phone Call & Voice Alert'}</p>
             </div>
           </div>
           <button
@@ -443,12 +447,14 @@ export function SOSModal({
                 <ShieldAlert className="w-12 h-12" />
               </div>
               <h3 className="text-2xl font-black text-gray-900 leading-snug">
-                Confirm Emergency SOS?
+                {activeT.sosConfirmTitle || 'Confirm Emergency SOS?'}
               </h3>
               <p className="text-sm text-gray-600 mt-2.5 max-w-sm">
-                Confirming will immediately initiate an automated phone call to your registered caregiver{' '}
-                <span className="font-bold text-gray-900">{primaryCaregiver.name}</span> ({maskedCaregiverPhone(primaryCaregiver.phone)}){' '}
-                and launch your interactive voice alert.
+                {activeT.sosConfirmDesc
+                  ? activeT.sosConfirmDesc
+                      .replace('{name}', primaryCaregiver.name)
+                      .replace('{phone}', maskedCaregiverPhone(primaryCaregiver.phone))
+                  : `Confirming will immediately initiate an automated phone call to your registered caregiver ${primaryCaregiver.name} (${maskedCaregiverPhone(primaryCaregiver.phone)}) and launch your interactive voice alert.`}
               </p>
 
               <div className="w-full grid grid-cols-1 gap-3.5 mt-8">
@@ -456,19 +462,19 @@ export function SOSModal({
                   type="button"
                   onClick={handleConfirmEmergency}
                   disabled={loading}
-                  className="w-full py-4 px-6 rounded-2xl bg-red-600 hover:bg-red-700 active:scale-98 text-white font-extrabold text-lg shadow-xl shadow-red-600/35 flex items-center justify-center gap-3 transition-all"
+                  className="w-full py-4 px-6 rounded-2xl bg-red-600 hover:bg-red-700 active:scale-98 text-white font-extrabold text-lg shadow-xl shadow-red-600/35 flex items-center justify-center gap-3 transition-all cursor-pointer"
                 >
                   <AlertOctagon className="w-6 h-6" />
-                  <span>{loading ? 'INITIATING CALL...' : 'CONFIRM EMERGENCY'}</span>
+                  <span>{loading ? (activeT.sosCallingCaregiver || 'INITIATING CALL...') : (activeT.sosConfirmBtn || 'CONFIRM EMERGENCY')}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={onClose}
                   disabled={loading}
-                  className="w-full py-3.5 px-6 rounded-2xl bg-gray-100 hover:bg-gray-200 active:scale-98 text-gray-800 font-bold text-base transition-all"
+                  className="w-full py-3.5 px-6 rounded-2xl bg-gray-100 hover:bg-gray-200 active:scale-98 text-gray-800 font-bold text-base transition-all cursor-pointer"
                 >
-                  Cancel (False Alarm)
+                  {activeT.sosCancelBtn || 'Cancel (False Alarm)'}
                 </button>
               </div>
             </div>
@@ -483,7 +489,7 @@ export function SOSModal({
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-red-600 animate-ping" />
                     <span className="text-xs font-black tracking-wider text-red-700 uppercase">
-                      SOS ACTIVATED
+                      {activeT.sosActivated || 'SOS ACTIVATED'}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs text-red-800 font-semibold">
@@ -492,14 +498,14 @@ export function SOSModal({
                   </div>
                 </div>
 
-                {/* Calling Status Text following Strict Prompt Rules */}
+                {/* Calling Status Text */}
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-base font-extrabold text-gray-900">
                       {caregiverHeadingText}
                     </h3>
                     <p className="text-xs text-gray-600 mt-0.5">
-                      Caregiver: <span className="font-bold text-gray-900">{primaryCaregiver.name}</span> • {maskedCaregiverPhone(primaryCaregiver.phone)}
+                      {activeT.primaryCaregiverHeader || 'Caregiver'}: <span className="font-bold text-gray-900">{primaryCaregiver.name}</span> • {maskedCaregiverPhone(primaryCaregiver.phone)}
                     </p>
                   </div>
                   <span className={`text-xs px-2.5 py-1 rounded-full border font-bold ${getStatusBadgeStyle(emergencyStatus)}`}>
@@ -512,16 +518,16 @@ export function SOSModal({
               <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-xs flex items-center justify-between">
                 <div>
                   <span className="text-[11px] text-gray-500 font-bold uppercase tracking-wider">
-                    Caregiver Telephony
+                    {activeT.primaryCaregiverHeader || 'Caregiver Telephony'}
                   </span>
                   <p className="text-sm font-extrabold text-gray-900 mt-0.5">
                     {emergencyStatus === 'CAREGIVER ACKNOWLEDGED' 
-                      ? 'Caregiver Acknowledged Call'
+                      ? (activeT.sosCaregiverAck || 'Caregiver Acknowledged Call')
                       : emergencyStatus === 'CAREGIVER CALL CONNECTED'
-                      ? 'Call In Progress'
+                      ? (activeT.sosCaregiverCallConnected || 'Call In Progress')
                       : emergencyStatus === 'CALL FAILED'
-                      ? 'Call Unanswered / Failed'
-                      : 'Twilio Cloud Telephony Active'}
+                      ? (activeT.sosCallFailed || 'Call Unanswered / Failed')
+                      : (activeT.sosTelephonyActive || 'Twilio Cloud Telephony Active')}
                   </p>
                 </div>
 
@@ -532,10 +538,10 @@ export function SOSModal({
                       type="button"
                       onClick={handleRetryCall}
                       disabled={retryingCall}
-                      className="py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/25 transition-all"
+                      className="py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-md shadow-amber-500/25 transition-all cursor-pointer"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${retryingCall ? 'animate-spin' : ''}`} />
-                      <span>{retryingCall ? 'Retrying...' : 'Retry Call'}</span>
+                      <span>{retryingCall ? (activeT.sosCallingCaregiver || 'Retrying...') : (activeT.sosRetryCall || 'Retry Call')}</span>
                     </button>
                   )}
 
@@ -543,10 +549,10 @@ export function SOSModal({
                   <a
                     href={`tel:${primaryCaregiver.phone}`}
                     className="py-2.5 px-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/20"
-                    title="Direct Phone Call"
+                    title={activeT.sosDialPhone || 'Direct Phone Call'}
                   >
                     <PhoneForwarded className="w-3.5 h-3.5" />
-                    <span>Dial Phone</span>
+                    <span>{activeT.sosDialPhone || 'Dial Phone'}</span>
                   </a>
                 </div>
               </div>
@@ -558,7 +564,7 @@ export function SOSModal({
                     <AlertTriangle className="w-6 h-6 shrink-0 text-yellow-300 mt-0.5" />
                     <div>
                       <h4 className="font-black text-sm text-yellow-200 uppercase tracking-wide">
-                        CRITICAL MEDICAL GUIDANCE
+                        {activeT.sosCriticalGuidance || 'CRITICAL MEDICAL GUIDANCE'}
                       </h4>
                       <p className="text-xs mt-1 text-white leading-relaxed">
                         {triageAdvice || 'Chest pain can be serious. Please seek immediate emergency medical assistance. Do not wait for the caregiver if you are experiencing severe symptoms.'}
@@ -568,7 +574,7 @@ export function SOSModal({
                         className="mt-2.5 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-yellow-400 text-gray-950 font-black text-xs shadow-md hover:bg-yellow-300 active:scale-95 transition-all"
                       >
                         <Phone className="w-3.5 h-3.5" />
-                        <span>DIAL 112 (AMBULANCE)</span>
+                        <span>{activeT.sosDialAmbulance || 'DIAL 108 / 112 (AMBULANCE)'}</span>
                       </a>
                     </div>
                   </div>
@@ -581,16 +587,16 @@ export function SOSModal({
                   <div className="flex items-center gap-2">
                     <Volume2 className={`w-4 h-4 ${isAiSpeaking ? 'text-emerald-400 animate-pulse' : 'text-slate-400'}`} />
                     <span className="text-xs font-bold text-slate-300">
-                      {isAiSpeaking ? 'SmartMed Speaking (Kokoro TTS)...' : 'Interactive Emergency Voice'}
+                      {isAiSpeaking ? (activeT.sosSpeaking || 'SmartMed Speaking (Kokoro TTS)...') : (activeT.sosInteractiveVoice || 'Interactive Emergency Voice')}
                     </span>
                   </div>
                   {isAiSpeaking && (
                     <button
                       type="button"
                       onClick={stopAllAudio}
-                      className="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded-md text-slate-300 font-semibold"
+                      className="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded-md text-slate-300 font-semibold cursor-pointer"
                     >
-                      Mute Voice
+                      {activeT.sosMuteVoice || 'Mute Voice'}
                     </button>
                   )}
                 </div>
@@ -605,10 +611,10 @@ export function SOSModal({
                     <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${isListening ? 'bg-red-500 animate-ping' : 'bg-slate-600'}`} />
                     <span className="truncate">
                       {isListening 
-                        ? 'Listening to you now...' 
+                        ? (activeT.sosListeningNow || 'Listening to you now...') 
                         : patientSpeech 
-                        ? `You: "${patientSpeech}"` 
-                        : 'Tap Speak or reply naturally'}
+                        ? `${activeT.patientRepliedLabel || 'You'}: "${patientSpeech}"` 
+                        : (activeT.sosTapSpeak || 'Tap Speak or reply naturally')}
                     </span>
                   </div>
 
@@ -622,14 +628,14 @@ export function SOSModal({
                         startPatientSpeechListening(emergencyData.emergency_id);
                       }
                     }}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+                    className={`py-2 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                       isListening
                         ? 'bg-red-500 text-white animate-pulse'
                         : 'bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/30'
                     }`}
                   >
                     {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
-                    <span>{isListening ? 'Stop' : 'Speak'}</span>
+                    <span>{isListening ? (activeT.sosStop || 'Stop') : (activeT.sosSpeak || 'Speak')}</span>
                   </button>
                 </div>
               </div>
@@ -638,11 +644,11 @@ export function SOSModal({
               <div className="flex items-center justify-between text-xs text-gray-500 px-1 pt-1">
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Call & Alerts Active</span>
+                  <span>{activeT.sosCallAlertsActive || 'Call & Alerts Active'}</span>
                 </span>
                 <span className="flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Emergency Event Recorded</span>
+                  <span>{activeT.sosEventRecorded || 'Emergency Event Recorded'}</span>
                 </span>
               </div>
 
@@ -652,19 +658,19 @@ export function SOSModal({
                   type="button"
                   onClick={handleResolve}
                   disabled={loading}
-                  className="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-sm shadow-md shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all"
+                  className="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-sm shadow-md shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
                   <UserCheck className="w-4 h-4" />
-                  <span>Assistance Arrived</span>
+                  <span>{activeT.sosAssistanceArrived || 'Assistance Arrived'}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleCancel}
                   disabled={loading}
-                  className="py-3 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-700 font-bold text-sm flex items-center justify-center gap-2 transition-all"
+                  className="py-3 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 active:scale-95 text-gray-700 font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
-                  <span>Resolve / Close</span>
+                  <span>{activeT.sosResolveClose || 'Resolve / Close'}</span>
                 </button>
               </div>
             </div>
@@ -676,9 +682,9 @@ export function SOSModal({
               <div className="w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4 shadow-inner">
                 <CheckCircle2 className="w-10 h-10" />
               </div>
-              <h3 className="text-xl font-black text-gray-900">Emergency Resolved Safely</h3>
+              <h3 className="text-xl font-black text-gray-900">{activeT.sosResolvedSafely || 'Emergency Resolved Safely'}</h3>
               <p className="text-sm text-gray-600 mt-1 max-w-xs">
-                Your caregiver alert and call status have been marked as resolved. We are glad you are safe!
+                {activeT.sosResolvedDesc || 'Your caregiver alert and call status have been marked as resolved. We are glad you are safe!'}
               </p>
             </div>
           )}

@@ -70,10 +70,14 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     i18nInstance.changeLanguage(newLang);
   }, [i18nInstance]);
 
-  // Synchronize with i18n instance
+  // Synchronize with i18n instance and document attributes
   useEffect(() => {
     if (i18n.language !== language) {
       i18n.changeLanguage(language);
+    }
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = language;
+      document.documentElement.dir = language === 'ur' ? 'rtl' : 'ltr';
     }
   }, [language]);
 

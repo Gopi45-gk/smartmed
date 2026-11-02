@@ -380,7 +380,7 @@ export function ChatScreen({ medicines, t, lang, patientProfile, onBack }: Props
       <div className="px-4 py-1.5 bg-amber-50/90 border-b border-amber-200/70 flex items-center gap-2 z-10">
         <ShieldAlert className="w-3.5 h-3.5 text-amber-600 shrink-0" />
         <p className="text-[10px] text-amber-800 font-semibold leading-tight">
-          SmartMed AI provides verified medical triage. Always consult a physician for urgent diagnosis.
+          {t.triageDisclaimer || 'SmartMed AI provides verified medical triage. Always consult a physician for urgent diagnosis.'}
         </p>
       </div>
 

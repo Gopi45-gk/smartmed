@@ -222,7 +222,7 @@ function MainApp() {
               />
               <span className="font-bold text-gray-900 tracking-wide text-sm">SmartMed</span>
               <span className="text-[10px] bg-blue-500/15 text-[#0071E3] font-semibold px-2 py-0.5 rounded-full border border-blue-500/20">
-                Care AI
+                {t.careAI || 'Care AI'}
               </span>
             </div>
 
@@ -235,10 +235,10 @@ function MainApp() {
                 setIsSOSOpen(true);
               }}
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-red-600 hover:bg-red-700 active:scale-95 text-white font-extrabold text-xs shadow-md shadow-red-600/30 transition-all border border-red-500 cursor-pointer"
-              aria-label="SOS Emergency"
+              aria-label={t.sosEmergency || 'SOS EMERGENCY'}
             >
               <AlertOctagon className="w-4 h-4 animate-pulse" />
-              <span>SOS EMERGENCY</span>
+              <span>{t.sosEmergency || 'SOS EMERGENCY'}</span>
             </button>
           </div>
         </header>
@@ -277,6 +277,7 @@ function MainApp() {
         caregivers={caregivers}
         medicines={medicines}
         language={lang}
+        t={t}
         onSOSResolved={() => setIsSOSOpen(false)}
       />
     </div>

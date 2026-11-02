@@ -46,13 +46,13 @@ export function BottomNav({ activeTab, setActiveTab, onCallAI, t }: Props) {
           <button 
             onClick={onCallAI}
             className="w-14 h-14 rounded-full bg-[#0071E3] hover:bg-[#0062c4] text-white flex items-center justify-center shadow-[0_8px_20px_rgba(0,113,227,0.35)] active:scale-90 transition-all ring-4 ring-white border border-blue-400/20"
-            title="SmartMed AI Voice Call"
-            aria-label="SmartMed AI Voice Call"
+            title={t.callAI || 'SmartMed AI Voice Call'}
+            aria-label={t.callAI || 'SmartMed AI Voice Call'}
           >
             <Phone className="w-6 h-6 stroke-[2.2] animate-pulse" />
           </button>
           <span className="text-[11px] font-bold text-[#0071E3] mt-1 tracking-tight">
-            Call AI
+            {t.callAI || 'Call AI'}
           </span>
         </div>
 
