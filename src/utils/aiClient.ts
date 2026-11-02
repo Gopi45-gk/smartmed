@@ -45,6 +45,8 @@ export function getAugmentedSystemPrompt(language: string = 'en'): string {
     ta: 'Tamil (தமிழ்)',
     hi: 'Hindi (हिन्दी)',
     te: 'Telugu (తెలుగు)',
+    bn: 'Bengali (বাংলা)',
+    mr: 'Marathi (मराठी)',
     kn: 'Kannada (ಕನ್ನಡ)',
     ml: 'Malayalam (മലയാളം)',
     en: 'English',
@@ -263,17 +265,20 @@ export function detectLanguageFromText(text: string, fallback: string = 'en'): s
   if (!text) {
     if (typeof localStorage !== 'undefined') {
       const stored = localStorage.getItem('smartmed_preferred_language');
-      if (stored && ['ta', 'en', 'hi', 'te', 'kn', 'ml'].includes(stored)) return stored;
+      if (stored && ['ta', 'en', 'hi', 'te', 'bn', 'mr', 'kn', 'ml', 'ur'].includes(stored)) return stored;
     }
     return fallback;
   }
   const s = text.toLowerCase();
-  if (/[\u0B80-\u0BFF]/.test(s) || s.includes('ta') || s.includes('tamil')) return 'ta';
-  if (/[\u0900-\u097F]/.test(s) || s.includes('hi') || s.includes('hindi')) return 'hi';
-  if (/[\u0C00-\u0C7F]/.test(s) || s.includes('te') || s.includes('telugu')) return 'te';
-  if (/[\u0C80-\u0CFF]/.test(s) || s.includes('kn') || s.includes('kannada')) return 'kn';
-  if (/[\u0D00-\u0D7F]/.test(s) || s.includes('ml') || s.includes('malayalam')) return 'ml';
-  if (s.includes('en') || s.includes('english')) return 'en';
+  if (/[\u0B80-\u0BFF]/.test(s) || s.includes('tamil') || s.includes('தமிழ்')) return 'ta';
+  if (/[\u0980-\u09FF]/.test(s) || s.includes('bengali') || s.includes('bangla') || /বাংলা/.test(s)) return 'bn';
+  if (s.includes('marathi') || /मराठी/.test(s) || (fallback === 'mr' && /[\u0900-\u097F]/.test(s))) return 'mr';
+  if (/[\u0900-\u097F]/.test(s) || s.includes('hindi') || /हिंदी/.test(s)) return 'hi';
+  if (/[\u0C00-\u0C7F]/.test(s) || s.includes('telugu') || /తెలుగు/.test(s)) return 'te';
+  if (/[\u0C80-\u0CFF]/.test(s) || s.includes('kannada') || /ಕನ್ನಡ/.test(s)) return 'kn';
+  if (/[\u0D00-\u0D7F]/.test(s) || s.includes('malayalam') || /മലയാളം/.test(s)) return 'ml';
+  if (/[\u0600-\u06FF]/.test(s) || s.includes('urdu') || /اردو/.test(s)) return 'ur';
+  if (s.includes('english')) return 'en';
   return fallback;
 }
 
@@ -289,10 +294,12 @@ export function resolveClinicalTriageOffline(
 
   // If Voice requested (1 to 2 spoken sentences)
   if (isVoice) {
-    if (q.includes('chest pain') || q.includes('heart') || q.includes('breathe') || /நெஞ்சு|சீने|ఛాతీ|നെഞ്ചുവേദന|ಎದೆ ನೋವು/.test(q)) {
+    if (q.includes('chest pain') || q.includes('heart') || q.includes('breathe') || /நெஞ்சு|சீने|छाती|ఛాతీ|বুকে ব্যথা|छातीत|നെഞ്ചുവേദന|ಎದೆ ನೋವು/.test(q)) {
       if (lang === 'ta') return `${prefix}நெஞ்சு வலி அவசர சிகிச்சை தேவைப்படும் அறிகுறி. உடனே அவசர மருத்துவ சேவையைத் தொடர்பு கொள்ளவும்.`;
       if (lang === 'hi') return `${prefix}सीने में दर्द आपातकालीन लक्षण है। कृपया तुरंत नजदीकी अस्पताल जाएं।`;
       if (lang === 'te') return `${prefix}ఛాతీ నొప్పి అత్యవసర పరిస్థితి. వెంటనే వైద్య సహాయం తీసుకోండి.`;
+      if (lang === 'bn') return `${prefix}বুকে ব্যথা একটি জরুরি অবস্থা। অবিলম্বে জরুরি চিকিৎসা সহায়তা নিন।`;
+      if (lang === 'mr') return `${prefix}छातीत दुखणे हे आणीबाणीचे लक्षण आहे. कृपया त्वरित वैद्यकीय मदत घ्या.`;
       if (lang === 'kn') return `${prefix}ಎದೆ ನೋವು ತುರ್ತು ವೈದ್ಯಕೀಯ ಚಿಕಿತ್ಸೆ ಅಗತ್ಯವಿರುವ ಲಕ್ಷಣ. ದಯವಿಟ್ಟು ತಕ್ಷಣವೇ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
       if (lang === 'ml') return `${prefix}നെഞ്ചുവേദന അടിയന്തിര വൈദ്യസഹായം ആവശ്യമുള്ള ലക്ഷണമാണ്. ഉടൻ ആശുപത്രിയിൽ ചികിത്സ തേടുക.`;
       return `${prefix}chest pain requires immediate emergency medical care. Please call emergency services right away.`;
@@ -363,10 +370,12 @@ export function resolveClinicalTriageOffline(
   }
 
   // If Chat requested (Master System Prompt 5 Rules)
-  if (q.includes('chest pain') || q.includes('heart attack') || q.includes('breathe') || /நெஞ்சு|சீने|ఛాతీ|നെഞ്ചുവേദന|ಎದೆ ನೋವು/.test(q)) {
+  if (q.includes('chest pain') || q.includes('heart attack') || q.includes('breathe') || /நெஞ்சு|சீने|छाती|ఛాతీ|বুকে ব্যথা|छातीत|നെഞ്ചുവേദന|ಎದೆ ನೋವು/.test(q)) {
     if (lang === 'ta') return `⚠️ அவசர எச்சரிக்கை:\n• நெஞ்சு வலி மற்றும் மூச்சுத் திணறல் உடனடி மருத்துவ அவசர சிகிச்சை தேவைப்படும் அறிகுறிகள் ஆகும்.\n• உடனே அவசர மருத்துவ பிரிவை அணுகவும்.\nகடுமையான அறிகுறிகளுக்கு தயவுசெய்து மருத்துவரை அணுகவும்.`;
     if (lang === 'hi') return `⚠️ तत्काल चेतावनी:\n• सीने में दर्द और सांस लेने में कठिनाई गंभीर आपातकालीन लक्षण हैं।\n• कृपया तुरंत नजदीकी अस्पताल जाएं।\nगंभीर लक्षणों के लिए कृपया डॉक्टर से परामर्श लें।`;
     if (lang === 'te') return `⚠️ అత్యవసర హెచ్చరిక:\n• ఛాతీ నొప్పి మరియు శ్వాస ఇబ్బంది అత్యవసర పరిస్థితి.\n• వెంటనే ఆసుపత్రికి వెళ్లండి.\nతీవ్రమైన లక్షణాల కోసం దయచేసి వైద్యుడిని సంప్రదించండి.`;
+    if (lang === 'bn') return `⚠️ জরুরি সতর্কতা:\n• বুকে তীব্র ব্যথা বা শ্বাসকষ্ট জরুরি চিকিৎসার লক্ষণ।\n• অবিলম্বে নিকটস্থ জরুরি বিভাগে যোগাযোগ করুন।\nগুরুতর উপসর্গের জন্য অনুগ্রহ করে চিকিৎসকের পরামর্শ নিন।`;
+    if (lang === 'mr') return `⚠️ तातडीचा इशारा:\n• छातीत तीव्र वेदना आणि श्वास घेण्यास त्रास ही आणीबाणीची लक्षणे आहेत।\n• कृपया त्वरित जवळच्या रुग्णालयात जा।\nगंभीर लक्षणांसाठी कृपया डॉक्टरांचा सल्ला घ्या।`;
     if (lang === 'kn') return `⚠️ ತುರ್ತು ವೈದ್ಯಕೀಯ ಎಚ್ಚರಿಕೆ:\n• ಎದೆ ನೋವು ಮತ್ತು ಉಸಿರಾಟದ ತೊಂದರೆಗೆ ತಕ್ಷಣ ತುರ್ತು ಚಿಕಿತ್ಸೆ ಅಗತ್ಯವಿದೆ.\n• ದಯವಿಟ್ಟು ತಕ್ಷಣವೇ ಹತ್ತಿರದ ತುರ್ತು ಚಿಕಿತ್ಸಾ ಕೇಂದ್ರಕ್ಕೆ ಭೇಟಿ ನೀಡಿ.\nತೀವ್ರವಾದ ರೋಗಲಕ್ಷಣಗಳಿಗಾಗಿ ದಯವಿಟ್ಟು ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
     if (lang === 'ml') return `⚠️ അടിയന്തര വൈദ്യസഹായം:\n• നെഞ്ചുവേദനയും ശ്വാസതടസ്സവും അടിയന്തിര ചികിത്സ ആവശ്യമുള്ള ലക്ഷണങ്ങളാണ്.\n• ദയവായി ഉടൻ തന്നെ അടുത്തുള്ള ആശുപത്രിയിൽ എത്തുക.\nഗുരുതരമായ ലക്ഷണങ്ങൾക്ക് ദയവായി ഒരു ഡോക്ടറെ കാണുക.`;
     return `⚠️ IMMEDIATE MEDICAL ALERT:\n• Acute chest pain or difficulty breathing requires emergency medical care.\n• Please seek emergency hospital attention immediately.\nPlease consult a doctor for severe symptoms.`;
@@ -432,6 +441,8 @@ export function resolveClinicalTriageOffline(
   if (lang === 'ta') return `• உங்கள் உடல்நலக் கேள்வியைப் புரிந்து கொண்டேன். பரிந்துரைக்கப்பட்ட மருந்துகளை அட்டவணைப்படி உட்கொள்ளவும்.\n• போதுமான தண்ணீர் அருந்தி நல்ல ஓய்வெடுக்கவும்.\nகடுமையான அறிகுறிகளுக்கு தயவுசெய்து மருத்துவரை அணுகவும்.`;
   if (lang === 'hi') return `• आपकी स्वास्थ्य संबंधी बात नोट कर ली गई है। कृपया अपनी निर्धारित दवाओं का समय पर सेवन करें।\n• पर्याप्त पानी पिएं और अच्छा आराम करें।\nगंभीर लक्षणों के लिए कृपया डॉक्टर से परामर्श लें।`;
   if (lang === 'te') return `• మీ ఆరోగ్య ప్రశ్నను అర్థం చేసుకున్నాను. సూచించిన మందులను సమయానికి క్రమం తప్పకుండా తీసుకోండి.\n• తగినంత నీరు త్రాగండి మరియు విశ్రాంతి తీసుకోండి.\nతీవ్రమైన లక్షణాల కోసం దయచేసి వైద్యుడిని సంప్రదించండి.`;
+  if (lang === 'bn') return `• আপনার স্বাস্থ্য সংক্রান্ত প্রশ্নটি বুঝতে পেরেছি। দয়া করে নির্ধারিত ওষুধ সঠিক সময়ে খান।\n• পর্যাপ্ত জল পান করুন এবং বিশ্রাম নিন।\nগুরুতর উপসর্গের জন্য অনুগ্রহ করে চিকিৎসকের পরামর্শ নিন।`;
+  if (lang === 'mr') return `• आपल्या आरोग्याचा प्रश्न समजला आहे। कृपया डॉक्टरांनी सांगितलेली औषधे वेळेवर घ्या।\n• भरपूर पाणी प्या आणि पुरेशी विश्रांती घ्या।\nगंभीर लक्षणांसाठी कृपया डॉक्टरांचा सल्ला घ्या।`;
   if (lang === 'ml') return `• താങ്കളുടെ ആരോഗ്യപരമായ സംശയം മനസ്സിലാക്കുന്നു. നിർദ്ദേശിച്ച മരുന്നുകൾ കൃത്യസമയത്ത് കഴിക്കുക.\n• ആവശ്യത്തിന് വെള്ളം കുടിക്കുകയും വിശ്രമിക്കുകയും ചെയ്യുക.\nഗുരുതരമായ ലക്ഷണങ്ങൾക്ക് ദയവായി ഒരു ഡോക്ടറെ കാണുക.`;
   if (lang === 'kn') return `• ನಿಮ್ಮ ಆರೋಗ್ಯ ಪ್ರಶ್ನೆಯನ್ನು ಗಮನಿಸಿದ್ದೇನೆ. ದಯವಿಟ್ಟು ವೈದ್ಯರು ಸೂಚಿಸಿದ ಔಷಧಿಗಳನ್ನು ನಿಯಮಿತವಾಗಿ ತೆಗೆದುಕೊಳ್ಳಿ.\n• ಸಾಕಷ್ಟು ನೀರು ಕುಡಿಯಿರಿ ಮತ್ತು ವಿಶ್ರಾಂತಿ ಪಡೆಯಿರಿ.\nತೀವ್ರವಾದ ರೋಗಲಕ್ಷಣಗಳಿಗಾಗಿ ದಯವಿಟ್ಟು ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
   return `• I have noted your health query. Please maintain proper hydration, rest, and adhere to prescribed medication schedules.\n• Check your prescription label for specific dosage directions.\nPlease consult a doctor for severe symptoms.`;
@@ -849,6 +860,120 @@ export function clearConversationHistory(): void {
   localStorage.removeItem(STORAGE_KEY);
   localStorage.removeItem('smartmed-chat-history');
   localStorage.removeItem('smartmed-conversation-id');
+}
+
+// ─── Multi-Session Chat & History Storage Management (Modules 2 & 3) ────────
+export const CHAT_SESSIONS_STORAGE_KEY = 'smartmed_chat_sessions_v2';
+
+export interface ChatSessionData {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  language: string;
+  messages: Array<{
+    id: string;
+    sender: 'user' | 'ai';
+    text: string;
+    time?: string;
+  }>;
+  preview?: string;
+}
+
+export function getAllChatSessions(): ChatSessionData[] {
+  try {
+    const raw = localStorage.getItem(CHAT_SESSIONS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+      }
+    }
+    // Backward compatibility: migrate legacy conversation from smartmed-mnn-v1
+    const legacy = loadConversationHistory();
+    if (legacy && legacy.length > 0) {
+      const legacySession: ChatSessionData = {
+        id: `sess_legacy_${Date.now()}`,
+        title: legacy[0]?.content?.slice(0, 32) || 'Previous Consultation',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        language: localStorage.getItem('smartmed_preferred_language') || 'en',
+        messages: legacy.map((m, idx) => ({
+          id: `msg_leg_${idx}`,
+          sender: m.role === 'user' ? 'user' : 'ai',
+          text: m.content,
+          time: 'Saved'
+        })),
+        preview: legacy[legacy.length - 1]?.content?.slice(0, 60) || ''
+      };
+      localStorage.setItem(CHAT_SESSIONS_STORAGE_KEY, JSON.stringify([legacySession]));
+      return [legacySession];
+    }
+  } catch (err) {
+    console.warn('Failed to load chat sessions:', err);
+  }
+  return [];
+}
+
+export function getChatSession(id: string): ChatSessionData | null {
+  const sessions = getAllChatSessions();
+  return sessions.find(s => s.id === id) || null;
+}
+
+export function saveChatSession(session: ChatSessionData): void {
+  try {
+    const sessions = getAllChatSessions();
+    const idx = sessions.findIndex(s => s.id === session.id);
+
+    if (!session.title || session.title === 'New Chat') {
+      const firstUserMsg = session.messages.find(m => m.sender === 'user');
+      if (firstUserMsg) {
+        session.title = firstUserMsg.text.slice(0, 32) + (firstUserMsg.text.length > 32 ? '...' : '');
+      } else {
+        session.title = 'Health Consultation';
+      }
+    }
+    const lastMsg = session.messages[session.messages.length - 1];
+    session.preview = lastMsg ? (lastMsg.text.slice(0, 60) + (lastMsg.text.length > 60 ? '...' : '')) : '';
+    session.updatedAt = new Date().toISOString();
+
+    if (idx >= 0) {
+      sessions[idx] = session;
+    } else {
+      sessions.unshift(session);
+    }
+
+    localStorage.setItem(CHAT_SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
+
+    // Mirror active messages to legacy key for backward compatibility
+    const aiMessages: AIMessage[] = session.messages.map(m => ({
+      role: m.sender === 'user' ? 'user' : 'assistant',
+      content: m.text
+    }));
+    saveConversationHistory(aiMessages);
+  } catch (err) {
+    console.warn('Failed to save chat session:', err);
+  }
+}
+
+export function deleteChatSession(id: string): void {
+  try {
+    const sessions = getAllChatSessions().filter(s => s.id !== id);
+    localStorage.setItem(CHAT_SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
+  } catch (err) {
+    console.warn('Failed to delete chat session:', err);
+  }
+}
+
+export function createNewChatSession(language: string = 'en'): ChatSessionData {
+  return {
+    id: `sess_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    title: 'New Chat',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    language,
+    messages: []
+  };
 }
 
 // ─── Twilio Web Telephony & Scheduler Integration ──────────────────────────

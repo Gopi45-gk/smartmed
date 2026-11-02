@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Language, TranslationStrings, PatientProfile, defaultPatientProfile, Caregiver } from '../types';
 import { initialCaregivers } from '../data/initialData';
@@ -75,7 +75,7 @@ export function ProfileScreen({
     setShowAlterModal(true);
   };
 
-  const handleSaveAlterDetails = (e?: React.FormEvent) => {
+  const handleSaveAlterDetails = (e?: FormEvent) => {
     if (e) e.preventDefault();
     if (!cgName.trim() || !docName.trim()) return;
 
@@ -129,10 +129,12 @@ export function ProfileScreen({
   const languages: { code: Language; name: string; native: string }[] = [
     { code: 'en', name: 'English', native: 'English' },
     { code: 'ta', name: 'Tamil', native: 'தமிழ்' },
-    { code: 'te', name: 'Telugu', native: 'తెలుగు' },
-    { code: 'ml', name: 'Malayalam', native: 'മലയാളം' },
-    { code: 'kn', name: 'Kannada', native: 'ಕನ್ನಡ' },
     { code: 'hi', name: 'Hindi', native: 'हिन्दी' },
+    { code: 'te', name: 'Telugu', native: 'తెలుగు' },
+    { code: 'bn', name: 'Bengali', native: 'বাংলা' },
+    { code: 'mr', name: 'Marathi', native: 'मराठी' },
+    { code: 'kn', name: 'Kannada', native: 'ಕನ್ನಡ' },
+    { code: 'ml', name: 'Malayalam', native: 'മലയാളം' },
     { code: 'ur', name: 'Urdu', native: 'اردو' }
   ];
 

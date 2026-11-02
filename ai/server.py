@@ -280,6 +280,8 @@ async def query_nvidia_nim(
         "kn": "Kannada",
         "ml": "Malayalam",
         "ur": "Urdu",
+        "bn": "Bengali",
+        "mr": "Marathi",
     }
     target_lang = (preferred_language or "en").lower().strip()
     target_lang_name = lang_name_map.get(target_lang, target_lang.capitalize())
@@ -1053,6 +1055,10 @@ async def answer_medical_query(
                 med_resp = f"{matched_med_name} ಔಷಧಿಯು {indication or db_info.get('use', '')}. ವೈದ್ಯರು ಸೂಚಿಸಿದಂತೆ ನಿಯಮಿತವಾಗಿ ತೆಗೆದುಕೊಳ್ಳಿ."
             elif lang == "ml":
                 med_resp = f"{matched_med_name} മരുന്ന് {indication or db_info.get('use', '')}. ഡോക്ടർ നിർദ്ദേശിച്ച രീതിയിൽ കൃത്യമായി കഴിക്കുക."
+            elif lang == "bn":
+                med_resp = f"{matched_med_name} ওষুধটি {indication or db_info.get('use', '')}। চিকিৎসকের নির্দেশ অনুযায়ী নিয়মিত গ্রহণ করুন।"
+            elif lang == "mr":
+                med_resp = f"{matched_med_name} हे औषध {indication or db_info.get('use', '')} साठी आहे। डॉक्टरांच्या सल्ल्यानुसार वेळेवर घ्या।"
             else:
                 med_resp = f"{matched_med_name} is prescribed for: {indication or db_info.get('use', '')}. Please take it exactly as directed by your doctor."
 
@@ -1125,7 +1131,8 @@ async def answer_medical_query(
                 )
                 lang_names = {
                     "en": "English", "ta": "Tamil", "hi": "Hindi",
-                    "te": "Telugu", "ur": "Urdu", "ml": "Malayalam", "kn": "Kannada"
+                    "te": "Telugu", "ur": "Urdu", "ml": "Malayalam", "kn": "Kannada",
+                    "bn": "Bengali", "mr": "Marathi"
                 }
                 target_lang_name = lang_names.get(lang, "English")
                 voice_sys = (
@@ -1154,13 +1161,15 @@ async def answer_medical_query(
 
             # Coherence & script validation check
             is_valid = bool(result.get("success") and clean_resp and len(clean_resp.strip()) >= 5)
-            if is_valid and lang in ["ta", "hi", "te", "kn", "ml"]:
+            if is_valid and lang in ["ta", "hi", "te", "kn", "ml", "bn", "mr"]:
                 script_regexes = {
                     "ta": r"[\u0B80-\u0BFF]",
                     "hi": r"[\u0900-\u097F]",
                     "te": r"[\u0C00-\u0C7F]",
                     "kn": r"[\u0C80-\u0CFF]",
                     "ml": r"[\u0D00-\u0D7F]",
+                    "bn": r"[\u0980-\u09FF]",
+                    "mr": r"[\u0900-\u097F]",
                 }
                 rx = script_regexes.get(lang)
                 if rx and not re.search(rx, clean_resp):

@@ -104,6 +104,22 @@ export const initialChatMessages: Record<string, ChatMessage[]> = {
       time: 'ఇప్పుడు'
     }
   ],
+  bn: [
+    {
+      id: '1',
+      sender: 'ai',
+      text: 'নমস্কার! SmartMed AI-তে আপনাকে স্বাগতম। আজ আমি আপনার স্বাস্থ্য বা ওষুধ সম্পর্কে কীভাবে সাহায্য করতে পারি?',
+      time: 'এখন'
+    }
+  ],
+  mr: [
+    {
+      id: '1',
+      sender: 'ai',
+      text: 'नमस्कार! SmartMed AI मध्ये आपले स्वागत आहे. आज मी आपल्या आरोग्य किंवा औषधांबद्दल कशी मदत करू शकतो?',
+      time: 'आता'
+    }
+  ],
   kn: [
     {
       id: '1',

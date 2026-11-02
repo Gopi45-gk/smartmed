@@ -26,14 +26,13 @@ interface LanguageOption {
 export function LanguageScreen({ currentLang, setLang, next, onBack }: Props) {
   const [selectedCode, setSelectedCode] = useState<Language>(currentLang);
 
-  // 6 Languages matching SmartMed's cohesive iOS color palette & tactile texture
+  // Supported languages with SmartMed iOS color palette & tactile texture
   const languageOptions: LanguageOption[] = [
     {
       code: 'ta',
       native: 'தமிழ்',
       label: 'TAMIL',
       headingText: 'உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்',
-      // Emerald / Healing Mint (SmartMed Medicine adherence accent)
       gradient: 'from-[#059669] via-[#10B981] to-[#047857]',
       topSheen: 'bg-white/20',
       bottomTone: 'bg-black/15',
@@ -44,55 +43,70 @@ export function LanguageScreen({ currentLang, setLang, next, onBack }: Props) {
       native: 'ENGLISH',
       label: 'ENGLISH',
       headingText: 'Select Your Language',
-      // Signature SmartMed iOS Royal Blue
       gradient: 'from-[#0071E3] via-[#0A84FF] to-[#0055B3]',
       topSheen: 'bg-white/25',
       bottomTone: 'bg-black/15',
       shadowColor: 'shadow-blue-600/30'
     },
     {
+      code: 'hi',
+      native: 'हिंदी',
+      label: 'HINDI',
+      headingText: 'अपनी भाषा का चयन करें',
+      gradient: 'from-[#D97706] via-[#F59E0B] to-[#B45309]',
+      topSheen: 'bg-white/20',
+      bottomTone: 'bg-black/15',
+      shadowColor: 'shadow-amber-600/30'
+    },
+    {
       code: 'te',
       native: 'తెలుగు',
       label: 'TELUGU',
       headingText: 'మీ భాషను ఎంచుకోండి',
-      // Cyan / Cerulean Blue
       gradient: 'from-[#0284C7] via-[#0EA5E9] to-[#0369A1]',
       topSheen: 'bg-white/20',
       bottomTone: 'bg-black/15',
       shadowColor: 'shadow-sky-600/25'
     },
     {
-      code: 'ml',
-      native: 'മലയാളം',
-      label: 'MALAYALAM',
-      headingText: 'നിങ്ങളുടെ ഭാഷ തിരഞ്ഞെടുക്കുക',
-      // Teal / Seafoam Clinical
-      gradient: 'from-[#0D9488] via-[#14B8A6] to-[#0F766E]',
+      code: 'bn',
+      native: 'বাংলা',
+      label: 'BENGALI',
+      headingText: 'আপনার ভাষা নির্বাচন করুন',
+      gradient: 'from-[#E11D48] via-[#F43F5E] to-[#BE123C]',
       topSheen: 'bg-white/20',
       bottomTone: 'bg-black/15',
-      shadowColor: 'shadow-teal-600/25'
+      shadowColor: 'shadow-rose-600/25'
+    },
+    {
+      code: 'mr',
+      native: 'मराठी',
+      label: 'MARATHI',
+      headingText: 'आपली भाषा निवडा',
+      gradient: 'from-[#EA580C] via-[#F97316] to-[#C2410C]',
+      topSheen: 'bg-white/20',
+      bottomTone: 'bg-black/15',
+      shadowColor: 'shadow-orange-600/25'
     },
     {
       code: 'kn',
       native: 'ಕನ್ನಡ',
       label: 'KANNADA',
       headingText: 'ನಿಮ್ಮ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ',
-      // Indigo / Caregiver Violet
       gradient: 'from-[#4F46E5] via-[#6366F1] to-[#3730A3]',
       topSheen: 'bg-white/20',
       bottomTone: 'bg-black/15',
       shadowColor: 'shadow-indigo-600/25'
     },
     {
-      code: 'hi',
-      native: 'हिंदी',
-      label: 'HINDI',
-      headingText: 'अपनी भाषा का चयन करें',
-      // Warm Saffron Gold / Vitality Amber
-      gradient: 'from-[#D97706] via-[#F59E0B] to-[#B45309]',
+      code: 'ml',
+      native: 'മലയാളം',
+      label: 'MALAYALAM',
+      headingText: 'നിങ്ങളുടെ ഭാഷ തിരഞ്ഞെടുക്കുക',
+      gradient: 'from-[#0D9488] via-[#14B8A6] to-[#0F766E]',
       topSheen: 'bg-white/20',
       bottomTone: 'bg-black/15',
-      shadowColor: 'shadow-amber-600/30'
+      shadowColor: 'shadow-teal-600/25'
     }
   ];
 
@@ -183,7 +197,7 @@ export function LanguageScreen({ currentLang, setLang, next, onBack }: Props) {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => handleSelect(item)}
-              className={`h-22 sm:h-24 rounded-[26px] relative overflow-hidden transition-all flex flex-col justify-center items-center p-2 shadow-md ${item.shadowColor} bg-gradient-to-b ${item.gradient} ${
+              className={`h-20 sm:h-22 rounded-[22px] relative overflow-hidden transition-all flex flex-col justify-center items-center p-2 shadow-md ${item.shadowColor} bg-gradient-to-b ${item.gradient} ${
                 isSelected 
                   ? 'ring-4 ring-[#0071E3]/40 ring-offset-2 scale-[1.02] shadow-xl' 
                   : 'hover:opacity-95'

@@ -19,13 +19,13 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [language, setLanguageState] = useState<Language>(() => {
     try {
       const stored = localStorage.getItem('smartmed_preferred_language') as Language;
-      if (stored && ['ta', 'en', 'hi', 'te', 'kn', 'ml', 'ur'].includes(stored)) {
+      if (stored && ['ta', 'en', 'hi', 'te', 'bn', 'mr', 'kn', 'ml', 'ur'].includes(stored)) {
         return stored;
       }
       const profileStr = localStorage.getItem('smartmed_patient_profile');
       if (profileStr) {
         const p = JSON.parse(profileStr);
-        if (p.preferred_language && ['ta', 'en', 'hi', 'te', 'kn', 'ml', 'ur'].includes(p.preferred_language)) {
+        if (p.preferred_language && ['ta', 'en', 'hi', 'te', 'bn', 'mr', 'kn', 'ml', 'ur'].includes(p.preferred_language)) {
           return p.preferred_language;
         }
       }
@@ -38,7 +38,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const { i18n: i18nInstance } = useTranslation();
 
   const setLanguage = useCallback((newLang: Language, phone?: string) => {
-    if (!['ta', 'en', 'hi', 'te', 'kn', 'ml', 'ur'].includes(newLang)) return;
+    if (!['ta', 'en', 'hi', 'te', 'bn', 'mr', 'kn', 'ml', 'ur'].includes(newLang)) return;
     
     setLanguageState(newLang);
 

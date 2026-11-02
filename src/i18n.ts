@@ -9,6 +9,8 @@ const resources = {
   ta: { translation: translations.ta },
   hi: { translation: translations.hi },
   te: { translation: translations.te },
+  bn: { translation: translations.bn },
+  mr: { translation: translations.mr },
   kn: { translation: translations.kn },
   ml: { translation: translations.ml },
   ur: { translation: translations.ur },
@@ -18,13 +20,13 @@ const getInitialLanguage = (): Language => {
   if (typeof window === 'undefined') return 'en';
   try {
     const saved = localStorage.getItem('smartmed_preferred_language') as Language;
-    if (saved && ['ta', 'en', 'hi', 'te', 'kn', 'ml', 'ur'].includes(saved)) {
+    if (saved && ['ta', 'en', 'hi', 'te', 'bn', 'mr', 'kn', 'ml', 'ur'].includes(saved)) {
       return saved;
     }
     const profile = localStorage.getItem('smartmed_patient_profile');
     if (profile) {
       const parsed = JSON.parse(profile);
-      if (parsed.preferred_language && ['ta', 'en', 'hi', 'te', 'kn', 'ml', 'ur'].includes(parsed.preferred_language)) {
+      if (parsed.preferred_language && ['ta', 'en', 'hi', 'te', 'bn', 'mr', 'kn', 'ml', 'ur'].includes(parsed.preferred_language)) {
         return parsed.preferred_language;
       }
     }

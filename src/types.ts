@@ -1,4 +1,4 @@
-export type Language = 'en' | 'ta' | 'hi' | 'ur' | 'te' | 'ml' | 'kn';
+export type Language = 'en' | 'ta' | 'hi' | 'te' | 'bn' | 'mr' | 'kn' | 'ml' | 'ur';
 
 export type ScreenType = 
   | 'splash' 
@@ -46,6 +46,16 @@ export interface ChatMessage {
   sender: 'ai' | 'user';
   text: string;
   time?: string;
+}
+
+export interface ChatSession {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  language: Language;
+  messages: ChatMessage[];
+  preview?: string;
 }
 
 export interface PatientProfile {
@@ -131,6 +141,81 @@ export interface TranslationStrings {
   scheduledLabel?: string;
   glucoseAndLabTitle?: string;
   glucoseAndLabSub?: string;
+
+  // ─── Module 1, 2 & 3: Chatbot & History Translations ─────────────────────
+  chatGreeting?: string;
+  chatSubtitle?: string;
+  newChat?: string;
+  chatHistory?: string;
+  suggestedQuestions?: string;
+  promptMyMeds?: string;
+  promptPrescription?: string;
+  promptGlucose?: string;
+  promptLabReport?: string;
+  promptGeneralHealth?: string;
+  promptCaregiver?: string;
+  typeMessagePlaceholder?: string;
+  clearInput?: string;
+  voiceInput?: string;
+  listening?: string;
+  onlineStatus?: string;
+  offlineStatus?: string;
+  noConversations?: string;
+  deleteChatConfirm?: string;
+  backToChat?: string;
+  copyMessage?: string;
+  copied?: string;
+  readAloud?: string;
+  deleteConversation?: string;
+  confirmDeleteTitle?: string;
+  confirmDeleteText?: string;
+  cancelBtn?: string;
+  deleteBtn?: string;
+
+  // ─── Medication Instructions & Timings ───────────────────────────────────
+  beforeFood?: string;
+  afterFood?: string;
+  withWater?: string;
+  emptyStomach?: string;
+  daily?: string;
+  twiceDaily?: string;
+  morning?: string;
+  afternoon?: string;
+  night?: string;
+  asNeeded?: string;
+  takeWithWaterNotice?: string;
+  medicationAdherenceNotice?: string;
+
+  // ─── Prescription & OCR ──────────────────────────────────────────────────
+  scanPrescription?: string;
+  dragAndDrop?: string;
+  processingOcr?: string;
+  medicinesExtracted?: string;
+  requiresReview?: string;
+  confidenceLabel?: string;
+  ocrAccuracyDisclaimer?: string;
+
+  // ─── Diabetes & Glucose Monitoring ───────────────────────────────────────
+  glucosePortal?: string;
+  logGlucose?: string;
+  fasting?: string;
+  postPrandial?: string;
+  random?: string;
+  targetRange?: string;
+  diabetesRisk?: string;
+  lowRisk?: string;
+  moderateRisk?: string;
+  highRisk?: string;
+  clinicalRecommendation?: string;
+  glucoseAlertWarning?: string;
+
+  // ─── SOS & Emergency ─────────────────────────────────────────────────────
+  sosButton?: string;
+  confirmEmergency?: string;
+  callingCaregiver?: string;
+  emergencyResolved?: string;
+  cancelAlert?: string;
+  emergencyInstructions?: string;
 }
 
 export type ReminderStatus = 'PENDING' | 'CALLING' | 'COMPLETED' | 'DELAYED' | 'SKIPPED' | 'UNCERTAIN' | 'FAILED';

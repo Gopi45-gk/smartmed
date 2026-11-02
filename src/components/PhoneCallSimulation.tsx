@@ -60,6 +60,14 @@ function buildVoiceScript(
         const pStr = pName ? `${pName} ചേട്ടാ` : 'ചേട്ടാ';
         const medStr = med ? `നിങ്ങളുടെ ${med} മരുന്ന്` : 'നിങ്ങളുടെ മരുന്ന്';
         return `നമസ്കാരം ${pStr}! സുഖമാണോ? ഇപ്പോൾ ${medStr} കഴിക്കാനുള്ള സമയമാണ്. മരുന്ന് കഴിച്ചോ?`;
+      } else if (lang === 'bn') {
+        const pStr = pName ? `${pName} মশাই` : '';
+        const medStr = med ? `আপনার ${med} ওষুধ` : 'আপনার ওষুধ';
+        return `নমস্কার ${pStr}! কেমন আছেন? এখন ${medStr} খাওয়ার সময় হয়েছে। আপনি কি ওষুধটি খেয়েছেন?`;
+      } else if (lang === 'mr') {
+        const pStr = pName ? `${pName} जी` : '';
+        const medStr = med ? `आपले ${med} औषध` : 'आपले औषध';
+        return `नमस्कार ${pStr}! आपण कसे आहात? आता ${medStr} घेण्याची वेळ झाली आहे. आपण औषध घेतले आहे का?`;
       } else {
         const pStr = pName ? pName : 'there';
         const medStr = med ? `your ${med}` : 'your medication';
@@ -85,6 +93,14 @@ function buildVoiceScript(
       } else if (lang === 'ml') {
         const pStr = pName ? `${pName} ചേട്ടാ` : 'ചേട്ടാ';
         return `വളരെ സന്തോഷം ${pStr}! കൃത്യസമയത്ത് മരുന്ന് കഴിച്ചതിൽ സന്തോഷം. ഞാൻ രേഖപ്പെടുത്തിയിട്ടുണ്ട്. ഇപ്പോൾ എങ്ങനെയുണ്ട്?`;
+      } else if (lang === 'bn') {
+        const pStr = pName ? `${pName}` : '';
+        const medStr = med ? `আপনার ${med} ওষুধ` : 'ওষুধ';
+        return `খুব ভালো ${pStr}! আপনি সময়মতো ${medStr} খেয়েছেন। আমি তা লিপিবদ্ধ করেছি। পর্যাপ্ত জল পান করুন। আর কোনো প্রশ্ন আছে কি?`;
+      } else if (lang === 'mr') {
+        const pStr = pName ? `${pName}` : '';
+        const medStr = med ? `आपले ${med} औषध` : 'औषध';
+        return `खूप छान ${pStr}! आपण वेळेवर ${medStr} घेतले आहे. मी नोंद केली आहे. भरपूर पाणी प्या. आणखी काही विचारायचे आहे का?`;
       } else {
         const pStr = pName ? pName : 'friend';
         const medStr = med ? `your ${med}` : 'your medicine';
@@ -107,6 +123,12 @@ function buildVoiceScript(
       } else if (lang === 'ml') {
         const pStr = pName ? `${pName} ചേട്ടാ` : 'ചേട്ടാ';
         return `ഒരു കുഴപ്പവുമില്ല ${pStr}, സാവധാനം ഭക്ഷണം കഴിക്കുക. 15 മിനിറ്റിനു ശേഷം ഞാൻ വീണ്ടും ഓർമ്മിപ്പിക്കാം!`;
+      } else if (lang === 'bn') {
+        const pStr = pName ? `${pName}` : '';
+        return `ঠিক আছে ${pStr}। আমি আপনাকে ১৫ মিনিট পরে আবার মনে করিয়ে দেব। ওষুধ নিতে ভুলবেন না!`;
+      } else if (lang === 'mr') {
+        const pStr = pName ? `${pName}` : '';
+        return `ठीक आहे ${pStr}। मी आपल्याला १५ मिनिटांनी पुन्हा आठवण करून देईन. औषध वेळेवर घ्यायला विसरू नका!`;
       } else {
         const pStr = pName ? pName : 'friend';
         return `No problem at all, ${pStr}! Please take your time, and I will remind you again in 15 minutes. Take good care!`;
@@ -123,6 +145,12 @@ function buildVoiceScript(
         return 'ಅರ್ಥವಾಯಿತು, ಈ ಡೋಸ್ ತೆಗೆದುಕೊಳ್ಳಲಾಗಿಲ್ಲ ಎಂದು ನಮೂದಿಸಲಾಗಿದೆ. ಮುಂದಿನ ಬಾರಿ ಡಬಲ್ ಡೋಸ್ ತೆಗೆದುಕೊಳ್ಳಬೇಡಿ.';
       } else if (lang === 'ml') {
         return 'മനസ്സിലായി, ഈ ഡോസ് ഒഴിവാക്കിയതായി രേഖപ്പെടുത്തി. അടുത്ത തവണ ഇരട്ടി ഡോസ് കഴിക്കരുത്.';
+      } else if (lang === 'bn') {
+        const pStr = pName ? `${pName}` : '';
+        return `বুঝেছি ${pStr}। এই ডোজটি বাদ দেওয়া হয়েছে বলে চিহ্নিত করলাম। কোনো সমস্যা বা অস্বস্তি হলে চিকিৎসককে জানান।`;
+      } else if (lang === 'mr') {
+        const pStr = pName ? `${pName}` : '';
+        return `समजले ${pStr}। हा डोस वगळल्याचे नोंदवले आहे. काही त्रास जाणवल्यास कृपया डॉक्टरांशी संपर्क साधा.`;
       } else {
         return 'I understand. I have recorded this dose as skipped. Please remember never to take a double dose next time, and do contact your doctor if you feel unwell.';
       }
@@ -141,6 +169,12 @@ function buildVoiceScript(
         return 'ತುಂಬಾ ಸಂತೋಷ! ನಿಮ್ಮ ಆರೋಗ್ಯವನ್ನು ಚೆನ್ನಾಗಿ ನೋಡಿಕೊಳ್ಳಿ. ನಮಸ್ಕಾರ!';
       } else if (lang === 'ml') {
         return 'വളരെ സന്തോഷം! ആരോഗ്യം ശ്രദ്ധിക്കുക. നല്ലൊരു ദിവസം ആശംസിക്കുന്നു. നമസ്കാരം!';
+      } else if (lang === 'bn') {
+        const pStr = pName ? `${pName}` : '';
+        return `শুনে খুব আনন্দ হলো ${pStr}! নিজের যত্ন নেবেন এবং আপনার দিনটি শুভ হোক। নমস্কার!`;
+      } else if (lang === 'mr') {
+        const pStr = pName ? `${pName}` : '';
+        return `ऐकून खूप आनंद झाला ${pStr}! आपली काळजी घ्या आणि आपला दिवस चांगला जावो. नमस्कार!`;
       } else {
         const pStr = pName ? pName : 'friend';
         return `That is wonderful to hear, ${pStr}! You take care and have a blessed, healthy day. Feel free to reach out anytime. Goodbye!`;
@@ -156,6 +190,12 @@ function buildVoiceScript(
       } else if (lang === 'te') {
         const pStr = pName ? `${pName} గారు, ` : '';
         return `${pStr}ఛాతీ నొప్పి మరియు శ్వాసలో ఇబ్బంది తీవ్రమైన అత్యవసర పరిస్థితి. వెంటనే కూర్చోండి మరియు అత్యవసర వైద్య సహాయం పొందండి!`;
+      } else if (lang === 'bn') {
+        const pStr = pName ? `${pName}, ` : '';
+        return `${pStr}বুকে তীব্র ব্যথা এবং শ্বাসকষ্ট একটি জরুরি অবস্থা। অবিলম্বে বসে পড়ুন এবং জরুরি সেবা বা অ্যাম্বুলেন্সকে কল করুন!`;
+      } else if (lang === 'mr') {
+        const pStr = pName ? `${pName}, ` : '';
+        return `${pStr}छातीत दुखणे आणि श्वास घेण्यास त्रास ही गंभीर आणीबाणी आहे. कृपया त्वरित बसा आणि रुग्णवाहिकेला कॉल करा!`;
       } else {
         const pStr = pName ? `${pName}, ` : '';
         return `${pStr}chest pain and difficulty breathing are medical emergencies. Please sit down immediately, remain calm, and call emergency services or an ambulance right away!`;
@@ -175,6 +215,12 @@ function buildVoiceScript(
         return 'ಕ್ಷಮಿಸಿ, ಅರ್ಥವಾಗಲಿಲ್ಲ. ನೀವು ಔಷಧಿ ತೆಗೆದುಕೊಂಡಿದ್ದೀರಾ?';
       } else if (lang === 'ml') {
         return 'ക്ഷമിക്കണം, വ്യക്തമായില്ല. നിങ്ങൾ മരുന്ന് കഴിച്ചോ?';
+      } else if (lang === 'bn') {
+        const pStr = pName ? `${pName}` : '';
+        return `ক্ষমা করবেন ${pStr}, আমি ঠিক শুনতে পাইনি। আপনি কি ওষুধ খেয়েছেন নাকি কোনো প্রশ্ন আছে?`;
+      } else if (lang === 'mr') {
+        const pStr = pName ? `${pName}` : '';
+        return `माफ करा ${pStr}, मला नीट ऐकू आले नाही. आपण औषध घेतले आहे की काही अडचण आहे?`;
       } else {
         const pStr = pName ? pName : 'friend';
         return `I didn't quite catch that, ${pStr}. Could you please repeat if you have taken your medicine or if you need any advice?`;
@@ -186,6 +232,8 @@ function buildVoiceScript(
       if (lang === 'te') return 'స్పష్టత రాలేదు. దయచేసి స్క్రీన్‌పై ఉన్న బటன்లను ఉపయోగించండి.';
       if (lang === 'kn') return 'ಖಚಿತಪಡಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಪರದೆಯ ಮೇಲಿನ ಬಟನ್ ಬಳಸಿ.';
       if (lang === 'ml') return 'സ്ഥിರീകരിക്കാൻ കഴിഞ്ഞില്ല. ദയവായി സ്ക്രീനിലെ ബട്ടണുകൾ ഉപയോഗിക്കുക.';
+      if (lang === 'bn') return 'আপনার উত্তর নিশ্চিত করা যায়নি। অনুগ্রহ করে স্ক্রিনের বোতাম ব্যবহার করুন।';
+      if (lang === 'mr') return 'औषध घेतल्याची पुष्टी झाली नाही. कृपया स्क्रीनवरील बटण वापरा.';
       return 'I could not confirm your response. Please use the buttons on your screen to confirm.';
   }
 }
@@ -200,6 +248,8 @@ function classifyVoiceIntent(spokenText: string): MedicationIntent {
     'trouble breathing', 'stroke', 'fainted', 'bleeding heavily', 'emergency',
     'நெஞ்சு வலி', 'மூச்சு', 'மாரடைப்பு', 'சீने में दर्द', 'सांस', 'ఛాతీ నొప్పి', 'శ్వాస',
     'നെഞ്ചുവേദന', 'ശ്വാസം', 'ಎದೆ ನೋವು', 'ಉಸಿರಾಟ'
+  ,
+    'বুকে ব্যথা', 'শ্বাসকষ্ট', 'অ্যাম্বুলেন্স', 'छातीत दुखणे', 'हार्ट'
   ];
   if (emergencyKeywords.some(kw => lower.includes(kw))) {
     return 'EMERGENCY';
@@ -214,6 +264,9 @@ function classifyVoiceIntent(spokenText: string): MedicationIntent {
     'బాగున్నాను', 'ధన్యవాదాలు', 'నమస్కారం',
     'ಚೆನ್ನಾಗಿದ್ದೇನೆ', 'ಧನ್ಯವಾದಗಳು',
     'സുഖമാണ്', 'നന്ദി'
+  ,
+    'ভালো আছি', 'ধন্যবাদ', 'নমস্কার', 'ঠিক আছি',
+    'छान आहे', 'धन्यवाद', 'नमस्कार', 'बाय'
   ];
   if (farewellKeywords.some(kw => lower.includes(kw))) {
     return 'FAREWELL';
@@ -253,6 +306,8 @@ function classifyVoiceIntent(spokenText: string): MedicationIntent {
     'తర్వాత', 'గుర్తు', 'భోజనం',
     'ಆಮೇಲೆ', 'ನೆನ',
     'ಪಿന്നെ', 'ഓർമ്മി',
+      'পরে', '১৫ মিনিট', 'খাবার খাচ্ছি',
+    'नंतर', '१५ मिनिटे', 'जेवत आहे'
   ];
 
   // Negative / NOT TAKEN
@@ -265,6 +320,8 @@ function classifyVoiceIntent(spokenText: string): MedicationIntent {
     'లేదు', 'ఇంకా తీసుకోలేదు', 'ledu', 'inka ledu',
     'ಇಲ್ಲ', 'ಇನ್ನೂ ತೆಗೆದುಕೊಂಡಿಲ್ಲ',
     'ಇಲ್ಲ', 'ಇതുവരെ കഴിച്ചಿಲ್ಲ',
+      'না', 'খাইনি', 'এখনো খাইনি', 'নিইনি',
+    'नाही', 'घेतले नाही', 'अजून नाही'
   ];
 
   // Positive / TAKEN Keywords
@@ -279,6 +336,8 @@ function classifyVoiceIntent(spokenText: string): MedicationIntent {
     'తీసుకున్నాను', 'వేసుకున్నాను', 'అవును', 'అయింది', 'తీసుకున్నా', 'avunu', 'teesukunna',
     'ತಗೊಂಡೆ', 'ತೆಗೆದುಕೊಂಡೆ', 'ಹೌದು', 'ಆಯಿತು', 'haudu',
     'കഴിച്ചു', 'എടുത്തു', 'ഉവ്വ്', 'കഴിഞ്ഞു', 'athe', 'kazhichu',
+      'হ্যাঁ', 'খেয়েছি', 'নিয়েছি', 'খেয়ে নিয়েছি', 'হয়ে গেছে',
+    'हो', 'होय', 'घेतले', 'घेऊन झाले', 'खाल्ले'
   ];
 
   // Skip Keywords
